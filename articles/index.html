@@ -102,12 +102,13 @@
 <ul>
 <li>Add the number of features to subtitles in <code>cov_plot</code>
 </li>
+<li>Ensure python3 can be configured for MOFA2</li>
 </ul>
 <hr>
 <p><strong>Note:</strong> These analyses are (slightly) different from the ones presented in the hackathon in the sense that:</p>
 <ul>
-<li>The cells used are different after discussing with theme leaders (only embryonic cells used)</li>
-<li>To enhance reproducibility on different machines, <code><a href="https://rdrr.io/pkg/uwot/man/umap.html">uwot::umap</a></code> was used instead of <code><a href="https://rdrr.io/pkg/umap/man/umap.html">umap::umap</a></code> for dimensionality reduction of RNA data</li>
+<li>The cells used are different (only embryonic cells used)</li>
+<li>To enhance reproducibility on different machines, <code><a href="https://rdrr.io/pkg/uwot/man/umap.html">uwot::umap</a></code> was used instead of <code><a href="https://rdrr.io/pkg/umap/man/umap.html">umap::umap</a></code> for dimensionality reduction of RNA data so that python depndencies are reduced</li>
 </ul>
 <hr>
 <p>Load the required packages:</p>
@@ -119,26 +120,15 @@
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">kableExtra</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">data.table</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">uwot</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">reticulate</span>)
-<span class="co">## you might need to set up your own python3</span>
-<span class="co"># if (.Platform$OS.type == "unix") {</span>
-<span class="co">#   if (file.exists('usr/bin/python3')) {</span>
-<span class="co">#     use_python('usr/bin/python3', required = TRUE)</span>
-<span class="co">#   } else if (file.exists('~/anaconda3/bin/python3')) {</span>
-<span class="co">#     use_python('usr/bin/python3', required = TRUE)</span>
-<span class="co">#   }</span>
-<span class="co"># }</span></pre></body></html></div>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="co"># use_python('usr/bin/python3', required = TRUE)</span>
-<span class="no">iris.umap</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/conditions.html">tryCatch</a></span>({<span class="kw pkg">umap</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/umap/man/umap.html">umap</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="fl">10000</span>), <span class="kw">ncol</span> <span class="kw">=</span> <span class="fl">40</span>), <span class="kw">method</span> <span class="kw">=</span> <span class="st">'umap-learn'</span>, <span class="kw">n_components</span> <span class="kw">=</span> <span class="fl">3</span>)}, <span class="kw">error</span> <span class="kw">=</span> <span class="kw">function</span>(<span class="no">e</span>) <span class="fl">1</span>)
-<span class="kw">if</span> (<span class="fu">is</span>(<span class="no">iris.umap</span>, <span class="st">'umap'</span>)) {
-  <span class="no">res</span> <span class="kw">&lt;-</span> <span class="st">'umap-succ'</span>
-} <span class="kw">else</span> {
-  <span class="no">res</span> <span class="kw">&lt;-</span> <span class="st">'umap-fail'</span>
-}
-<span class="fu"><a href="https://rdrr.io/r/base/message.html">message</a></span>(<span class="st">'STOP RIGHT HERE: Python used: '</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/system.html">system</a></span>(<span class="st">'which python'</span>, <span class="kw">intern</span> <span class="kw">=</span> <span class="fl">TRUE</span>)))
-<span class="co">#&gt; STOP RIGHT HERE: Python used: /usr/bin/python</span>
-<span class="fu"><a href="https://rdrr.io/r/base/message.html">message</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="no">res</span>,<span class="st">'\n'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="kw pkg">reticulate</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/reticulate/man/py_config.html">py_config</a></span>(), <span class="kw">collapse</span> <span class="kw">=</span> <span class="st">'\n'</span>)))
-<span class="co">#&gt; umap-fail</span>
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">reticulate</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="co">## you might need to set up your own python3 using reticulate::use_python</span>
+<span class="no">py.res</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/conditions.html">tryCatch</a></span>({<span class="fu"><a href="https://rdrr.io/pkg/reticulate/man/use_python.html">use_python</a></span>(<span class="st">'usr/bin/python3'</span>, <span class="kw">required</span> <span class="kw">=</span> <span class="fl">TRUE</span>)}, <span class="kw">error</span> <span class="kw">=</span> <span class="kw">function</span>(<span class="no">e</span>) <span class="no">e</span>)
+
+<span class="fu"><a href="https://rdrr.io/r/base/message.html">message</a></span>(<span class="st">'Python used: '</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/system.html">system</a></span>(<span class="st">'which python'</span>, <span class="kw">intern</span> <span class="kw">=</span> <span class="fl">TRUE</span>)))
+<span class="co">#&gt; Python used: /usr/bin/python</span>
+<span class="fu"><a href="https://rdrr.io/r/base/message.html">message</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="no">py.res</span>,<span class="st">'\n'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="kw pkg">reticulate</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/reticulate/man/py_config.html">py_config</a></span>(), <span class="kw">collapse</span> <span class="kw">=</span> <span class="st">'\n'</span>)))
+<span class="co">#&gt; Error in use_python("usr/bin/python3", required = TRUE): Specified version of python 'usr/bin/python3' does not exist.</span>
+<span class="co">#&gt; </span>
 <span class="co">#&gt; /usr/bin/python</span>
 <span class="co">#&gt; /usr/lib/python2.7/config-x86_64-linux-gnu/libpython2.7.so</span>
 <span class="co">#&gt; //usr://usr</span>
@@ -149,7 +139,7 @@
 <span class="co">#&gt; 64bit</span>
 <span class="co">#&gt; FALSE</span>
 <span class="co">#&gt; list(path = "/usr/local/lib/python2.7/dist-packages/numpy", version = list(c(1, 16, 6)))</span>
-<span class="co">#&gt; umap</span>
+<span class="co">#&gt; NULL</span>
 <span class="co">#&gt; NULL</span>
 <span class="co">#&gt; TRUE</span>
 <span class="co">#&gt; c("/usr/bin/python3", "/usr/bin/python")</span>
@@ -335,7 +325,7 @@ Primitive_Streak
   <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="kw">pct_NAs</span><span class="kw">=</span><span class="no">NAs</span>)
 })
 <span class="co"># create a long data.frame containing the assay name for plot</span>
-<span class="no">coverages</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://seandavi.github.io/sars2pack/reference/utils.html">rbindListWithNames</a></span>(<span class="no">coverages</span>)
+<span class="no">coverages</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/reference/utils.html">rbindListWithNames</a></span>(<span class="no">coverages</span>)
 <span class="no">coverages</span>$<span class="no">dataset</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">coverages</span>$<span class="no">dataset</span>, <span class="kw">levels</span> <span class="kw">=</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/duplicated.html">unique</a></span>(<span class="no">coverages</span>$<span class="no">dataset</span>), <span class="kw">ordered</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
 <div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="no">cov_plot</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">coverages</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">pct_NAs</span>)) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span>(<span class="kw">fill</span> <span class="kw">=</span> <span class="st">'lightblue'</span>, <span class="kw">show.legend</span> <span class="kw">=</span> <span class="fl">FALSE</span>) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_vline</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">xintercept</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="no">pct_NAs</span>)),
