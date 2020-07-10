@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://seandavi.github.io/sars2pack/index.html</loc>
+    <loc>https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/index.html</loc>
   </url>
   <url>
-    <loc>https://seandavi.github.io/sars2pack/articles/index.html</loc>
+    <loc>https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/reference/utils.html</loc>
+  </url>
+  <url>
+    <loc>https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/articles/index.html</loc>
   </url>
 </urlset>

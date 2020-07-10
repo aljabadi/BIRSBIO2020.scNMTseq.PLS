@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>scNMTseq challenge analysis using a PLS approach • BIRSBIO2020.scNMTseq.PLS</title>
+<title>scNMTseq challenge analysis using a PLS-based approach • BIRSBIO2020.scNMTseq.PLS</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="scNMTseq challenge analysis using a PLS approach">
+<script src="../pkgdown.js"></script><meta property="og:title" content="scNMTseq challenge analysis using a PLS-based approach">
 <meta property="og:description" content="BIRSBIO2020.scNMTseq.PLS">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -60,14 +60,14 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/index.html">scNMTseq challenge analysis using a PLS approach</a>
+      <a href="../articles/index.html">scNMTseq challenge analysis using a PLS-based approach</a>
     </li>
   </ul>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/seandavi/BuildABiocWorkshop2020">
+  <a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS">
     <span class="fa fa-github"></span>
      
   </a>
@@ -82,13 +82,14 @@
 
       
 
-      </header><script src="index_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="index_files/accessible-code-block-0.0.1/empty-anchor.js"></script><script src="index_files/kePrint-0.0.1/kePrint.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>scNMTseq challenge analysis using a PLS approach</h1>
+      <h1 data-toc-skip>scNMTseq challenge analysis using a PLS-based approach</h1>
                         <h4 class="author">Al JalalAbadi<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>
 </h4>
             
+            <h4 class="date">10 Jul 2020</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/blob/master/vignettes/index.Rmd"><code>vignettes/index.Rmd</code></a></small>
       <div class="hidden name"><code>index.Rmd</code></div>
@@ -97,16 +98,330 @@
 
     
     
-<div id="scnmtseq-challenge-analysis-using-a-pls-approach" class="section level1">
+<p>To Do</p>
+<ul>
+<li>Add the number of features to subtitles in <code>cov_plot</code>
+</li>
+</ul>
+<hr>
+<p><strong>Note:</strong> These analyses are (slightly) different from the ones presented in the hackathon in the sense that:</p>
+<ul>
+<li>The cells used are different after discussing with theme leaders (only embryonic cells used)</li>
+<li>To enhance reproducibility on different machines, <code><a href="https://rdrr.io/pkg/uwot/man/umap.html">uwot::umap</a></code> was used instead of <code><a href="https://rdrr.io/pkg/umap/man/umap.html">umap::umap</a></code> for dimensionality reduction of RNA data</li>
+</ul>
+<hr>
+<p>Load the required packages:</p>
+<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">BIRSBIO2020.scNMTseq.PLS</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">SingleCellMultiModal</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">MultiAssayExperiment</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">knitr</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">kableExtra</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">data.table</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">uwot</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">reticulate</span>)
+<span class="co">## you might need to set up your own python3</span>
+<span class="co"># if (.Platform$OS.type == "unix") {</span>
+<span class="co">#   if (file.exists('usr/bin/python3')) {</span>
+<span class="co">#     use_python('usr/bin/python3', required = TRUE)</span>
+<span class="co">#   } else if (file.exists('~/anaconda3/bin/python3')) {</span>
+<span class="co">#     use_python('usr/bin/python3', required = TRUE)</span>
+<span class="co">#   }</span>
+<span class="co"># }</span></pre></body></html></div>
+<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="co"># use_python('usr/bin/python3', required = TRUE)</span>
+<span class="no">iris.umap</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/conditions.html">tryCatch</a></span>({<span class="kw pkg">umap</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/umap/man/umap.html">umap</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="fl">10000</span>), <span class="kw">ncol</span> <span class="kw">=</span> <span class="fl">40</span>), <span class="kw">method</span> <span class="kw">=</span> <span class="st">'umap-learn'</span>, <span class="kw">n_components</span> <span class="kw">=</span> <span class="fl">3</span>)}, <span class="kw">error</span> <span class="kw">=</span> <span class="kw">function</span>(<span class="no">e</span>) <span class="fl">1</span>)
+<span class="kw">if</span> (<span class="fu">is</span>(<span class="no">iris.umap</span>, <span class="st">'umap'</span>)) {
+  <span class="no">res</span> <span class="kw">&lt;-</span> <span class="st">'umap-succ'</span>
+} <span class="kw">else</span> {
+  <span class="no">res</span> <span class="kw">&lt;-</span> <span class="st">'umap-fail'</span>
+}
+<span class="fu"><a href="https://rdrr.io/r/base/message.html">message</a></span>(<span class="st">'STOP RIGHT HERE: Python used: '</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/system.html">system</a></span>(<span class="st">'which python'</span>, <span class="kw">intern</span> <span class="kw">=</span> <span class="fl">TRUE</span>)))
+<span class="co">#&gt; STOP RIGHT HERE: Python used: /usr/bin/python</span>
+<span class="fu"><a href="https://rdrr.io/r/base/message.html">message</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="no">res</span>,<span class="st">'\n'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="kw pkg">reticulate</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/reticulate/man/py_config.html">py_config</a></span>(), <span class="kw">collapse</span> <span class="kw">=</span> <span class="st">'\n'</span>)))
+<span class="co">#&gt; umap-fail</span>
+<span class="co">#&gt; /usr/bin/python</span>
+<span class="co">#&gt; /usr/lib/python2.7/config-x86_64-linux-gnu/libpython2.7.so</span>
+<span class="co">#&gt; //usr://usr</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; 2.7.17 (default, Apr 15 2020, 17:20:14)  [GCC 7.5.0]</span>
+<span class="co">#&gt; 2.7</span>
+<span class="co">#&gt; 64bit</span>
+<span class="co">#&gt; FALSE</span>
+<span class="co">#&gt; list(path = "/usr/local/lib/python2.7/dist-packages/numpy", version = list(c(1, 16, 6)))</span>
+<span class="co">#&gt; umap</span>
+<span class="co">#&gt; NULL</span>
+<span class="co">#&gt; TRUE</span>
+<span class="co">#&gt; c("/usr/bin/python3", "/usr/bin/python")</span>
+<span class="co">#&gt; NULL</span></pre></body></html></div>
+<div id="data" class="section level1">
 <h1 class="hasAnchor">
-<a href="#scnmtseq-challenge-analysis-using-a-pls-approach" class="anchor"></a>scNMTseq challenge analysis using a PLS approach</h1>
-<p>Authors: Al JalalAbadi<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>. <br> Last modified: 08 Jul 2020.</p>
+<a href="#data" class="anchor"></a>Data</h1>
+<p>Load RNA and methylation data from <code>SingleCellMultiModal</code> package:</p>
+<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">gastru.mae</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SingleCellMultiModal/man/scNMT.html">scNMT</a></span>(<span class="st">"mouse_gastrulation"</span>, <span class="kw">mode</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'rna'</span>, <span class="st">'met*'</span>), <span class="kw">dry.run</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
+<span class="no">gastru.mae</span>
+<span class="co">#&gt; A MultiAssayExperiment object of 7 listed</span>
+<span class="co">#&gt;  experiments with user-defined names and respective classes.</span>
+<span class="co">#&gt;  Containing an ExperimentList class object of length 7:</span>
+<span class="co">#&gt;  [1] met_cgi: matrix with 5536 rows and 826 columns</span>
+<span class="co">#&gt;  [2] met_CTCF: matrix with 175 rows and 826 columns</span>
+<span class="co">#&gt;  [3] met_DHS: matrix with 66 rows and 826 columns</span>
+<span class="co">#&gt;  [4] met_genebody: matrix with 15837 rows and 826 columns</span>
+<span class="co">#&gt;  [5] met_p300: matrix with 101 rows and 826 columns</span>
+<span class="co">#&gt;  [6] met_promoter: matrix with 12092 rows and 826 columns</span>
+<span class="co">#&gt;  [7] rna: matrix with 18345 rows and 826 columns</span>
+<span class="co">#&gt; Functionality:</span>
+<span class="co">#&gt;  experiments() - obtain the ExperimentList instance</span>
+<span class="co">#&gt;  colData() - the primary/phenotype DataFrame</span>
+<span class="co">#&gt;  sampleMap() - the sample coordination DataFrame</span>
+<span class="co">#&gt;  `$`, `[`, `[[` - extract colData columns, subset, or experiment</span>
+<span class="co">#&gt;  *Format() - convert into a long or wide DataFrame</span>
+<span class="co">#&gt;  assays() - convert ExperimentList to a SimpleList of matrices</span>
+<span class="co">#&gt;  exportClass() - save all data to files</span></pre></body></html></div>
+<div id="filter-extra-embryonic-cells" class="section level2">
+<h2 class="hasAnchor">
+<a href="#filter-extra-embryonic-cells" class="anchor"></a>filter extra-embryonic cells</h2>
+<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span>(<span class="no">gastru.mae</span>$<span class="no">lineage10x_2</span>)
+<span class="co">#&gt; </span>
+<span class="co">#&gt;           Ectoderm           Endoderm           Epiblast       ExE_ectoderm </span>
+<span class="co">#&gt;                 43                 81                334                  8 </span>
+<span class="co">#&gt;           Mesoderm Primitive_endoderm   Primitive_Streak  Visceral_endoderm </span>
+<span class="co">#&gt;                169                 43                 76                 69</span></pre></body></html></div>
+<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">drop_lineages</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'ExE_ectoderm'</span>, <span class="st">'Primitive_endoderm'</span>, <span class="st">'Visceral_endoderm'</span>)
+<span class="no">drop_cells</span> <span class="kw">&lt;-</span> (<span class="no">gastru.mae</span>$<span class="no">lineage10x_2</span> <span class="kw">%in%</span> <span class="no">drop_lineages</span>) <span class="kw">|</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="no">gastru.mae</span>$<span class="no">lineage10x_2</span>)
+<span class="no">gastru.mae</span> <span class="kw">&lt;-</span> <span class="no">gastru.mae</span>[, !<span class="no">drop_cells</span>,]</pre></body></html></div>
+<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">gastru.mae</span>
+<span class="co">#&gt; A MultiAssayExperiment object of 7 listed</span>
+<span class="co">#&gt;  experiments with user-defined names and respective classes.</span>
+<span class="co">#&gt;  Containing an ExperimentList class object of length 7:</span>
+<span class="co">#&gt;  [1] met_cgi: matrix with 5536 rows and 703 columns</span>
+<span class="co">#&gt;  [2] met_CTCF: matrix with 175 rows and 703 columns</span>
+<span class="co">#&gt;  [3] met_DHS: matrix with 66 rows and 703 columns</span>
+<span class="co">#&gt;  [4] met_genebody: matrix with 15837 rows and 703 columns</span>
+<span class="co">#&gt;  [5] met_p300: matrix with 101 rows and 703 columns</span>
+<span class="co">#&gt;  [6] met_promoter: matrix with 12092 rows and 703 columns</span>
+<span class="co">#&gt;  [7] rna: matrix with 18345 rows and 703 columns</span>
+<span class="co">#&gt; Functionality:</span>
+<span class="co">#&gt;  experiments() - obtain the ExperimentList instance</span>
+<span class="co">#&gt;  colData() - the primary/phenotype DataFrame</span>
+<span class="co">#&gt;  sampleMap() - the sample coordination DataFrame</span>
+<span class="co">#&gt;  `$`, `[`, `[[` - extract colData columns, subset, or experiment</span>
+<span class="co">#&gt;  *Format() - convert into a long or wide DataFrame</span>
+<span class="co">#&gt;  assays() - convert ExperimentList to a SimpleList of matrices</span>
+<span class="co">#&gt;  exportClass() - save all data to files</span></pre></body></html></div>
+<p>Check column names are consistent:</p>
+<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu">all_identical</span>(<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">gastru.mae</span>))
+<span class="co">#&gt; [1] TRUE</span></pre></body></html></div>
+<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="no">coldata</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="fu">colData</span>(<span class="no">gastru.mae</span>))</pre></body></html></div>
+<p>Breakdown of the number of cells in each stage and putative lineage:</p>
+<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span>(<span class="no">coldata</span>$<span class="no">lineage10x_2</span>, <span class="no">coldata</span>$<span class="no">stage</span>) <span class="kw">%&gt;%</span> <span class="no">kable</span> <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_styling.html">kable_styling</a></span>(<span class="kw">bootstrap_options</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"striped"</span>), <span class="kw">font_size</span> <span class="kw">=</span> <span class="fl">16</span>)</pre></body></html></div>
+<table class="table table table-striped">
+<thead><tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+E4.5
+</th>
+<th style="text-align:right;">
+E5.5
+</th>
+<th style="text-align:right;">
+E6.5
+</th>
+<th style="text-align:right;">
+E7.5
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Ectoderm
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+43
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Endoderm
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+81
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Epiblast
+</td>
+<td style="text-align:right;">
+60
+</td>
+<td style="text-align:right;">
+84
+</td>
+<td style="text-align:right;">
+146
+</td>
+<td style="text-align:right;">
+44
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mesoderm
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+28
+</td>
+<td style="text-align:right;">
+141
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Primitive_Streak
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+43
+</td>
+<td style="text-align:right;">
+33
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="feature-detection" class="section level2">
+<h2 class="hasAnchor">
+<a href="#feature-detection" class="anchor"></a>Feature detection</h2>
+<p>Create density plots of the feature detection rate across all cells for all modalities:</p>
+<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="co"># get the methylation assays</span>
+<span class="no">met_assays</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">gastru.mae</span>), <span class="kw">pattern</span> <span class="kw">=</span> <span class="st">'^met'</span>, <span class="kw">value</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
+<span class="co"># calculate the feature detection in a data.frame for methylation assays</span>
+<span class="no">coverages</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="fu">named_list</span>(<span class="no">met_assays</span>), <span class="kw">function</span>(<span class="no">assay_name</span>) {
+  <span class="no">mat</span> <span class="kw">&lt;-</span> <span class="fu">assay</span>(<span class="no">gastru.mae</span>, <span class="no">assay_name</span>)
+  <span class="no">NAs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">rowSums</a></span>(!<span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="no">mat</span>))/<span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span>(<span class="no">mat</span>)[<span class="fl">2</span>]*<span class="fl">100</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="kw">pct_NAs</span><span class="kw">=</span><span class="no">NAs</span>)
+})
+<span class="co"># create a long data.frame containing the assay name for plot</span>
+<span class="no">coverages</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://seandavi.github.io/sars2pack/reference/utils.html">rbindListWithNames</a></span>(<span class="no">coverages</span>)
+<span class="no">coverages</span>$<span class="no">dataset</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">coverages</span>$<span class="no">dataset</span>, <span class="kw">levels</span> <span class="kw">=</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/duplicated.html">unique</a></span>(<span class="no">coverages</span>$<span class="no">dataset</span>), <span class="kw">ordered</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="no">cov_plot</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">coverages</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">pct_NAs</span>)) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span>(<span class="kw">fill</span> <span class="kw">=</span> <span class="st">'lightblue'</span>, <span class="kw">show.legend</span> <span class="kw">=</span> <span class="fl">FALSE</span>) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_vline</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">xintercept</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="no">pct_NAs</span>)),
+             <span class="kw">color</span><span class="kw">=</span><span class="st">"blue"</span>, <span class="kw">linetype</span><span class="kw">=</span><span class="st">"dashed"</span>, <span class="kw">size</span><span class="kw">=</span><span class="fl">0.5</span>) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">'% of cells detecting the feature'</span>) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="no">.</span>~<span class="no">dataset</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">2</span>) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">strip.text.x</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">size</span> <span class="kw">=</span> <span class="fl">10</span>, <span class="kw">face</span> <span class="kw">=</span> <span class="st">'bold'</span>))
+<span class="no">cov_plot</span></pre></body></html></div>
+<div class="figure">
+<img src="index_files/figure-html/unnamed-chunk-12-1.png" alt="density plots for methylation data show that shorter genomic regions tend to have less feture coverage. Dashed blue line indicates the average across all modalities." width="768"><p class="caption">
+density plots for methylation data show that shorter genomic regions tend to have less feture coverage. Dashed blue line indicates the average across all modalities.
+</p>
+</div>
+</div>
+</div>
+<div id="rna" class="section level1">
+<h1 class="hasAnchor">
+<a href="#rna" class="anchor"></a>RNA</h1>
+<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="no">rna</span> <span class="kw">&lt;-</span> <span class="fu">assay</span>(<span class="no">gastru.mae</span>, <span class="st">'rna'</span>)</pre></body></html></div>
+<div id="umap" class="section level2">
+<h2 class="hasAnchor">
+<a href="#umap" class="anchor"></a>UMAP</h2>
+<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="no">ncomp</span> <span class="kw">&lt;-</span> <span class="fl">5</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">42</span>)
+<span class="co">## all params use defaults except for 'n_components' and 'min_dist'</span>
+<span class="no">umap_rna_unsup</span> <span class="kw">&lt;-</span> <span class="kw pkg">uwot</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/uwot/man/umap.html">umap</a></span>(
+  <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="no">rna</span>),
+  <span class="kw">n_neighbors</span> <span class="kw">=</span> <span class="fl">15</span>,
+  <span class="kw">n_components</span> <span class="kw">=</span> <span class="no">ncomp</span>,
+  <span class="kw">metric</span> <span class="kw">=</span> <span class="st">"euclidean"</span>,
+  <span class="kw">n_epochs</span> <span class="kw">=</span> <span class="kw">NULL</span>,
+  <span class="kw">learning_rate</span> <span class="kw">=</span> <span class="fl">1</span>,
+  <span class="kw">scale</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
+  <span class="kw">init</span> <span class="kw">=</span> <span class="st">"spectral"</span>,
+  <span class="kw">init_sdev</span> <span class="kw">=</span> <span class="kw">NULL</span>,
+  <span class="kw">spread</span> <span class="kw">=</span> <span class="fl">1</span>,
+  <span class="kw">min_dist</span> <span class="kw">=</span> <span class="fl">0.7</span>, <span class="co">## as we're interested in continuous transitions rather than 'clusters'</span>
+  <span class="kw">set_op_mix_ratio</span> <span class="kw">=</span> <span class="fl">1</span>,
+  <span class="kw">local_connectivity</span> <span class="kw">=</span> <span class="fl">1</span>)</pre></body></html></div>
+<p>Get a data.frame of embeddings:</p>
+<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">umap_rna_unsup</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">df</span>) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">'UMAP_'</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span>(<span class="no">df</span>))
+<span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(<span class="no">df</span>, <span class="no">coldata</span>)</pre></body></html></div>
+<p>Create colour palettes for stages and lineages:</p>
+<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="no">nstage</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/duplicated.html">unique</a></span>(<span class="no">gastru.mae</span>$<span class="no">stage</span>))
+<span class="no">nlineage</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/duplicated.html">unique</a></span>(<span class="no">gastru.mae</span>$<span class="no">lineage10x_2</span>))
+<span class="no">ntotal</span> <span class="kw">&lt;-</span> <span class="no">nstage</span> + <span class="no">nlineage</span>
+<span class="no">col_pallete</span> <span class="kw">&lt;-</span> <span class="fu">gg_color_hue</span>(<span class="kw">n</span><span class="kw">=</span><span class="no">ntotal</span>)
+<span class="no">ind.stage</span> <span class="kw">&lt;-</span> <span class="fl">2</span>*<span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span>(<span class="no">nstage</span>) <span class="co">## every other colour</span>
+<span class="no">stage_cols</span> <span class="kw">&lt;-</span> <span class="no">col_pallete</span>[<span class="no">ind.stage</span>]
+<span class="no">lineage_cols</span> <span class="kw">&lt;-</span> <span class="no">col_pallete</span>[-<span class="no">ind.stage</span>]</pre></body></html></div>
+<div class="sourceCode" id="cb16"><html><body><pre class="r"><span class="co">## helper function to create both plots coloured by stage and lineage</span>
+<span class="no">plot_umap_by_stage_and_lineage</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">df</span>, <span class="no">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>)) {
+  <span class="no">axes</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">'UMAP_'</span>, <span class="no">dims</span>)
+  <span class="no">p1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_.html">aes_string</a></span>(<span class="no">axes</span>[<span class="fl">1</span>], <span class="no">axes</span>[<span class="fl">2</span>])) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">col</span><span class="kw">=</span><span class="no">lineage10x_2</span>)) +
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_classic</a></span>() + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="no">lineage_cols</span>)
+
+  <span class="no">p2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_.html">aes_string</a></span>(<span class="no">axes</span>[<span class="fl">1</span>], <span class="no">axes</span>[<span class="fl">2</span>])) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">col</span><span class="kw">=</span><span class="no">stage</span>)) +
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_classic</a></span>()+ <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="no">stage_cols</span>)
+  <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">lineage</span> <span class="kw">=</span> <span class="no">p1</span>, <span class="kw">stage</span> <span class="kw">=</span> <span class="no">p2</span>)
+}</pre></body></html></div>
+<p>First two components highlight the distinct transcriptional state of the early-stage cells compared to the late-stage cells:</p>
+<div class="sourceCode" id="cb17"><html><body><pre class="r"><span class="fu">plot_umap_by_stage_and_lineage</span>(<span class="kw">df</span> <span class="kw">=</span> <span class="no">df</span>, <span class="kw">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>))
+<span class="co">#&gt; $lineage</span></pre></body></html></div>
+<p><img src="index_files/figure-html/unnamed-chunk-20-1.png" width="672"></p>
+<pre><code>#&gt; 
+#&gt; $stage</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-20-2.png" width="672"></p>
+<p>The variation driven by known and putative phenotypes is more apparent in the following dimensions:</p>
+<div class="sourceCode" id="cb19"><html><body><pre class="r"><span class="fu">plot_umap_by_stage_and_lineage</span>(<span class="kw">df</span> <span class="kw">=</span> <span class="no">df</span>, <span class="kw">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">2</span>,<span class="fl">3</span>))
+<span class="co">#&gt; $lineage</span></pre></body></html></div>
+<p><img src="index_files/figure-html/unnamed-chunk-21-1.png" width="672"></p>
+<pre><code>#&gt; 
+#&gt; $stage</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-21-2.png" width="672"></p>
+<div class="sourceCode" id="cb21"><html><body><pre class="r"><span class="fu">plot_umap_by_stage_and_lineage</span>(<span class="kw">df</span> <span class="kw">=</span> <span class="no">df</span>, <span class="kw">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">3</span>,<span class="fl">4</span>))
+<span class="co">#&gt; $lineage</span></pre></body></html></div>
+<p><img src="index_files/figure-html/unnamed-chunk-22-1.png" width="672"></p>
+<pre><code>#&gt; 
+#&gt; $stage</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-22-2.png" width="672"></p>
+</div>
 </div>
 <div class="footnotes">
 <hr>
 <ol>
-<li id="fn1"><p><a href="mailto:al.jal.abadi@gmail.com" class="email">al.jal.abadi@gmail.com</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
-<li id="fn2"><p>Melbourne Integrative Genomics, The University of Melbourne<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn1"><p>Melbourne Integrative Genomics, The University of Melbourne (<a href="mailto:al.jal.abadi@gmail.com" class="email">al.jal.abadi@gmail.com</a>)<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
   </div>
