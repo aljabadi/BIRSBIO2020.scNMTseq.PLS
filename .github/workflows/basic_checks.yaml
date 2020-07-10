@@ -2,16 +2,30 @@ on: [push]
 jobs:
   job1:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7]
+
     container: bioconductor/bioconductor_docker:devel
     steps:
-      - uses: actions/checkout@v1
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+         python-version: ${{ matrix.python-version }}
+      - name: Install python dependencies
+        run: |
+          sudo -H apt-get update -y
+          sudo -H apt-get install -y libpython3.7
+          python3 -m pip install --upgrade pip
+          python3 -m pip install mofapy
 
+      - uses: actions/checkout@v1
       - name: Query dependencies
         run: |
           install.packages('remotes')
           saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
         shell: Rscript {0}
-        
+
       - name: Cache R packages
         if: runner.os != 'Windows'
         uses: actions/cache@v1
@@ -29,7 +43,7 @@ jobs:
           Rscript -e "remotes::install_github('r-hub/sysreqs')"
           sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
           sudo -s eval "$sysreqs"
-          
+
       - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE, repos = BiocManager::repositories())
@@ -39,14 +53,14 @@ jobs:
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
-        run: rcmdcheck::rcmdcheck(args = c("--no-manual"), error_on = "warning", check_dir = "check")
+        run: rcmdcheck::rcmdcheck(args = c("--no-manual"), error_on = "error", check_dir = "check")
         shell: Rscript {0}
-        
+
       - uses: docker/build-push-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: seandavi/buildabiocworkshop2020
+          repository: aljabadi/birs_bio_2020-scnmtseq-pls
           tag_with_ref: true
           tag_with_sha: true
           tags: latest
