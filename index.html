@@ -88,6 +88,18 @@
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#birsbio-2020-scnmtseq-challenge-using-a-pls-based-approach" class="anchor"></a>BIRSBIO 2020 scNMTseq challenge using a PLS-based approach</h1></div>
 <p>pkdown report available at: <a href="https://ajabadi.github.io/BIRSBIO2020.scNMTseq.PLS" class="uri">https://ajabadi.github.io/BIRSBIO2020.scNMTseq.PLS</a></p>
+<div id="how-to-take-your-vignette-into-a-pkdown-package-deployed-using-github-actions" class="section level2">
+<h2 class="hasAnchor">
+<a href="#how-to-take-your-vignette-into-a-pkdown-package-deployed-using-github-actions" class="anchor"></a>How to take your vignette into a <code>pkdown</code> package deployed using GitHub Actions</h2>
+<p><span class="emoji" data-emoji="zero">0️⃣</span> Choose a name for your package. Recommended convention: <code>{hackathon_event}.{theme}.{method/topic}</code>. e.g. <code>BIRSBIO2020.scNMTseq.Benchmarking</code>, <code>BIRSBIO2020.scProteomics.LatentDirichlet</code>. Ensure that you also have a <a href="https://hub.docker.com/">Docker</a> account for automatic containerization as well.</p>
+<p><span class="emoji" data-emoji="one">1️⃣</span> Use <a href="https://github.com/seandavi/BuildABiocWorkshop2020" class="uri">https://github.com/seandavi/BuildABiocWorkshop2020</a> as template for your analysis package. You can simply click <a href="https://github.com/seandavi/BuildABiocWorkshop2020/generate">here</a> to accomplish this. Make it public and include all branches (to keep <code>master</code> &amp; <code>gh-pages</code>, you can delete the rest).</p>
+<p><span class="emoji" data-emoji="two">2️⃣</span> Follow the steps outlined <a href="https://github.com/seandavi/BuildABiocWorkshop2020/blob/master/vignettes/HOWTO_BUILD_WORKSHOP.Rmd">here</a> to set up your own workflow and create a package from your analyses. The notebooks should go in <code>./vignettes</code> folder and source files in <code>./R</code> (or simply include them in notebooks). Include all dependencies in <code>DESCRIPTION</code> and ensure it can be installed, Ensure <code><a href="https://devtools.r-lib.org//reference/build_vignettes.html">devtools::build_vignettes()</a></code> can successfully create the vignettes locally before testing using GitHub Actions.</p>
+<p><span class="emoji" data-emoji="bulb">💡</span> If you use R and have python dependencies, <a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/commit/3155bbab63129e3734e155f9f245c3a386230627#diff-5822d7d51c0024ec80488aa8a41ba9caR5-R20">this setup</a> should help as an example.</p>
+<p><span class="emoji" data-emoji="bulb">💡</span> The docker image name should only include lowercase letters, integers, <code>_</code> and <code><a href="https://rdrr.io/r/base/Arithmetic.html">-</a></code>.</p>
+<p><span class="emoji" data-emoji="bulb">💡</span> Follow <a href="https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets">this article</a> to add Docker credentials to GitHub Secrets.</p>
+<p><span class="emoji" data-emoji="three">3️⃣</span> Push and ensure the workflow deploys successfully using GitHub Actions (<a href="https://github.com/YOUR_GITHUB_USER/REPO/actions" class="uri">https://github.com/YOUR_GITHUB_USER/REPO/actions</a>)</p>
+<p><span class="emoji" data-emoji="four">4️⃣</span> Please update these steps through a PR if required</p>
+</div>
 </div>
   </div>
 
