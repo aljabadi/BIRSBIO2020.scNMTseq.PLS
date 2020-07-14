@@ -12,14 +12,11 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
-Depends: MultiAssayExperiment, ggplot2, kableExtra, data.table,
-        reticulate, uwot, nipals, microbenchmark, egg, biomaRt,
-        SingleCellMultiModal, reshape2, grDevices
+Imports: MultiAssayExperiment, ggplot2, data.table,
+         reticulate, uwot, nipals, biomaRt,
+         reshape2, grDevices
 Remotes: mixOmicsTeam/mixOmics@MultiAssayExperiment, bioFAM/MOFA2/MOFA2
-Suggests: 
-    knitr,
-    rmarkdown,
-    pkgdown
+Suggests: knitr, rmarkdown, pkdown
 URL: https://ajabadi.github.io/BIRSBIO2020.scNMTseq.PLS/
 BugReports: https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/issues/new
 VignetteBuilder: knitr

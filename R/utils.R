@@ -1,3 +1,9 @@
+
+## ----------- Imports -----------
+#' @import MultiAssayExperiment ggplot2 data.table reticulate
+#' @import uwot nipals biomaRt
+#' @import reshape2 grDevices
+
 ## ----------- all_identical -----------
 ## check if elements in a list are identical
 #' @export
@@ -18,7 +24,7 @@ all_identical <- function(lst) {
 #' @param new_col Character, the name of the new column which adds the list names
 #' to the resulting array
 #'
-#' @name utils
+#' @rdname utils
 #' @export
 rbindListWithNames <- function(lst, new_col = "dataset") {
   lst_with_newcol <- mapply(x=names(lst), y=lst, FUN = function(x, y){
