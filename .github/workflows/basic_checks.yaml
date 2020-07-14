@@ -40,11 +40,11 @@ jobs:
 
       # This lets us augment with additional dependencies
       - name: Install system dependencies
+        with:
+          r-version: '4.0.0'
         if: runner.os == 'Linux'
         env:
           RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
-        with:
-          r-version: '4.0.0'
         run: |
           Rscript -e "remotes::install_github('r-hub/sysreqs')"
           sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
