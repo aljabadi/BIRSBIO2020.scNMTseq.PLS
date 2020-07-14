@@ -15,8 +15,8 @@ RoxygenNote: 7.1.0
 Imports: MultiAssayExperiment, ggplot2, data.table,
          reticulate, uwot, nipals, biomaRt,
          reshape2, grDevices
-Remotes: mixOmicsTeam/mixOmics@MultiAssayExperiment, bioFAM/MOFA2/MOFA2
-Suggests: knitr, rmarkdown, pkdown
+Remotes: r-lib/pkgdown, mixOmicsTeam/mixOmics@MultiAssayExperiment, bioFAM/MOFA2/MOFA2
+Suggests: knitr, rmarkdown
 URL: https://ajabadi.github.io/BIRSBIO2020.scNMTseq.PLS/
 BugReports: https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/issues/new
 VignetteBuilder: knitr
