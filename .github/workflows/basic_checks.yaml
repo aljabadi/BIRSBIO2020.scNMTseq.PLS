@@ -23,7 +23,6 @@ jobs:
       - uses: r-lib/actions/setup-r@master
         with:
           r-version: '4.0.0'
-      - uses: r-lib/actions/setup-pandoc@master
       - name: Query dependencies
         run: |
           install.packages('remotes')
@@ -39,9 +38,10 @@ jobs:
           restore-keys: ${{ runner.os }}-r-1-
 
       # This lets us augment with additional dependencies
-      - name: Install system dependencies
+      - uses: r-lib/actions/setup-r@master
         with:
           r-version: '4.0.0'
+      - name: Install system dependencies
         if: runner.os == 'Linux'
         env:
           RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
@@ -49,18 +49,18 @@ jobs:
           Rscript -e "remotes::install_github('r-hub/sysreqs')"
           sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
           sudo -s eval "$sysreqs"
-
-      - name: Install dependencies
+      - uses: r-lib/actions/setup-r@master
         with:
           r-version: '4.0.0'
+      - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE, repos = BiocManager::repositories())
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
-
-      - name: Check
+      - uses: r-lib/actions/setup-r@master
         with:
           r-version: '4.0.0'
+      - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
         run: rcmdcheck::rcmdcheck(args = c("--no-manual"), error_on = "error", check_dir = "check")
@@ -74,10 +74,10 @@ jobs:
       #     tag_with_ref: true
       #     tag_with_sha: true
       #     tags: latest
-
-      - name: Build pkgdown
+      - uses: r-lib/actions/setup-r@master
         with:
           r-version: '4.0.0'
+      - name: Build pkgdown
         run: |
            PATH=$PATH:$HOME/bin/ Rscript -e 'pkgdown::build_site(".")'
 
