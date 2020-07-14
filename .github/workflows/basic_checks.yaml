@@ -1,25 +1,29 @@
 on: [push]
 jobs:
-  job1:
+  pkgdown:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.7]
+    # strategy:
+    #   matrix:
+        # python-version: [3.7]
 
-    container: bioconductor/bioconductor_docker:devel
+    container: bioconductor/bioconductor_docker:RELEASE_3_11
     steps:
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-         python-version: ${{ matrix.python-version }}
-      - name: Install python dependencies
-        run: |
-          sudo -H apt-get update -y
-          sudo -H apt-get install -y libpython3.7
-          python3 -m pip install --upgrade pip
-          python3 -m pip install mofapy
+      # - name: Set up Python ${{ matrix.python-version }}
+      #   uses: actions/setup-python@v2
+      #   with:
+      #    python-version: ${{ matrix.python-version }}
+      # - name: Install python dependencies
+      #   run: |
+      #     sudo -H apt-get update -y
+      #     sudo -H apt-get install -y libpython3.7
+      #     python3 -m pip install --upgrade pip
+      #     python3 -m pip install mofapy
 
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+      - uses: r-lib/actions/setup-r@master
+        with:
+          r-version: '4.0.0'
+      - uses: r-lib/actions/setup-pandoc@master
       - name: Query dependencies
         run: |
           install.packages('remotes')
@@ -56,14 +60,14 @@ jobs:
         run: rcmdcheck::rcmdcheck(args = c("--no-manual"), error_on = "error", check_dir = "check")
         shell: Rscript {0}
 
-      - uses: docker/build-push-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: aljabadi/birs_bio_2020-scnmtseq-pls
-          tag_with_ref: true
-          tag_with_sha: true
-          tags: latest
+      # - uses: docker/build-push-action@v1
+      #   with:
+      #     username: ${{ secrets.DOCKER_USERNAME }}
+      #     password: ${{ secrets.DOCKER_PASSWORD }}
+      #     repository: aljabadi/birs_bio_2020-scnmtseq-pls
+      #     tag_with_ref: true
+      #     tag_with_sha: true
+      #     tags: latest
 
       - name: Build pkgdown
         run: |
