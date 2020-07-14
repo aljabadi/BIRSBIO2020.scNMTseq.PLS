@@ -19,17 +19,16 @@ jobs:
       #     python3 -m pip install --upgrade pip
       #     python3 -m pip install mofapy
 
-      - uses: actions/checkout@v2
-      - uses: r-lib/actions/setup-r@master
+      - name: Query dependencies
+        uses: actions/checkout@v2
+        uses: r-lib/actions/setup-r@master
+        uses: r-lib/actions/setup-pandoc@master
         with:
           r-version: '4.0.0'
-      - uses: r-lib/actions/setup-pandoc@master
-      - name: Query dependencies
         run: |
           install.packages('remotes')
           saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
         shell: Rscript {0}
-
       - name: Cache R packages
         if: runner.os != 'Windows'
         uses: actions/cache@v1
@@ -40,6 +39,9 @@ jobs:
 
       # This lets us augment with additional dependencies
       - name: Install system dependencies
+        uses: actions/checkout@v2
+        uses: r-lib/actions/setup-r@master
+        uses: r-lib/actions/setup-pandoc@master
         with:
           r-version: '4.0.0'
         if: runner.os == 'Linux'
@@ -51,6 +53,9 @@ jobs:
           sudo -s eval "$sysreqs"
 
       - name: Install dependencies
+        uses: actions/checkout@v2
+        uses: r-lib/actions/setup-r@master
+        uses: r-lib/actions/setup-pandoc@master
         with:
           r-version: '4.0.0'
         run: |
@@ -59,6 +64,9 @@ jobs:
         shell: Rscript {0}
 
       - name: Check
+        uses: actions/checkout@v2
+        uses: r-lib/actions/setup-r@master
+        uses: r-lib/actions/setup-pandoc@master
         with:
           r-version: '4.0.0'
         env:
@@ -76,6 +84,9 @@ jobs:
       #     tags: latest
 
       - name: Build pkgdown
+        uses: actions/checkout@v2
+        uses: r-lib/actions/setup-r@master
+        uses: r-lib/actions/setup-pandoc@master
         with:
           r-version: '4.0.0'
         run: |
