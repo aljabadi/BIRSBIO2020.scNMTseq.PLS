@@ -8,16 +8,16 @@ jobs:
 
     container: bioconductor/bioconductor_docker:devel
     steps:
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-         python-version: ${{ matrix.python-version }}
-      - name: Install python dependencies
-        run: |
-          sudo -H apt-get update -y
-          sudo -H apt-get install -y libpython3.7
-          python3 -m pip install --upgrade pip
-          python3 -m pip install mofapy
+      # - name: Set up Python ${{ matrix.python-version }}
+      #   uses: actions/setup-python@v2
+      #   with:
+      #    python-version: ${{ matrix.python-version }}
+      # - name: Install python dependencies
+      #   run: |
+      #     sudo -H apt-get update -y
+      #     sudo -H apt-get install -y libpython3.7
+      #     python3 -m pip install --upgrade pip
+      #     python3 -m pip install mofapy
 
       - uses: actions/checkout@v1
       - name: Query dependencies
