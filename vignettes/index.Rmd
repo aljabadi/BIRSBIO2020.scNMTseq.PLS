@@ -39,7 +39,6 @@ library(SingleCellMultiModal)
 library(MultiAssayExperiment)
 library(ggplot2)
 library(knitr)
-library(kableExtra)
 library(data.table)
 library(uwot)
 library(reticulate)
@@ -75,7 +74,7 @@ gastru.mae <- gastru.mae[, !drop_cells,]
 ```
 
 ```{r}
-gastru.mae
+table(gastru.mae$stage) %>% as.data.frame() %>% set_colnames(c('stage', '# of cells')) %>% kable()
 ```
 
 Check column names are consistent:
@@ -90,8 +89,7 @@ coldata <- data.frame(colData(gastru.mae))
 
 Breakdown of the number of cells in each stage and putative lineage:
 ```{r, out.width='80%'}
-table(coldata$lineage10x_2, coldata$stage) %>% kable %>% 
-  kable_styling(bootstrap_options = c("striped"), font_size = 16)
+table(coldata$lineage10x_2, coldata$stage) %>% kable
 ```
 
 ## Feature detection
