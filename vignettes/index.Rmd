@@ -3,6 +3,12 @@ title: "scNMTseq challenge analysis using a PLS-based approach"
 author: Al JalalAbadi^[Melbourne Integrative Genomics, The University of Melbourne (al.jal.abadi@gmail.com)]
 date: "`r format(Sys.Date(), '%d %b %Y')`"
 output: rmarkdown::html_vignette
+params:
+  drop_lineages: !r c('Visceral_endoderm')
+  keep_assays: !r c("rna", "met_genebody", "met_promoter", "met_cgi", "met_p300", "met_CTCF", "met_DHS")
+  save_output: no
+  on_my_mac: !r Sys.info()['user'] == 'alabadi'
+  not_on_my_mac: !r Sys.info()['user'] != 'alabadi'
 vignette: >
   %\VignetteIndexEntry{scNMTseq challenge analysis using a PLS-based approach}
   %\VignetteEngine{knitr::rmarkdown}
@@ -35,7 +41,6 @@ Load the required packages:
 
 ```{r, warning=FALSE, message=FALSE}
 library(BIRSBIO2020.scNMTseq.PLS)
-library(SingleCellMultiModal)
 library(MultiAssayExperiment)
 library(ggplot2)
 library(knitr)
@@ -54,17 +59,17 @@ message(paste0(py.res,'\n', paste(reticulate::py_config(), collapse = '\n')))
 
 # Data
 
-Load RNA and methylation data from `SingleCellMultiModal` package:
+Load MAE object from https://cloudstor.aarnet.edu.au/ 
 
-```{r, message=FALSE}
-gastru.mae <- scNMT("mouse_gastrulation", mode = c('rna', 'met*'), dry.run = FALSE)
-gastru.mae
+```{r, eval=params$on_my_mac, include=FALSE}
+gastru.mae <- readRDS('/Users/alabadi/Projects/analysis/R/multiOmics/scNMTseq/BIRSBIO_scNMTseq/output/scnmtseq_gastrulation_mae_826-cells_orderedFeatures-weights.rds')
 ```
 
 ## filter extra-embryonic cells
 
-```{r}
-table(gastru.mae$lineage10x_2)
+```{r, eval=params$not_on_my_mac}
+scnmtseq_url <- "https://cloudstor.aarnet.edu.au/plus/s/Xzf5vCgAEUVgbfQ/download?path=%2Foutput&files=scnmtseq_gastrulation_mae_826-cells_orderedFeatures-weights.rds"
+gastru.mae <- readRDS(url(scnmtseq_url))
 ```
 
 ```{r}
