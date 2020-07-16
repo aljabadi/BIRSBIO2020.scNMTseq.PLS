@@ -47,6 +47,7 @@ library(knitr)
 library(data.table)
 library(uwot)
 library(reticulate)
+library(magrittr)
 ```
 
 ```{r}
