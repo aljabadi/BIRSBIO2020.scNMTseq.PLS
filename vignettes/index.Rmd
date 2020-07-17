@@ -4,7 +4,7 @@ author: Al JalalAbadi^[Melbourne Integrative Genomics, The University of Melbour
 date: "`r format(Sys.Date(), '%d %b %Y')`"
 output: rmarkdown::html_vignette
 params:
-  drop_lineages: !r c('Visceral_endoderm')
+  drop_lineages: !r c('Visceral_endoderm', 'ExE_ectoderm')
   keep_assays: !r c("rna", "met_genebody", "met_promoter", "met_cgi", "met_p300", "met_CTCF", "met_DHS")
   save_output: no
   data_path: "https://cloudstor.aarnet.edu.au/plus/s/Xzf5vCgAEUVgbfQ/download?path=%2Foutput&files=scnmtseq_gastrulation_mae_826-cells_orderedFeatures.rds"
