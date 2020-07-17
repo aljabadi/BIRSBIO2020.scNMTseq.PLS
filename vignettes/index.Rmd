@@ -7,6 +7,8 @@ params:
   drop_lineages: !r c('Visceral_endoderm')
   keep_assays: !r c("rna", "met_genebody", "met_promoter", "met_cgi", "met_p300", "met_CTCF", "met_DHS")
   save_output: no
+  data_path: "https://cloudstor.aarnet.edu.au/plus/s/Xzf5vCgAEUVgbfQ/download?path=%2Foutput&files=scnmtseq_gastrulation_mae_826-cells_orderedFeatures.rds"
+  umap_params: !r c(run.seed = 42, n_neighbors = 15, n_components = 4 , min_dist = 0.7)
   on_my_mac: !r Sys.info()['user'] == 'alabadi'
   not_on_my_mac: !r Sys.info()['user'] != 'alabadi'
 vignette: >
@@ -17,6 +19,7 @@ vignette: >
 
 To Do
 
+* Add performance measure
 * Add the number of features to subtitles in `cov_plot`
 * Ensure python3 can be configured for MOFA2
 
@@ -39,63 +42,71 @@ knitr::opts_chunk$set(
 
 Load the required packages:
 
-```{r, warning=FALSE, message=FALSE}
-library(BIRSBIO2020.scNMTseq.PLS)
-library(MultiAssayExperiment)
-library(ggplot2)
-library(knitr)
-library(data.table)
-library(uwot)
-library(reticulate)
-library(magrittr)
+```{r, eval=params$on_my_mac, include=FALSE}
+local.lib <- '../lib'
+dir.create(local.lib)
+.libPaths(local.lib)
+remotes::install_github('mixOmicsTeam/mixOmics@MultiAssayExperiment', upgrade = 'never')
+library(mixOmics)
 ```
 
-```{r}
-## you might need to set up your own python3 using reticulate::use_python
-py.res <- tryCatch({use_python('usr/bin/python3', required = TRUE)}, error = function(e) e)
+```{r, warning=FALSE, message=FALSE}
+library(BIRSBIO2020.scNMTseq.PLS)
+```
 
-message('Python used: ', paste0(system('which python', intern = TRUE)))
-message(paste0(py.res,'\n', paste(reticulate::py_config(), collapse = '\n')))
+```{r, eval=params$save_output, include=params$save_output}
+## create directories to save the figures and output data:
+if (!dir.exists('figures')) {
+  cat('creating "figures" folder ...\n')
+  dir.create('figures')
+}
+
+if (!dir.exists('savedata')) {
+   cat('creating "savedata" folder ...\n')
+  dir.create('savedata')
+}
 ```
 
 # Data
 
-Load MAE object from https://cloudstor.aarnet.edu.au/ 
+Details of the hackathon data and preprocessing steps: https://github.com/BIRSBiointegration/Hackathon/tree/master/scNMT-seq
+
+Load the `MultiAssayExperiment` object:
 
 ```{r, eval=params$on_my_mac, include=FALSE}
+cat('loading data from Cloudstor ...\n')
 gastru.mae <- readRDS('/Users/alabadi/Projects/analysis/R/multiOmics/scNMTseq/BIRSBIO_scNMTseq/output/scnmtseq_gastrulation_mae_826-cells_orderedFeatures-weights.rds')
+```
+
+```{r, eval=params$not_on_my_mac}
+cat(sprintf('loading data from %s ...\n', params$data_path))
+gastru.mae <- readRDS(url(params$data_path))
+```
+
+An overview of the data object:
+
+```{r}
+gastru.mae
 ```
 
 ## filter extra-embryonic cells
 
-```{r, eval=params$not_on_my_mac}
-scnmtseq_url <- "https://cloudstor.aarnet.edu.au/plus/s/Xzf5vCgAEUVgbfQ/download?path=%2Foutput&files=scnmtseq_gastrulation_mae_826-cells_orderedFeatures-weights.rds"
-gastru.mae <- readRDS(url(scnmtseq_url))
+```{r}
+cat(sprintf('Dropping cells from lineage(s) %s ... \n', paste(sQuote(params$drop_lineages), collapse = ', ')))
+cat(sprintf('Retaining assays: %s ... \n', paste(sQuote(params$keep_assays), collapse = ', ')))
+gastru.mae <- gastru.mae[, !(gastru.mae$lineage10x_2 %in% params$drop_lineages), params$keep_assays]
 ```
 
 ```{r}
-drop_lineages <- c('ExE_ectoderm', 'Primitive_endoderm', 'Visceral_endoderm')
-drop_cells <- (gastru.mae$lineage10x_2 %in% drop_lineages) | is.na(gastru.mae$lineage10x_2)
-gastru.mae <- gastru.mae[, !drop_cells,]
+gastru.mae
 ```
+
+Breakdown of the cells in each stage:
 
 ```{r}
 table(gastru.mae$stage) %>% as.data.frame() %>% set_colnames(c('stage', '# of cells')) %>% kable()
-```
-
-Check column names are consistent:
-
-```{r}
-all_identical(colnames(gastru.mae))
-```
-
-```{r}
+## create a data.frame from cell meta data 
 coldata <- data.frame(colData(gastru.mae))
-```
-
-Breakdown of the number of cells in each stage and putative lineage:
-```{r, out.width='80%'}
-table(coldata$lineage10x_2, coldata$stage) %>% kable
 ```
 
 ## Feature detection
@@ -125,26 +136,25 @@ cov_plot <- ggplot(coverages, aes(x = pct_NAs)) + geom_density(fill = 'lightblue
 cov_plot
 ```
 
-```{r, eval=FALSE, echo=FALSE}
+```{r, eval=params$save_output, include=params$save_output}
 ggsave(cov_plot, filename = 'figures/covplots.pdf', width = 8, height = 4)
 ```
 
 # RNA
 
-```{r}
-rna <- assay(gastru.mae, 'rna')
-```
-
 ## UMAP
 
 ```{r}
-ncomp <- 5
-set.seed(42)
+RNGversion('4.0.0')
+set.seed(params$umap_params['run.seed'])
 ## all params use defaults except for 'n_components' and 'min_dist'
+cat(sprintf('running umap on RNA data with parameters: %s ...\n ', 
+            paste(names(params$umap_params[-1]), ':', 
+                  params$umap_params[-1], collapse = ', ')))
 umap_rna_unsup <- uwot::umap(
-  t(rna), 
-  n_neighbors = 15,
-  n_components = ncomp,
+  t(assay(gastru.mae, 'rna')), 
+  n_neighbors = params$umap_params['n_neighbors'],
+  n_components = params$umap_params['n_components'],
   metric = "euclidean",
   n_epochs = NULL,
   learning_rate = 1,
@@ -152,16 +162,16 @@ umap_rna_unsup <- uwot::umap(
   init = "spectral",
   init_sdev = NULL,
   spread = 1,
-  min_dist = 0.7, ## as we're interested in continuous transitions rather than 'clusters'
+  min_dist = params$umap_params['min_dist'],
   set_op_mix_ratio = 1,
   local_connectivity = 1)
 ```
 
-```{r, eval=FALSE, echo=FALSE}
+```{r, eval=params$save_output, include=params$save_output}
 saveRDS(umap_rna_unsup, file = sprintf('savedata/umap-result-ncomp-%s.rds', ncomp))
 ```
 
-Get a data.frame of embeddings:
+Create a data.frame of embeddings:
 ```{r}
 df <- data.frame(umap_rna_unsup)
 colnames(df) <- paste0('UMAP_', seq_along(df))
@@ -171,42 +181,92 @@ df <- cbind(df, coldata)
 Create colour palettes for stages and lineages:
 
 ```{r}
-nstage <- length(unique(gastru.mae$stage))
-nlineage <- length(unique(gastru.mae$lineage10x_2))
-ntotal <- nstage + nlineage
-col_pallete <- gg_color_hue(n=ntotal)
-ind.stage <- 2*seq_len(nstage) ## every other colour
-stage_cols <- col_pallete[ind.stage]
-lineage_cols <- col_pallete[-ind.stage]
+col_pallete <-c("#440154FF", "#31688EFF", "#35B779FF", "#FDE725FF")
+names(col_pallete) <- c("E4.5", "E5.5", "E6.5", "E7.5")
 ```
 
 
 ```{r}
-## helper function to create both plots coloured by stage and lineage
-plot_umap_by_stage_and_lineage <- function(df, dims = c(1,2)) {
+## helper function to create both plots coloured by stage
+plot_umap_by_stage <- function(df, dims = c(1,2)) {
   axes <- paste0('UMAP_', dims)
-  p1 <- ggplot(df, aes_string(axes[1], axes[2])) + geom_point(aes(col=lineage10x_2)) + 
-    theme_classic() + scale_color_manual(values = lineage_cols)
-  
-  p2 <- ggplot(df, aes_string(axes[1], axes[2])) + geom_point(aes(col=stage)) + 
-    theme_classic()+ scale_color_manual(values = stage_cols)
-  list(lineage = p1, stage = p2)
+  ggplot(df, aes_string(axes[1], axes[2])) + geom_point(aes(col=stage)) + 
+    theme_classic()+ scale_color_manual(values = col_pallete)
 }
 ```
 
 First two components highlight the distinct transcriptional state of the early-stage cells compared to the late-stage cells:
 
-```{r, fig.asp=0.6}
-plot_umap_by_stage_and_lineage(df = df, dims = c(1,2))
+```{r, eval=FALSE, fig.asp=0.6}
+## dimensions 1 to 3 capture early- vs late-stage variation
+plot_umap_by_stage(df = df, dims = c(1,2))
+plot_umap_by_stage(df = df, dims = c(2,3))
 ```
 
-The variation driven by known and putative phenotypes is more apparent in the following dimensions:
+The variation driven by different stages is more apparent in the following dimensions:
 
-```{r, fig.asp=0.6}
-plot_umap_by_stage_and_lineage(df = df, dims = c(2,3))
+```{r, fig.asp=0.6, fig.cap="UMAP plot shows distinct cell populations corresponding to early-stage, mid-stage, and late-stage cells as well as the within-stage variation which could correspond to different lineages."}
+plot_umap_by_stage(df = df, dims = c(3,4))
 ```
 
-```{r, fig.asp=0.6}
-plot_umap_by_stage_and_lineage(df = df, dims = c(3,4))
+# Integration
+
+Get all the gene names from all modalities:
+
+```{r}
+all_features <- sapply(experiments(gastru.mae), rownames) %>% unlist()
+all_genes <- grep(pattern = '^ENSMUSG', x = all_features, value = TRUE)
+all_genes <- unique(all_genes)
+length(all_genes)
+```
+
+Get the Ensembl gene name for these gene ids:
+
+```{r}
+ensembl <- useMart("ensembl", dataset="mmusculus_gene_ensembl")
+mouse_gene_ids  <- all_genes
+
+symbols <- getBM(attributes=c('ensembl_gene_id',
+                          'external_gene_name'),
+             filters = "ensembl_gene_id",
+             values = all_genes,
+             mart = ensembl)
+symbols <- data.frame(symbols, row.names = 1)
+```
+
+```{r, eval=params$save_output, echo=FALSE}
+save(symbols, file = 'savedata/all-gene-symbols.RData')
+# load('savedata/all-gene-symbols.RData')
+```
+
+```{r}
+lapply(experiments(gastru.mae), dim)
+```
+
+```{r, eval=FALSE}
+mmspls <- multimodal_analysis_wrapper(mae = gastru.mae, study_assays = NULL, ncomp = 2, scale = FALSE, design = 'null', lineages = NULL, stages = NULL, DA = NULL, keepX = NULL, save = FALSE)
+```
+
+```{r, eval=params$save_output, echo=FALSE}
+saveRDS(mmspls, file = 'savedata/MultiModalSparsePLS-All.rds')
+# mmspls <- readRDS('savedata/MultiModalSparsePLS-All.rds')
+```
+
+```{r}
+plotIndiv_wrapper <- function(pls_obj, col = 'stage', legend.title = 'Stage', comp = c(1,2), ...) {
+  plotIndiv(pls_obj, pch = 16, comp = comp,group = droplevels(factor(coldata[rownames(pls_obj$X[[1]]),][,col])), legend = TRUE, legend.title = legend.title, size.subtitle = 10, cex=0.8, ...)
+}
+```
+
+## score plots
+
+Colored by stage:
+
+```{r}
+plotIndiv_wrapper(pls_obj = mmspls,col = 'stage', legend.title = 'Stage', comp = c(1,2), subtitle = names(mmspls$X), col.per.group = col_pallete)
+```
+
+```{r, eval=params$save_output, echo=FALSE}
+ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf', width = 8, height = 6)
 ```
 
