@@ -14,7 +14,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
 Depends: MultiAssayExperiment, ggplot2, data.table,
         reticulate, uwot, nipals, biomaRt,
-        reshape2, grDevices, magrittr
+        reshape2, grDevices, magrittr, mixOmics, MOFA2
 Remotes: mixOmicsTeam/mixOmics@MultiAssayExperiment, bioFAM/MOFA2/MOFA2
 Suggests: 
     knitr,
