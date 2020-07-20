@@ -15,7 +15,7 @@ RoxygenNote: 7.1.0
 Imports: MultiAssayExperiment, ggplot2, data.table,
         uwot, nipals, biomaRt,
         reshape2, magrittr, MOFA2
-Remotes: mbioFAM/MOFA2/MOFA2
+Remotes: bioFAM/MOFA2/MOFA2
 Suggests: 
     knitr,
     rmarkdown,
