@@ -89,7 +89,7 @@
                         <h4 class="author">Al JalalAbadi<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>
 </h4>
             
-            <h4 class="date">16 Jul 2020</h4>
+            <h4 class="date">20 Jul 2020</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/blob/master/vignettes/index.Rmd"><code>vignettes/index.Rmd</code></a></small>
       <div class="hidden name"><code>index.Rmd</code></div>
@@ -100,6 +100,7 @@
     
 <p>To Do</p>
 <ul>
+<li>Add performance measure</li>
 <li>Add the number of features to subtitles in <code>cov_plot</code>
 </li>
 <li>Ensure python3 can be configured for MOFA2</li>
@@ -114,221 +115,185 @@
 <p>Load the required packages:</p>
 <div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">BIRSBIO2020.scNMTseq.PLS</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">MultiAssayExperiment</span>)
+<span class="co"># library(mixOmics)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">knitr</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">data.table</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">uwot</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">reticulate</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">magrittr</span>)</pre></body></html></div>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="co">## you might need to set up your own python3 using reticulate::use_python</span>
-<span class="no">py.res</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/conditions.html">tryCatch</a></span>({<span class="fu"><a href="https://rdrr.io/pkg/reticulate/man/use_python.html">use_python</a></span>(<span class="st">'usr/bin/python3'</span>, <span class="kw">required</span> <span class="kw">=</span> <span class="fl">TRUE</span>)}, <span class="kw">error</span> <span class="kw">=</span> <span class="kw">function</span>(<span class="no">e</span>) <span class="no">e</span>)
-
-<span class="fu"><a href="https://rdrr.io/r/base/message.html">message</a></span>(<span class="st">'Python used: '</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/system.html">system</a></span>(<span class="st">'which python'</span>, <span class="kw">intern</span> <span class="kw">=</span> <span class="fl">TRUE</span>)))
-<span class="co">#&gt; Python used: /usr/bin/python</span>
-<span class="fu"><a href="https://rdrr.io/r/base/message.html">message</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="no">py.res</span>,<span class="st">'\n'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="kw pkg">reticulate</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/reticulate/man/py_config.html">py_config</a></span>(), <span class="kw">collapse</span> <span class="kw">=</span> <span class="st">'\n'</span>)))
-<span class="co">#&gt; Error in use_python("usr/bin/python3", required = TRUE): Specified version of python 'usr/bin/python3' does not exist.</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; /usr/bin/python</span>
-<span class="co">#&gt; /usr/lib/python2.7/config-x86_64-linux-gnu/libpython2.7.so</span>
-<span class="co">#&gt; //usr://usr</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; 2.7.17 (default, Apr 15 2020, 17:20:14)  [GCC 7.5.0]</span>
-<span class="co">#&gt; 2.7</span>
-<span class="co">#&gt; 64bit</span>
-<span class="co">#&gt; FALSE</span>
-<span class="co">#&gt; list(path = "/usr/local/lib/python2.7/dist-packages/numpy", version = list(c(1, 16, 6)))</span>
-<span class="co">#&gt; NULL</span>
-<span class="co">#&gt; NULL</span>
-<span class="co">#&gt; TRUE</span>
-<span class="co">#&gt; c("/usr/bin/python3", "/usr/bin/python")</span>
-<span class="co">#&gt; NULL</span></pre></body></html></div>
-<div id="data" class="section level1">
-<h1 class="hasAnchor">
-<a href="#data" class="anchor"></a>Data</h1>
-<p>Load MAE object from <a href="https://cloudstor.aarnet.edu.au/" class="uri">https://cloudstor.aarnet.edu.au/</a></p>
-<div id="filter-extra-embryonic-cells" class="section level2">
-<h2 class="hasAnchor">
-<a href="#filter-extra-embryonic-cells" class="anchor"></a>filter extra-embryonic cells</h2>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">scnmtseq_url</span> <span class="kw">&lt;-</span> <span class="st">"https://cloudstor.aarnet.edu.au/plus/s/Xzf5vCgAEUVgbfQ/download?path=%2Foutput&amp;files=scnmtseq_gastrulation_mae_826-cells_orderedFeatures-weights.rds"</span>
-<span class="no">gastru.mae</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/connections.html">url</a></span>(<span class="no">scnmtseq_url</span>))</pre></body></html></div>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">drop_lineages</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'ExE_ectoderm'</span>, <span class="st">'Primitive_endoderm'</span>, <span class="st">'Visceral_endoderm'</span>)
-<span class="no">drop_cells</span> <span class="kw">&lt;-</span> (<span class="no">gastru.mae</span>$<span class="no">lineage10x_2</span> <span class="kw">%in%</span> <span class="no">drop_lineages</span>) <span class="kw">|</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="no">gastru.mae</span>$<span class="no">lineage10x_2</span>)
-<span class="no">gastru.mae</span> <span class="kw">&lt;-</span> <span class="no">gastru.mae</span>[, !<span class="no">drop_cells</span>,]</pre></body></html></div>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span>(<span class="no">gastru.mae</span>$<span class="no">stage</span>) <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>() <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/magrittr/man/aliases.html">set_colnames</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'stage'</span>, <span class="st">'# of cells'</span>)) <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span>()</pre></body></html></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">stage</th>
-<th align="right"># of cells</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">E4.5</td>
-<td align="right">60</td>
-</tr>
-<tr class="even">
-<td align="left">E5.5</td>
-<td align="right">84</td>
-</tr>
-<tr class="odd">
-<td align="left">E6.5</td>
-<td align="right">217</td>
-</tr>
-<tr class="even">
-<td align="left">E7.5</td>
-<td align="right">342</td>
-</tr>
-</tbody>
-</table>
-<p>Check column names are consistent:</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="fu">all_identical</span>(<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">gastru.mae</span>))
-<span class="co">#&gt; [1] TRUE</span></pre></body></html></div>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="no">coldata</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="fu">colData</span>(<span class="no">gastru.mae</span>))</pre></body></html></div>
-<p>Breakdown of the number of cells in each stage and putative lineage:</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span>(<span class="no">coldata</span>$<span class="no">lineage10x_2</span>, <span class="no">coldata</span>$<span class="no">stage</span>) <span class="kw">%&gt;%</span> <span class="no">kable</span></pre></body></html></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left"></th>
-<th align="right">E4.5</th>
-<th align="right">E5.5</th>
-<th align="right">E6.5</th>
-<th align="right">E7.5</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Ectoderm</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">43</td>
-</tr>
-<tr class="even">
-<td align="left">Endoderm</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">81</td>
-</tr>
-<tr class="odd">
-<td align="left">Epiblast</td>
-<td align="right">60</td>
-<td align="right">84</td>
-<td align="right">146</td>
-<td align="right">44</td>
-</tr>
-<tr class="even">
-<td align="left">Mesoderm</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">28</td>
-<td align="right">141</td>
-</tr>
-<tr class="odd">
-<td align="left">Primitive_Streak</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">43</td>
-<td align="right">33</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="feature-detection" class="section level2">
-<h2 class="hasAnchor">
-<a href="#feature-detection" class="anchor"></a>Feature detection</h2>
-<p>Create density plots of the feature detection rate across all cells for all modalities:</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="co"># get the methylation assays</span>
-<span class="no">met_assays</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">gastru.mae</span>), <span class="kw">pattern</span> <span class="kw">=</span> <span class="st">'^met'</span>, <span class="kw">value</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
-<span class="co"># calculate the feature detection in a data.frame for methylation assays</span>
-<span class="no">coverages</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="fu">named_list</span>(<span class="no">met_assays</span>), <span class="kw">function</span>(<span class="no">assay_name</span>) {
-  <span class="no">mat</span> <span class="kw">&lt;-</span> <span class="fu">assay</span>(<span class="no">gastru.mae</span>, <span class="no">assay_name</span>)
-  <span class="no">NAs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">rowSums</a></span>(!<span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="no">mat</span>))/<span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span>(<span class="no">mat</span>)[<span class="fl">2</span>]*<span class="fl">100</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="kw">pct_NAs</span><span class="kw">=</span><span class="no">NAs</span>)
-})
-<span class="co"># create a long data.frame containing the assay name for plot</span>
-<span class="no">coverages</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/reference/utils.html">rbindListWithNames</a></span>(<span class="no">coverages</span>)
-<span class="no">coverages</span>$<span class="no">dataset</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">coverages</span>$<span class="no">dataset</span>, <span class="kw">levels</span> <span class="kw">=</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/duplicated.html">unique</a></span>(<span class="no">coverages</span>$<span class="no">dataset</span>), <span class="kw">ordered</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="no">cov_plot</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">coverages</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">pct_NAs</span>)) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span>(<span class="kw">fill</span> <span class="kw">=</span> <span class="st">'lightblue'</span>, <span class="kw">show.legend</span> <span class="kw">=</span> <span class="fl">FALSE</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_vline</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">xintercept</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="no">pct_NAs</span>)),
-             <span class="kw">color</span><span class="kw">=</span><span class="st">"blue"</span>, <span class="kw">linetype</span><span class="kw">=</span><span class="st">"dashed"</span>, <span class="kw">size</span><span class="kw">=</span><span class="fl">0.5</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">'% of cells detecting the feature'</span>) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="no">.</span>~<span class="no">dataset</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">2</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">strip.text.x</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">size</span> <span class="kw">=</span> <span class="fl">10</span>, <span class="kw">face</span> <span class="kw">=</span> <span class="st">'bold'</span>))
-<span class="no">cov_plot</span></pre></body></html></div>
-<div class="figure">
-<img src="index_files/figure-html/unnamed-chunk-12-1.png" alt="density plots for methylation data show that shorter genomic regions tend to have less feture coverage. Dashed blue line indicates the average across all modalities." width="768"><p class="caption">
-density plots for methylation data show that shorter genomic regions tend to have less feture coverage. Dashed blue line indicates the average across all modalities.
-</p>
-</div>
-</div>
-</div>
-<div id="rna" class="section level1">
-<h1 class="hasAnchor">
-<a href="#rna" class="anchor"></a>RNA</h1>
-<div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="no">rna</span> <span class="kw">&lt;-</span> <span class="fu">assay</span>(<span class="no">gastru.mae</span>, <span class="st">'rna'</span>)</pre></body></html></div>
-<div id="umap" class="section level2">
-<h2 class="hasAnchor">
-<a href="#umap" class="anchor"></a>UMAP</h2>
-<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="no">ncomp</span> <span class="kw">&lt;-</span> <span class="fl">5</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">42</span>)
-<span class="co">## all params use defaults except for 'n_components' and 'min_dist'</span>
-<span class="no">umap_rna_unsup</span> <span class="kw">&lt;-</span> <span class="kw pkg">uwot</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/uwot/man/umap.html">umap</a></span>(
-  <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="no">rna</span>),
-  <span class="kw">n_neighbors</span> <span class="kw">=</span> <span class="fl">15</span>,
-  <span class="kw">n_components</span> <span class="kw">=</span> <span class="no">ncomp</span>,
-  <span class="kw">metric</span> <span class="kw">=</span> <span class="st">"euclidean"</span>,
-  <span class="kw">n_epochs</span> <span class="kw">=</span> <span class="kw">NULL</span>,
-  <span class="kw">learning_rate</span> <span class="kw">=</span> <span class="fl">1</span>,
-  <span class="kw">scale</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
-  <span class="kw">init</span> <span class="kw">=</span> <span class="st">"spectral"</span>,
-  <span class="kw">init_sdev</span> <span class="kw">=</span> <span class="kw">NULL</span>,
-  <span class="kw">spread</span> <span class="kw">=</span> <span class="fl">1</span>,
-  <span class="kw">min_dist</span> <span class="kw">=</span> <span class="fl">0.7</span>, <span class="co">## as we're interested in continuous transitions rather than 'clusters'</span>
-  <span class="kw">set_op_mix_ratio</span> <span class="kw">=</span> <span class="fl">1</span>,
-  <span class="kw">local_connectivity</span> <span class="kw">=</span> <span class="fl">1</span>)</pre></body></html></div>
-<p>Get a data.frame of embeddings:</p>
-<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">umap_rna_unsup</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">df</span>) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">'UMAP_'</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span>(<span class="no">df</span>))
-<span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(<span class="no">df</span>, <span class="no">coldata</span>)</pre></body></html></div>
-<p>Create colour palettes for stages and lineages:</p>
-<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="no">nstage</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/duplicated.html">unique</a></span>(<span class="no">gastru.mae</span>$<span class="no">stage</span>))
-<span class="no">nlineage</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/duplicated.html">unique</a></span>(<span class="no">gastru.mae</span>$<span class="no">lineage10x_2</span>))
-<span class="no">ntotal</span> <span class="kw">&lt;-</span> <span class="no">nstage</span> + <span class="no">nlineage</span>
-<span class="no">col_pallete</span> <span class="kw">&lt;-</span> <span class="fu">gg_color_hue</span>(<span class="kw">n</span><span class="kw">=</span><span class="no">ntotal</span>)
-<span class="no">ind.stage</span> <span class="kw">&lt;-</span> <span class="fl">2</span>*<span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span>(<span class="no">nstage</span>) <span class="co">## every other colour</span>
-<span class="no">stage_cols</span> <span class="kw">&lt;-</span> <span class="no">col_pallete</span>[<span class="no">ind.stage</span>]
-<span class="no">lineage_cols</span> <span class="kw">&lt;-</span> <span class="no">col_pallete</span>[-<span class="no">ind.stage</span>]</pre></body></html></div>
-<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="co">## helper function to create both plots coloured by stage and lineage</span>
-<span class="no">plot_umap_by_stage_and_lineage</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">df</span>, <span class="no">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>)) {
-  <span class="no">axes</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">'UMAP_'</span>, <span class="no">dims</span>)
-  <span class="no">p1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_.html">aes_string</a></span>(<span class="no">axes</span>[<span class="fl">1</span>], <span class="no">axes</span>[<span class="fl">2</span>])) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">col</span><span class="kw">=</span><span class="no">lineage10x_2</span>)) +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_classic</a></span>() + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="no">lineage_cols</span>)
-
-  <span class="no">p2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_.html">aes_string</a></span>(<span class="no">axes</span>[<span class="fl">1</span>], <span class="no">axes</span>[<span class="fl">2</span>])) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">col</span><span class="kw">=</span><span class="no">stage</span>)) +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_classic</a></span>()+ <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="no">stage_cols</span>)
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">lineage</span> <span class="kw">=</span> <span class="no">p1</span>, <span class="kw">stage</span> <span class="kw">=</span> <span class="no">p2</span>)
-}</pre></body></html></div>
-<p>First two components highlight the distinct transcriptional state of the early-stage cells compared to the late-stage cells:</p>
-<div class="sourceCode" id="cb16"><html><body><pre class="r"><span class="fu">plot_umap_by_stage_and_lineage</span>(<span class="kw">df</span> <span class="kw">=</span> <span class="no">df</span>, <span class="kw">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>))
-<span class="co">#&gt; $lineage</span></pre></body></html></div>
-<p><img src="index_files/figure-html/unnamed-chunk-20-1.png" width="672"></p>
-<pre><code>#&gt; 
-#&gt; $stage</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-20-2.png" width="672"></p>
-<p>The variation driven by known and putative phenotypes is more apparent in the following dimensions:</p>
-<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="fu">plot_umap_by_stage_and_lineage</span>(<span class="kw">df</span> <span class="kw">=</span> <span class="no">df</span>, <span class="kw">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">2</span>,<span class="fl">3</span>))
-<span class="co">#&gt; $lineage</span></pre></body></html></div>
-<p><img src="index_files/figure-html/unnamed-chunk-21-1.png" width="672"></p>
-<pre><code>#&gt; 
-#&gt; $stage</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-21-2.png" width="672"></p>
-<div class="sourceCode" id="cb20"><html><body><pre class="r"><span class="fu">plot_umap_by_stage_and_lineage</span>(<span class="kw">df</span> <span class="kw">=</span> <span class="no">df</span>, <span class="kw">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">3</span>,<span class="fl">4</span>))
-<span class="co">#&gt; $lineage</span></pre></body></html></div>
-<p><img src="index_files/figure-html/unnamed-chunk-22-1.png" width="672"></p>
-<pre><code>#&gt; 
-#&gt; $stage</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-22-2.png" width="672"></p>
-</div>
-</div>
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">nipals</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">biomaRt</span>)
+<span class="co"># library(MOFA2)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">magrittr</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">reshape2</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">data.table</span>)</pre></body></html></div>
+<!-- ```{r, eval=params$save_output, include=params$save_output} -->
+<!-- ## create directories to save the figures and output data: -->
+<!-- if (!dir.exists('figures')) { -->
+<!--   cat('creating "figures" folder ...\n') -->
+<!--   dir.create('figures') -->
+<!-- } -->
+<!-- if (!dir.exists('savedata')) { -->
+<!--    cat('creating "savedata" folder ...\n') -->
+<!--   dir.create('savedata') -->
+<!-- } -->
+<!-- ``` -->
+<!-- # Data -->
+<!-- Details of the hackathon data and preprocessing steps: https://github.com/BIRSBiointegration/Hackathon/tree/master/scNMT-seq -->
+<!-- Load the `MultiAssayExperiment` object: -->
+<!-- ```{r, eval=params$on_my_mac, include=FALSE} -->
+<!-- cat('loading data from Cloudstor ...\n') -->
+<!-- gastru.mae <- readRDS('/Users/alabadi/Projects/analysis/R/multiOmics/scNMTseq/BIRSBIO_scNMTseq/output/scnmtseq_gastrulation_mae_826-cells_orderedFeatures-weights.rds') -->
+<!-- ``` -->
+<!-- ```{r, eval=params$not_on_my_mac} -->
+<!-- cat(sprintf('loading data from %s ...\n', params$data_path)) -->
+<!-- gastru.mae <- readRDS(url(params$data_path)) -->
+<!-- ``` -->
+<!-- An overview of the data object: -->
+<!-- ```{r} -->
+<!-- gastru.mae -->
+<!-- ``` -->
+<!-- ## filter extra-embryonic cells -->
+<!-- ```{r} -->
+<!-- cat(sprintf('Dropping cells from lineage(s) %s ... \n', paste(sQuote(params$drop_lineages), collapse = ', '))) -->
+<!-- cat(sprintf('Retaining assays: %s ... \n', paste(sQuote(params$keep_assays), collapse = ', '))) -->
+<!-- gastru.mae <- gastru.mae[, !(gastru.mae$lineage10x_2 %in% params$drop_lineages), params$keep_assays] -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- gastru.mae -->
+<!-- ``` -->
+<!-- Breakdown of the cells in each stage: -->
+<!-- ```{r} -->
+<!-- table(gastru.mae$stage) %>% as.data.frame() %>% set_colnames(c('stage', '# of cells')) %>% kable() -->
+<!-- ## create a data.frame from cell meta data  -->
+<!-- coldata <- data.frame(colData(gastru.mae)) -->
+<!-- ``` -->
+<!-- ## Feature detection -->
+<!-- Create density plots of the feature detection rate across all cells for all modalities: -->
+<!-- ```{r} -->
+<!-- # get the methylation assays -->
+<!-- met_assays <- grep(names(gastru.mae), pattern = '^met', value = TRUE) -->
+<!-- # calculate the feature detection in a data.frame for methylation assays -->
+<!-- coverages <- lapply(named_list(met_assays), function(assay_name) { -->
+<!--   mat <- assay(gastru.mae, assay_name) -->
+<!--   NAs <- rowSums(!is.na(mat))/dim(mat)[2]*100 -->
+<!--   data.frame(pct_NAs=NAs) -->
+<!-- }) -->
+<!-- # create a long data.frame containing the assay name for plot -->
+<!-- coverages <- rbindListWithNames(coverages) -->
+<!-- coverages$dataset <- factor(coverages$dataset, levels = unique(coverages$dataset), ordered = TRUE) -->
+<!-- ``` -->
+<!-- ```{r, fig.width=8, fig.asp=0.4, fig.cap="density plots for methylation data show that shorter genomic regions tend to have less feture coverage. Dashed blue line indicates the average across all modalities."} -->
+<!-- cov_plot <- ggplot(coverages, aes(x = pct_NAs)) + geom_density(fill = 'lightblue', show.legend = FALSE) +  -->
+<!--   geom_vline(aes(xintercept=mean(pct_NAs)), -->
+<!--              color="blue", linetype="dashed", size=0.5) + -->
+<!--   labs(x = '% of cells detecting the feature') + facet_wrap(.~dataset, nrow = 2) +  -->
+<!--   theme_bw() + theme(strip.text.x = element_text(size = 10, face = 'bold')) -->
+<!-- cov_plot -->
+<!-- ``` -->
+<!-- ```{r, eval=params$save_output, include=params$save_output} -->
+<!-- ggsave(cov_plot, filename = 'figures/covplots.pdf', width = 8, height = 4) -->
+<!-- ``` -->
+<!-- # RNA -->
+<!-- ## UMAP -->
+<!-- ```{r} -->
+<!-- RNGversion('4.0.0') -->
+<!-- set.seed(params$umap_params['run.seed']) -->
+<!-- ## all params use defaults except for 'n_components' and 'min_dist' -->
+<!-- cat(sprintf('running umap on RNA data with parameters: %s ...\n ',  -->
+<!--             paste(names(params$umap_params[-1]), ':',  -->
+<!--                   params$umap_params[-1], collapse = ', '))) -->
+<!-- umap_rna_unsup <- uwot::umap( -->
+<!--   t(assay(gastru.mae, 'rna')),  -->
+<!--   n_neighbors = params$umap_params['n_neighbors'], -->
+<!--   n_components = params$umap_params['n_components'], -->
+<!--   metric = "euclidean", -->
+<!--   n_epochs = NULL, -->
+<!--   learning_rate = 1, -->
+<!--   scale = FALSE, -->
+<!--   init = "spectral", -->
+<!--   init_sdev = NULL, -->
+<!--   spread = 1, -->
+<!--   min_dist = params$umap_params['min_dist'], -->
+<!--   set_op_mix_ratio = 1, -->
+<!--   local_connectivity = 1) -->
+<!-- ``` -->
+<!-- ```{r, eval=params$save_output, include=params$save_output} -->
+<!-- saveRDS(umap_rna_unsup, file = sprintf('savedata/umap-result-ncomp-%s.rds', ncomp)) -->
+<!-- ``` -->
+<!-- Create a data.frame of embeddings: -->
+<!-- ```{r} -->
+<!-- df <- data.frame(umap_rna_unsup) -->
+<!-- colnames(df) <- paste0('UMAP_', seq_along(df)) -->
+<!-- df <- cbind(df, coldata) -->
+<!-- ``` -->
+<!-- Create colour palettes for stages and lineages: -->
+<!-- ```{r} -->
+<!-- col_pallete <-c("#440154FF", "#31688EFF", "#35B779FF", "#FDE725FF") -->
+<!-- names(col_pallete) <- c("E4.5", "E5.5", "E6.5", "E7.5") -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- ## helper function to create both plots coloured by stage -->
+<!-- plot_umap_by_stage <- function(df, dims = c(1,2)) { -->
+<!--   axes <- paste0('UMAP_', dims) -->
+<!--   ggplot(df, aes_string(axes[1], axes[2])) + geom_point(aes(col=stage)) +  -->
+<!--     theme_classic()+ scale_color_manual(values = col_pallete) -->
+<!-- } -->
+<!-- ``` -->
+<!-- First two components highlight the distinct transcriptional state of the early-stage cells compared to the late-stage cells: -->
+<!-- ```{r, eval=FALSE, fig.asp=0.6} -->
+<!-- ## dimensions 1 to 3 capture early- vs late-stage variation -->
+<!-- plot_umap_by_stage(df = df, dims = c(1,2)) -->
+<!-- plot_umap_by_stage(df = df, dims = c(2,3)) -->
+<!-- ``` -->
+<!-- The variation driven by different stages is more apparent in the following dimensions: -->
+<!-- ```{r, fig.asp=0.6, fig.cap="UMAP plot shows distinct cell populations corresponding to early-stage, mid-stage, and late-stage cells as well as the within-stage variation which could correspond to different lineages."} -->
+<!-- plot_umap_by_stage(df = df, dims = c(3,4)) -->
+<!-- ``` -->
+<!-- # Integration -->
+<!-- Get all the gene names from all modalities: -->
+<!-- ```{r} -->
+<!-- all_features <- sapply(experiments(gastru.mae), rownames) %>% unlist() -->
+<!-- all_genes <- grep(pattern = '^ENSMUSG', x = all_features, value = TRUE) -->
+<!-- all_genes <- unique(all_genes) -->
+<!-- length(all_genes) -->
+<!-- ``` -->
+<!-- Get the Ensembl gene name for these gene ids: -->
+<!-- ```{r} -->
+<!-- ensembl <- useMart("ensembl", dataset="mmusculus_gene_ensembl") -->
+<!-- mouse_gene_ids  <- all_genes -->
+<!-- symbols <- getBM(attributes=c('ensembl_gene_id', -->
+<!--                           'external_gene_name'), -->
+<!--              filters = "ensembl_gene_id", -->
+<!--              values = all_genes, -->
+<!--              mart = ensembl) -->
+<!-- symbols <- data.frame(symbols, row.names = 1) -->
+<!-- ``` -->
+<!-- ```{r, eval=params$save_output, echo=FALSE} -->
+<!-- save(symbols, file = 'savedata/all-gene-symbols.RData') -->
+<!-- # load('savedata/all-gene-symbols.RData') -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- lapply(experiments(gastru.mae), dim) -->
+<!-- ``` -->
+<!-- ```{r, eval=FALSE} -->
+<!-- mmspls <- multimodal_analysis_wrapper(mae = gastru.mae, study_assays = NULL, ncomp = 2, scale = FALSE, design = 'null', lineages = NULL, stages = NULL, DA = NULL, keepX = NULL, save = FALSE) -->
+<!-- ``` -->
+<!-- ```{r, eval=params$save_output, echo=FALSE} -->
+<!-- saveRDS(mmspls, file = 'savedata/MultiModalSparsePLS-All.rds') -->
+<!-- # mmspls <- readRDS('savedata/MultiModalSparsePLS-All.rds') -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- plotIndiv_wrapper <- function(pls_obj, col = 'stage', legend.title = 'Stage', comp = c(1,2), ...) { -->
+<!--   plotIndiv(pls_obj, pch = 16, comp = comp,group = droplevels(factor(coldata[rownames(pls_obj$X[[1]]),][,col])), legend = TRUE, legend.title = legend.title, size.subtitle = 10, cex=0.8, ...) -->
+<!-- } -->
+<!-- ``` -->
+<!-- ## score plots -->
+<!-- Colored by stage: -->
+<!-- ```{r} -->
+<!-- plotIndiv_wrapper(pls_obj = mmspls,col = 'stage', legend.title = 'Stage', comp = c(1,2), subtitle = names(mmspls$X), col.per.group = col_pallete) -->
+<!-- ``` -->
+<!-- ```{r, eval=params$save_output, echo=FALSE} -->
+<!-- ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf', width = 8, height = 6) -->
+<!-- ``` -->
 <div class="footnotes">
 <hr>
 <ol>
@@ -339,9 +304,7 @@ density plots for methylation data show that shorter genomic regions tend to hav
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 
