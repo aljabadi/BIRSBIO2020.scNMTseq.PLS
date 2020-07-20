@@ -54,7 +54,7 @@ library(mixOmics)
 ```{r, warning=FALSE, message=FALSE}
 library(BIRSBIO2020.scNMTseq.PLS)
 library(MultiAssayExperiment)
-library(mixOmics)
+# library(mixOmics)
 library(ggplot2)
 library(knitr)
 library(uwot)
