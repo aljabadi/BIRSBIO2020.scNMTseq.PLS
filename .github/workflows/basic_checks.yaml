@@ -46,14 +46,14 @@ jobs:
         run: rcmdcheck::rcmdcheck(args = c("--no-manual"), error_on = "error", check_dir = "check")
         shell: Rscript {0}
         
-      - uses: docker/build-push-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: aljabadi/birs_bio_2020-scnmtseq-pls
-          tag_with_ref: true
-          tag_with_sha: true
-          tags: latest
+      # - uses: docker/build-push-action@v1
+      #   with:
+      #     username: ${{ secrets.DOCKER_USERNAME }}
+      #     password: ${{ secrets.DOCKER_PASSWORD }}
+      #     repository: aljabadi/birs_bio_2020-scnmtseq-pls
+      #     tag_with_ref: true
+      #     tag_with_sha: true
+      #     tags: latest
 
       - name: Build pkgdown
         run: |
