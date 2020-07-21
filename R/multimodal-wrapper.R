@@ -7,9 +7,9 @@
 #' @param ncomp Integer, number of components
 #' @param scale Logical, whether to scale the features
 #' @param DA NULL for unsupervised, or from names(colData(mae)) for supervised (PLSDA)
-#'
+#' @export
 multimodal_analysis_wrapper <- function(mae, study_assays, lineages=NULL, stages = NULL, ncomp = 2, scale = TRUE, design = 'null', DA=NULL, keepX = NULL, save = TRUE) {
-  
+
   if (is.null(study_assays)) {
     study_assays <- names(experiments(mae))
     study_assays <- study_assays[!grepl(pattern = '^wt_*', x = study_assays)]
@@ -26,14 +26,14 @@ multimodal_analysis_wrapper <- function(mae, study_assays, lineages=NULL, stages
     lineages <- unique(mae$lineage10x_2 )
     lin <- paste0(lineages, collapse = '-')
   }
-  
+
   if (is.null(stages)) {
     stages <- unique(mae$stage)
   }
-  
+
   stag <- paste(stages, collapse = '-')
   mae <- mae[,mae$stage %in% stages,]
-  
+
   if (is.null(keepX)) {
     keepX <- lapply(named_list(study_assays), function(z){
       p <- dim(assay(mae, z))[1]
@@ -54,8 +54,8 @@ multimodal_analysis_wrapper <- function(mae, study_assays, lineages=NULL, stages
     out <- MultiModalSparsePLS(data = mae, formula = formu, keep_features = keepX, ncomp = ncomp, design = design, scale = scale)
   }
   NAME <- sprintf('savedata/MultiModalSparse%s_%s__%s__%s__%s.rds', pls_mode, ifelse(is.null(DA), 'rna', DA), paste0(study_assays[-1], collapse = '-'), lin, stag)
-  
-  
+
+
   if (isTRUE(save)) {
     saveRDS(out, file = NAME)
   }
