@@ -33,6 +33,8 @@ jobs:
           sudo -s eval "$sysreqs"
           
       - name: Install dependencies
+        env:
+          R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
         run: |
           options(repos = c(CRAN = "https://cran.r-project.org"))
           BiocManager::repositories()
