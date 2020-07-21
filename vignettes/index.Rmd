@@ -65,219 +65,219 @@ library(reshape2)
 library(data.table)
 ```
 
-<!-- ```{r, eval=params$save_output, include=params$save_output} -->
-<!-- ## create directories to save the figures and output data: -->
-<!-- if (!dir.exists('figures')) { -->
-<!--   cat('creating "figures" folder ...\n') -->
-<!--   dir.create('figures') -->
-<!-- } -->
+```{r, eval=params$save_output, include=params$save_output}
+## create directories to save the figures and output data:
+if (!dir.exists('figures')) {
+  cat('creating "figures" folder ...\n')
+  dir.create('figures')
+}
 
-<!-- if (!dir.exists('savedata')) { -->
-<!--    cat('creating "savedata" folder ...\n') -->
-<!--   dir.create('savedata') -->
-<!-- } -->
-<!-- ``` -->
+if (!dir.exists('savedata')) {
+   cat('creating "savedata" folder ...\n')
+  dir.create('savedata')
+}
+```
 
-<!-- # Data -->
+# Data
 
-<!-- Details of the hackathon data and preprocessing steps: https://github.com/BIRSBiointegration/Hackathon/tree/master/scNMT-seq -->
+Details of the hackathon data and preprocessing steps: https://github.com/BIRSBiointegration/Hackathon/tree/master/scNMT-seq
 
-<!-- Load the `MultiAssayExperiment` object: -->
+Load the `MultiAssayExperiment` object:
 
-<!-- ```{r, eval=params$on_my_mac, include=FALSE} -->
-<!-- cat('loading data from Cloudstor ...\n') -->
-<!-- gastru.mae <- readRDS('/Users/alabadi/Projects/analysis/R/multiOmics/scNMTseq/BIRSBIO_scNMTseq/output/scnmtseq_gastrulation_mae_826-cells_orderedFeatures-weights.rds') -->
-<!-- ``` -->
+```{r, eval=params$on_my_mac, include=FALSE}
+cat('loading data from Cloudstor ...\n')
+gastru.mae <- readRDS('/Users/alabadi/Projects/analysis/R/multiOmics/scNMTseq/BIRSBIO_scNMTseq/output/scnmtseq_gastrulation_mae_826-cells_orderedFeatures-weights.rds')
+```
 
-<!-- ```{r, eval=params$not_on_my_mac} -->
-<!-- cat(sprintf('loading data from %s ...\n', params$data_path)) -->
-<!-- gastru.mae <- readRDS(url(params$data_path)) -->
-<!-- ``` -->
+```{r, eval=params$not_on_my_mac}
+cat(sprintf('loading data from %s ...\n', params$data_path))
+gastru.mae <- readRDS(url(params$data_path))
+```
 
-<!-- An overview of the data object: -->
+An overview of the data object:
 
-<!-- ```{r} -->
-<!-- gastru.mae -->
-<!-- ``` -->
+```{r}
+gastru.mae
+```
 
-<!-- ## filter extra-embryonic cells -->
+## filter extra-embryonic cells
 
-<!-- ```{r} -->
-<!-- cat(sprintf('Dropping cells from lineage(s) %s ... \n', paste(sQuote(params$drop_lineages), collapse = ', '))) -->
-<!-- cat(sprintf('Retaining assays: %s ... \n', paste(sQuote(params$keep_assays), collapse = ', '))) -->
-<!-- gastru.mae <- gastru.mae[, !(gastru.mae$lineage10x_2 %in% params$drop_lineages), params$keep_assays] -->
-<!-- ``` -->
+```{r}
+cat(sprintf('Dropping cells from lineage(s) %s ... \n', paste(sQuote(params$drop_lineages), collapse = ', ')))
+cat(sprintf('Retaining assays: %s ... \n', paste(sQuote(params$keep_assays), collapse = ', ')))
+gastru.mae <- gastru.mae[, !(gastru.mae$lineage10x_2 %in% params$drop_lineages), params$keep_assays]
+```
 
-<!-- ```{r} -->
-<!-- gastru.mae -->
-<!-- ``` -->
+```{r}
+gastru.mae
+```
 
-<!-- Breakdown of the cells in each stage: -->
+Breakdown of the cells in each stage:
 
-<!-- ```{r} -->
-<!-- table(gastru.mae$stage) %>% as.data.frame() %>% set_colnames(c('stage', '# of cells')) %>% kable() -->
-<!-- ## create a data.frame from cell meta data  -->
-<!-- coldata <- data.frame(colData(gastru.mae)) -->
-<!-- ``` -->
+```{r}
+table(gastru.mae$stage) %>% as.data.frame() %>% set_colnames(c('stage', '# of cells')) %>% kable()
+## create a data.frame from cell meta data
+coldata <- data.frame(colData(gastru.mae))
+```
 
-<!-- ## Feature detection -->
+## Feature detection
 
-<!-- Create density plots of the feature detection rate across all cells for all modalities: -->
+Create density plots of the feature detection rate across all cells for all modalities:
 
-<!-- ```{r} -->
-<!-- # get the methylation assays -->
-<!-- met_assays <- grep(names(gastru.mae), pattern = '^met', value = TRUE) -->
-<!-- # calculate the feature detection in a data.frame for methylation assays -->
-<!-- coverages <- lapply(named_list(met_assays), function(assay_name) { -->
-<!--   mat <- assay(gastru.mae, assay_name) -->
-<!--   NAs <- rowSums(!is.na(mat))/dim(mat)[2]*100 -->
-<!--   data.frame(pct_NAs=NAs) -->
-<!-- }) -->
-<!-- # create a long data.frame containing the assay name for plot -->
-<!-- coverages <- rbindListWithNames(coverages) -->
-<!-- coverages$dataset <- factor(coverages$dataset, levels = unique(coverages$dataset), ordered = TRUE) -->
-<!-- ``` -->
+```{r}
+# get the methylation assays
+met_assays <- grep(names(gastru.mae), pattern = '^met', value = TRUE)
+# calculate the feature detection in a data.frame for methylation assays
+coverages <- lapply(named_list(met_assays), function(assay_name) {
+  mat <- assay(gastru.mae, assay_name)
+  NAs <- rowSums(!is.na(mat))/dim(mat)[2]*100
+  data.frame(pct_NAs=NAs)
+})
+# create a long data.frame containing the assay name for plot
+coverages <- rbindListWithNames(coverages)
+coverages$dataset <- factor(coverages$dataset, levels = unique(coverages$dataset), ordered = TRUE)
+```
 
-<!-- ```{r, fig.width=8, fig.asp=0.4, fig.cap="density plots for methylation data show that shorter genomic regions tend to have less feture coverage. Dashed blue line indicates the average across all modalities."} -->
-<!-- cov_plot <- ggplot(coverages, aes(x = pct_NAs)) + geom_density(fill = 'lightblue', show.legend = FALSE) +  -->
-<!--   geom_vline(aes(xintercept=mean(pct_NAs)), -->
-<!--              color="blue", linetype="dashed", size=0.5) + -->
-<!--   labs(x = '% of cells detecting the feature') + facet_wrap(.~dataset, nrow = 2) +  -->
-<!--   theme_bw() + theme(strip.text.x = element_text(size = 10, face = 'bold')) -->
-<!-- cov_plot -->
-<!-- ``` -->
+```{r, fig.width=8, fig.asp=0.4, fig.cap="density plots for methylation data show that shorter genomic regions tend to have less feture coverage. Dashed blue line indicates the average across all modalities."}
+cov_plot <- ggplot(coverages, aes(x = pct_NAs)) + geom_density(fill = 'lightblue', show.legend = FALSE) +
+  geom_vline(aes(xintercept=mean(pct_NAs)),
+             color="blue", linetype="dashed", size=0.5) +
+  labs(x = '% of cells detecting the feature') + facet_wrap(.~dataset, nrow = 2) +
+  theme_bw() + theme(strip.text.x = element_text(size = 10, face = 'bold'))
+cov_plot
+```
 
-<!-- ```{r, eval=params$save_output, include=params$save_output} -->
-<!-- ggsave(cov_plot, filename = 'figures/covplots.pdf', width = 8, height = 4) -->
-<!-- ``` -->
+```{r, eval=params$save_output, include=params$save_output}
+ggsave(cov_plot, filename = 'figures/covplots.pdf', width = 8, height = 4)
+```
 
-<!-- # RNA -->
+# RNA
 
-<!-- ## UMAP -->
+## UMAP
 
-<!-- ```{r} -->
-<!-- RNGversion('4.0.0') -->
-<!-- set.seed(params$umap_params['run.seed']) -->
-<!-- ## all params use defaults except for 'n_components' and 'min_dist' -->
-<!-- cat(sprintf('running umap on RNA data with parameters: %s ...\n ',  -->
-<!--             paste(names(params$umap_params[-1]), ':',  -->
-<!--                   params$umap_params[-1], collapse = ', '))) -->
-<!-- umap_rna_unsup <- uwot::umap( -->
-<!--   t(assay(gastru.mae, 'rna')),  -->
-<!--   n_neighbors = params$umap_params['n_neighbors'], -->
-<!--   n_components = params$umap_params['n_components'], -->
-<!--   metric = "euclidean", -->
-<!--   n_epochs = NULL, -->
-<!--   learning_rate = 1, -->
-<!--   scale = FALSE, -->
-<!--   init = "spectral", -->
-<!--   init_sdev = NULL, -->
-<!--   spread = 1, -->
-<!--   min_dist = params$umap_params['min_dist'], -->
-<!--   set_op_mix_ratio = 1, -->
-<!--   local_connectivity = 1) -->
-<!-- ``` -->
+```{r}
+RNGversion('4.0.0')
+set.seed(params$umap_params['run.seed'])
+## all params use defaults except for 'n_components' and 'min_dist'
+cat(sprintf('running umap on RNA data with parameters: %s ...\n ',
+            paste(names(params$umap_params[-1]), ':',
+                  params$umap_params[-1], collapse = ', ')))
+umap_rna_unsup <- uwot::umap(
+  t(assay(gastru.mae, 'rna')),
+  n_neighbors = params$umap_params['n_neighbors'],
+  n_components = params$umap_params['n_components'],
+  metric = "euclidean",
+  n_epochs = NULL,
+  learning_rate = 1,
+  scale = FALSE,
+  init = "spectral",
+  init_sdev = NULL,
+  spread = 1,
+  min_dist = params$umap_params['min_dist'],
+  set_op_mix_ratio = 1,
+  local_connectivity = 1)
+```
 
-<!-- ```{r, eval=params$save_output, include=params$save_output} -->
-<!-- saveRDS(umap_rna_unsup, file = sprintf('savedata/umap-result-ncomp-%s.rds', ncomp)) -->
-<!-- ``` -->
+```{r, eval=params$save_output, include=params$save_output}
+saveRDS(umap_rna_unsup, file = sprintf('savedata/umap-result-ncomp-%s.rds', ncomp))
+```
 
-<!-- Create a data.frame of embeddings: -->
-<!-- ```{r} -->
-<!-- df <- data.frame(umap_rna_unsup) -->
-<!-- colnames(df) <- paste0('UMAP_', seq_along(df)) -->
-<!-- df <- cbind(df, coldata) -->
-<!-- ``` -->
+Create a data.frame of embeddings:
+```{r}
+df <- data.frame(umap_rna_unsup)
+colnames(df) <- paste0('UMAP_', seq_along(df))
+df <- cbind(df, coldata)
+```
 
-<!-- Create colour palettes for stages and lineages: -->
+Create colour palettes for stages and lineages:
 
-<!-- ```{r} -->
-<!-- col_pallete <-c("#440154FF", "#31688EFF", "#35B779FF", "#FDE725FF") -->
-<!-- names(col_pallete) <- c("E4.5", "E5.5", "E6.5", "E7.5") -->
-<!-- ``` -->
+```{r}
+col_pallete <-c("#440154FF", "#31688EFF", "#35B779FF", "#FDE725FF")
+names(col_pallete) <- c("E4.5", "E5.5", "E6.5", "E7.5")
+```
 
 
-<!-- ```{r} -->
-<!-- ## helper function to create both plots coloured by stage -->
-<!-- plot_umap_by_stage <- function(df, dims = c(1,2)) { -->
-<!--   axes <- paste0('UMAP_', dims) -->
-<!--   ggplot(df, aes_string(axes[1], axes[2])) + geom_point(aes(col=stage)) +  -->
-<!--     theme_classic()+ scale_color_manual(values = col_pallete) -->
-<!-- } -->
-<!-- ``` -->
+```{r}
+## helper function to create both plots coloured by stage
+plot_umap_by_stage <- function(df, dims = c(1,2)) {
+  axes <- paste0('UMAP_', dims)
+  ggplot(df, aes_string(axes[1], axes[2])) + geom_point(aes(col=stage)) +
+    theme_classic()+ scale_color_manual(values = col_pallete)
+}
+```
 
-<!-- First two components highlight the distinct transcriptional state of the early-stage cells compared to the late-stage cells: -->
+First two components highlight the distinct transcriptional state of the early-stage cells compared to the late-stage cells:
 
-<!-- ```{r, eval=FALSE, fig.asp=0.6} -->
-<!-- ## dimensions 1 to 3 capture early- vs late-stage variation -->
-<!-- plot_umap_by_stage(df = df, dims = c(1,2)) -->
-<!-- plot_umap_by_stage(df = df, dims = c(2,3)) -->
-<!-- ``` -->
+```{r, eval=FALSE, fig.asp=0.6}
+## dimensions 1 to 3 capture early- vs late-stage variation
+plot_umap_by_stage(df = df, dims = c(1,2))
+plot_umap_by_stage(df = df, dims = c(2,3))
+```
 
-<!-- The variation driven by different stages is more apparent in the following dimensions: -->
+The variation driven by different stages is more apparent in the following dimensions:
 
-<!-- ```{r, fig.asp=0.6, fig.cap="UMAP plot shows distinct cell populations corresponding to early-stage, mid-stage, and late-stage cells as well as the within-stage variation which could correspond to different lineages."} -->
-<!-- plot_umap_by_stage(df = df, dims = c(3,4)) -->
-<!-- ``` -->
+```{r, fig.asp=0.6, fig.cap="UMAP plot shows distinct cell populations corresponding to early-stage, mid-stage, and late-stage cells as well as the within-stage variation which could correspond to different lineages."}
+plot_umap_by_stage(df = df, dims = c(3,4))
+```
 
-<!-- # Integration -->
+# Integration
 
-<!-- Get all the gene names from all modalities: -->
+Get all the gene names from all modalities:
 
-<!-- ```{r} -->
-<!-- all_features <- sapply(experiments(gastru.mae), rownames) %>% unlist() -->
-<!-- all_genes <- grep(pattern = '^ENSMUSG', x = all_features, value = TRUE) -->
-<!-- all_genes <- unique(all_genes) -->
-<!-- length(all_genes) -->
-<!-- ``` -->
+```{r}
+all_features <- sapply(experiments(gastru.mae), rownames) %>% unlist()
+all_genes <- grep(pattern = '^ENSMUSG', x = all_features, value = TRUE)
+all_genes <- unique(all_genes)
+length(all_genes)
+```
 
-<!-- Get the Ensembl gene name for these gene ids: -->
+Get the Ensembl gene name for these gene ids:
 
-<!-- ```{r} -->
-<!-- ensembl <- useMart("ensembl", dataset="mmusculus_gene_ensembl") -->
-<!-- mouse_gene_ids  <- all_genes -->
+```{r}
+ensembl <- useMart("ensembl", dataset="mmusculus_gene_ensembl")
+mouse_gene_ids  <- all_genes
 
-<!-- symbols <- getBM(attributes=c('ensembl_gene_id', -->
-<!--                           'external_gene_name'), -->
-<!--              filters = "ensembl_gene_id", -->
-<!--              values = all_genes, -->
-<!--              mart = ensembl) -->
-<!-- symbols <- data.frame(symbols, row.names = 1) -->
-<!-- ``` -->
+symbols <- getBM(attributes=c('ensembl_gene_id',
+                          'external_gene_name'),
+             filters = "ensembl_gene_id",
+             values = all_genes,
+             mart = ensembl)
+symbols <- data.frame(symbols, row.names = 1)
+```
 
-<!-- ```{r, eval=params$save_output, echo=FALSE} -->
-<!-- save(symbols, file = 'savedata/all-gene-symbols.RData') -->
-<!-- # load('savedata/all-gene-symbols.RData') -->
-<!-- ``` -->
+```{r, eval=params$save_output, echo=FALSE}
+save(symbols, file = 'savedata/all-gene-symbols.RData')
+# load('savedata/all-gene-symbols.RData')
+```
 
-<!-- ```{r} -->
-<!-- lapply(experiments(gastru.mae), dim) -->
-<!-- ``` -->
+```{r}
+lapply(experiments(gastru.mae), dim)
+```
 
-<!-- ```{r, eval=FALSE} -->
-<!-- mmspls <- multimodal_analysis_wrapper(mae = gastru.mae, study_assays = NULL, ncomp = 2, scale = FALSE, design = 'null', lineages = NULL, stages = NULL, DA = NULL, keepX = NULL, save = FALSE) -->
-<!-- ``` -->
+```{r, eval=FALSE}
+mmspls <- multimodal_analysis_wrapper(mae = gastru.mae, study_assays = NULL, ncomp = 2, scale = FALSE, design = 'null', lineages = NULL, stages = NULL, DA = NULL, keepX = NULL, save = FALSE)
+```
 
-<!-- ```{r, eval=params$save_output, echo=FALSE} -->
-<!-- saveRDS(mmspls, file = 'savedata/MultiModalSparsePLS-All.rds') -->
-<!-- # mmspls <- readRDS('savedata/MultiModalSparsePLS-All.rds') -->
-<!-- ``` -->
+```{r, eval=params$save_output, echo=FALSE}
+saveRDS(mmspls, file = 'savedata/MultiModalSparsePLS-All.rds')
+# mmspls <- readRDS('savedata/MultiModalSparsePLS-All.rds')
+```
 
-<!-- ```{r} -->
-<!-- plotIndiv_wrapper <- function(pls_obj, col = 'stage', legend.title = 'Stage', comp = c(1,2), ...) { -->
-<!--   plotIndiv(pls_obj, pch = 16, comp = comp,group = droplevels(factor(coldata[rownames(pls_obj$X[[1]]),][,col])), legend = TRUE, legend.title = legend.title, size.subtitle = 10, cex=0.8, ...) -->
-<!-- } -->
-<!-- ``` -->
+```{r}
+plotIndiv_wrapper <- function(pls_obj, col = 'stage', legend.title = 'Stage', comp = c(1,2), ...) {
+  plotIndiv(pls_obj, pch = 16, comp = comp,group = droplevels(factor(coldata[rownames(pls_obj$X[[1]]),][,col])), legend = TRUE, legend.title = legend.title, size.subtitle = 10, cex=0.8, ...)
+}
+```
 
-<!-- ## score plots -->
+## score plots
 
-<!-- Colored by stage: -->
+Colored by stage:
 
-<!-- ```{r} -->
-<!-- plotIndiv_wrapper(pls_obj = mmspls,col = 'stage', legend.title = 'Stage', comp = c(1,2), subtitle = names(mmspls$X), col.per.group = col_pallete) -->
-<!-- ``` -->
+```{r}
+plotIndiv_wrapper(pls_obj = mmspls,col = 'stage', legend.title = 'Stage', comp = c(1,2), subtitle = names(mmspls$X), col.per.group = col_pallete)
+```
 
-<!-- ```{r, eval=params$save_output, echo=FALSE} -->
-<!-- ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf', width = 8, height = 6) -->
-<!-- ``` -->
+```{r, eval=params$save_output, echo=FALSE}
+ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf', width = 8, height = 6)
+```
 
