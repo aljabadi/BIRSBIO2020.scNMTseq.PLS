@@ -255,7 +255,7 @@ save(symbols, file = 'savedata/all-gene-symbols.RData')
 lapply(experiments(gastru.mae), dim)
 ```
 
-```{r, eval=FALSE}
+```{r}
 mmspls <- multimodal_analysis_wrapper(mae = gastru.mae, study_assays = NULL, ncomp = 2, scale = FALSE, design = 'null', lineages = NULL, stages = NULL, DA = NULL, keepX = NULL, save = FALSE)
 ```
 
