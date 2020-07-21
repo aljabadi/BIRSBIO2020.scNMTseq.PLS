@@ -63,6 +63,7 @@ library(biomaRt)
 library(magrittr)
 library(reshape2)
 library(data.table)
+library(MOFA2)
 ```
 
 ```{r, eval=params$save_output, include=params$save_output}

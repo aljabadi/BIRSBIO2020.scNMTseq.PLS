@@ -14,8 +14,8 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
 Imports: MultiAssayExperiment, ggplot2, data.table,
         uwot, nipals, biomaRt,
-        reshape2, magrittr, mixOmics
-Remotes:  mixOmicsTeam/mixOmics@MultiAssayExperiment
+        reshape2, magrittr, mixOmics, HDF5Array, MOFA2
+Remotes: Bioconductor/HDF5Array, mixOmicsTeam/mixOmics@MultiAssayExperiment, bioFAM/MOFA2/MOFA2
 Suggests: 
     knitr,
     rmarkdown,
