@@ -164,6 +164,7 @@ ggsave(cov_plot, filename = 'figures/covplots.pdf', width = 8, height = 4)
 Here we use `uwot` package for Uniform Manifold Approximation Projection. The original study used the `umap` package with `method = 'umap-learn'` parameter which requires the 'umap-learn' python library and can add complexity to set up on a VM.
 
 ```{r}
+RNGversion('4.0.1')
 set.seed(params$umap_params['run.seed'])
 ## all params use defaults except for 'n_components' and 'min_dist'
 cat(sprintf('running umap on RNA data with parameters: %s ...\n ',
