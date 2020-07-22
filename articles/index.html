@@ -122,16 +122,31 @@
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">reshape2</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">data.table</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">MOFA2</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="co"># used run parameters from yaml</span>
+<span class="no">params</span>[-<span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span>(<span class="fl">3</span>)]
+<span class="co">#&gt; $drop_lineages</span>
+<span class="co">#&gt; [1] "Visceral_endoderm" "ExE_ectoderm"     </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $keep_assays</span>
+<span class="co">#&gt; [1] "rna"          "met_genebody" "met_promoter" "met_cgi"      "met_p300"    </span>
+<span class="co">#&gt; [6] "met_CTCF"     "met_DHS"     </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $data_path</span>
+<span class="co">#&gt; [1] "https://cloudstor.aarnet.edu.au/plus/s/Xzf5vCgAEUVgbfQ/download?path=%2Foutput&amp;files=scnmtseq_gastrulation_mae_826-cells_orderedFeatures.rds"</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $umap_params</span>
+<span class="co">#&gt;     run.seed  n_neighbors n_components     min_dist </span>
+<span class="co">#&gt;         42.0         15.0          4.0          0.1</span></pre></body></html></div>
 <div id="data" class="section level1">
 <h1 class="hasAnchor">
 <a href="#data" class="anchor"></a>Data</h1>
 <p>Details of the hackathon data and preprocessing steps: <a href="https://github.com/BIRSBiointegration/Hackathon/tree/master/scNMT-seq" class="uri">https://github.com/BIRSBiointegration/Hackathon/tree/master/scNMT-seq</a></p>
 <p>Load the <code>MultiAssayExperiment</code> object:</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'loading data from %s ...\n'</span>, <span class="no">params</span>$<span class="no">data_path</span>))
+<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'loading data from %s ...\n'</span>, <span class="no">params</span>$<span class="no">data_path</span>))
 <span class="co">#&gt; loading data from https://cloudstor.aarnet.edu.au/plus/s/Xzf5vCgAEUVgbfQ/download?path=%2Foutput&amp;files=scnmtseq_gastrulation_mae_826-cells_orderedFeatures.rds ...</span>
 <span class="no">gastru.mae</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/connections.html">url</a></span>(<span class="no">params</span>$<span class="no">data_path</span>))</pre></body></html></div>
 <p>An overview of the data object:</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">gastru.mae</span>
+<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">gastru.mae</span>
 <span class="co">#&gt; A MultiAssayExperiment object of 13 listed</span>
 <span class="co">#&gt;  experiments with user-defined names and respective classes.</span>
 <span class="co">#&gt;  Containing an ExperimentList class object of length 13:</span>
@@ -159,14 +174,14 @@
 <div id="filter-extra-embryonic-cells" class="section level2">
 <h2 class="hasAnchor">
 <a href="#filter-extra-embryonic-cells" class="anchor"></a>filter extra-embryonic cells</h2>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Dropping cells from lineage(s) %s:\n'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sQuote.html">sQuote</a></span>(<span class="no">params</span>$<span class="no">drop_lineages</span>), <span class="kw">collapse</span> <span class="kw">=</span> <span class="st">', '</span>)))
+<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Dropping cells from lineage(s) %s:\n'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sQuote.html">sQuote</a></span>(<span class="no">params</span>$<span class="no">drop_lineages</span>), <span class="kw">collapse</span> <span class="kw">=</span> <span class="st">', '</span>)))
 <span class="co">#&gt; Dropping cells from lineage(s) 'Visceral_endoderm', 'ExE_ectoderm':</span>
 <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Retaining assays: %s: \n'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sQuote.html">sQuote</a></span>(<span class="no">params</span>$<span class="no">keep_assays</span>), <span class="kw">collapse</span> <span class="kw">=</span> <span class="st">', '</span>)))
 <span class="co">#&gt; Retaining assays: 'rna', 'met_genebody', 'met_promoter', 'met_cgi', 'met_p300', 'met_CTCF', 'met_DHS':</span>
 <span class="no">gastru.mae</span> <span class="kw">&lt;-</span> <span class="no">gastru.mae</span>[, !(<span class="no">gastru.mae</span>$<span class="no">lineage10x_2</span> <span class="kw">%in%</span> <span class="no">params</span>$<span class="no">drop_lineages</span>), <span class="no">params</span>$<span class="no">keep_assays</span>]
 <span class="co">#&gt; harmonizing input:</span>
 <span class="co">#&gt;   removing 4494 sampleMap rows not in names(experiments)</span></pre></body></html></div>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">gastru.mae</span>
+<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">gastru.mae</span>
 <span class="co">#&gt; A MultiAssayExperiment object of 7 listed</span>
 <span class="co">#&gt;  experiments with user-defined names and respective classes.</span>
 <span class="co">#&gt;  Containing an ExperimentList class object of length 7:</span>
@@ -186,7 +201,7 @@
 <span class="co">#&gt;  assays() - convert ExperimentList to a SimpleList of matrices</span>
 <span class="co">#&gt;  exportClass() - save all data to files</span></pre></body></html></div>
 <p>Breakdown of the cells in each stage:</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span>(<span class="no">gastru.mae</span>$<span class="no">stage</span>) <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>() <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/magrittr/man/aliases.html">set_colnames</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'stage'</span>, <span class="st">'# of cells'</span>)) <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span>()</pre></body></html></div>
+<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span>(<span class="no">gastru.mae</span>$<span class="no">stage</span>) <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>() <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/magrittr/man/aliases.html">set_colnames</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'stage'</span>, <span class="st">'# of cells'</span>)) <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span>()</pre></body></html></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">stage</th>
@@ -211,14 +226,14 @@
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="co">## create a data.frame from cell metadata</span>
+<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="co">## create a data.frame from cell metadata</span>
 <span class="no">coldata</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="fu">colData</span>(<span class="no">gastru.mae</span>))</pre></body></html></div>
 </div>
 <div id="feature-detection" class="section level2">
 <h2 class="hasAnchor">
 <a href="#feature-detection" class="anchor"></a>Feature detection</h2>
 <p>Create density plots of the feature detection rate across all cells for all modalities:</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="co"># get the methylation assays</span>
+<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="co"># get the methylation assays</span>
 <span class="no">met_assays</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">gastru.mae</span>), <span class="kw">pattern</span> <span class="kw">=</span> <span class="st">'^met'</span>, <span class="kw">value</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
 <span class="co"># add dimensions to labels for ggplot</span>
 <span class="no">dims</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/MultiAssayExperiment/man/MultiAssayExperiment-methods.html">experiments</a></span>(<span class="no">gastru.mae</span>[,,<span class="no">met_assays</span>]), <span class="no">dim</span>)
@@ -241,7 +256,7 @@
 <span class="no">coverages</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/reference/utils.html">rbindListWithNames</a></span>(<span class="no">coverages</span>)
 <span class="no">coverages</span>$<span class="no">dataset</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">coverages</span>$<span class="no">dataset</span>, <span class="kw">levels</span> <span class="kw">=</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/duplicated.html">unique</a></span>(<span class="no">coverages</span>$<span class="no">dataset</span>), <span class="kw">ordered</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
 <p>Genomic contexts vary in level of feature detection rates:</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="no">cov_plot</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">coverages</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">pct_NAs</span>)) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span>(<span class="kw">fill</span> <span class="kw">=</span> <span class="st">'lightblue'</span>, <span class="kw">show.legend</span> <span class="kw">=</span> <span class="fl">FALSE</span>) +
+<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="no">cov_plot</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">coverages</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">pct_NAs</span>)) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span>(<span class="kw">fill</span> <span class="kw">=</span> <span class="st">'lightblue'</span>, <span class="kw">show.legend</span> <span class="kw">=</span> <span class="fl">FALSE</span>) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_vline</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">xintercept</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="no">pct_NAs</span>)),
              <span class="kw">color</span><span class="kw">=</span><span class="st">"blue"</span>, <span class="kw">linetype</span><span class="kw">=</span><span class="st">"dashed"</span>, <span class="kw">size</span><span class="kw">=</span><span class="fl">0.5</span>) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">'% of cells detecting the feature'</span>) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="no">.</span>~<span class="no">dataset</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">2</span>) +
@@ -249,7 +264,7 @@
 
 <span class="no">cov_plot</span></pre></body></html></div>
 <div class="figure">
-<img src="index_files/figure-html/unnamed-chunk-12-1.png" alt="density plots for methylation data show that shorter genomic regions tend to have less feture coverage. Dashed blue line indicates the average across all modalities." width="768"><p class="caption">
+<img src="index_files/figure-html/unnamed-chunk-13-1.png" alt="density plots for methylation data show that shorter genomic regions tend to have less feture coverage. Dashed blue line indicates the average across all modalities." width="768"><p class="caption">
 density plots for methylation data show that shorter genomic regions tend to have less feture coverage. Dashed blue line indicates the average across all modalities.
 </p>
 </div>
@@ -262,7 +277,7 @@ density plots for methylation data show that shorter genomic regions tend to hav
 <h2 class="hasAnchor">
 <a href="#umap" class="anchor"></a>UMAP</h2>
 <p>Here we use <code>uwot</code> package for Uniform Manifold Approximation Projection. The original study used the <code>umap</code> package with <code>method = 'umap-learn'</code> parameter which requires the ‘umap-learn’ python library and can add complexity to set up on a VM.</p>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">RNGversion</a></span>(<span class="st">'4.0.1'</span>)
+<div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">RNGversion</a></span>(<span class="st">'4.0.1'</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'run.seed'</span>])
 <span class="co">## all params use defaults except for 'n_components' and 'min_dist'</span>
 <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'running umap on RNA data with parameters: %s ...\n '</span>,
@@ -285,23 +300,23 @@ density plots for methylation data show that shorter genomic regions tend to hav
   <span class="kw">set_op_mix_ratio</span> <span class="kw">=</span> <span class="fl">1</span>,
   <span class="kw">local_connectivity</span> <span class="kw">=</span> <span class="fl">1</span>)</pre></body></html></div>
 <p>Create a data.frame of embeddings:</p>
-<div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">umap_rna_unsup</span>)
+<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">umap_rna_unsup</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">df</span>) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">'UMAP_'</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span>(<span class="no">df</span>))
 <span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(<span class="no">df</span>, <span class="no">coldata</span>)</pre></body></html></div>
 <p>Create colour palettes for stages and lineages:</p>
-<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="co"># col_pallete &lt;- viridisLite::viridis(n = 4)</span>
+<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="co"># col_pallete &lt;- viridisLite::viridis(n = 4)</span>
 <span class="no">col_pallete</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"#440154FF"</span>, <span class="st">"#31688EFF"</span>, <span class="st">"#35B779FF"</span>, <span class="st">"#FDE725FF"</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">col_pallete</span>) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"E4.5"</span>, <span class="st">"E5.5"</span>, <span class="st">"E6.5"</span>, <span class="st">"E7.5"</span>)</pre></body></html></div>
-<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="co">## helper function to create both plots coloured by stage</span>
+<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="co">## helper function to create both plots coloured by stage</span>
 <span class="no">plot_umap_by_stage</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">df</span>, <span class="no">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>)) {
   <span class="no">axes</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">'UMAP_'</span>, <span class="no">dims</span>)
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_.html">aes_string</a></span>(<span class="no">axes</span>[<span class="fl">1</span>], <span class="no">axes</span>[<span class="fl">2</span>])) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">col</span><span class="kw">=</span><span class="no">stage</span>)) +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_classic</a></span>()+ <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="no">col_pallete</span>)
 }</pre></body></html></div>
 <p>First two components:</p>
-<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="fu">plot_umap_by_stage</span>(<span class="kw">df</span> <span class="kw">=</span> <span class="no">df</span>, <span class="kw">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>))</pre></body></html></div>
+<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="fu">plot_umap_by_stage</span>(<span class="kw">df</span> <span class="kw">=</span> <span class="no">df</span>, <span class="kw">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>))</pre></body></html></div>
 <div class="figure">
-<img src="index_files/figure-html/unnamed-chunk-19-1.png" alt="UMAP plot shows distinct cell populations corresponding to early-stage, mid-stage, and late-stage cells as well as the within-stage variation for mainly E4.5 and E6.5 which could correspond to different lineages." width="672"><p class="caption">
+<img src="index_files/figure-html/unnamed-chunk-20-1.png" alt="UMAP plot shows distinct cell populations corresponding to early-stage, mid-stage, and late-stage cells as well as the within-stage variation for mainly E4.5 and E6.5 which could correspond to different lineages." width="672"><p class="caption">
 UMAP plot shows distinct cell populations corresponding to early-stage, mid-stage, and late-stage cells as well as the within-stage variation for mainly E4.5 and E6.5 which could correspond to different lineages.
 </p>
 </div>
@@ -314,13 +329,13 @@ UMAP plot shows distinct cell populations corresponding to early-stage, mid-stag
 <h2 class="hasAnchor">
 <a href="#gene-id-to-gene-symbol-conversion-data-frame" class="anchor"></a>gene id to gene symbol conversion data.frame</h2>
 <p>Get all the gene names from all modalities:</p>
-<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="no">all_features</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/MultiAssayExperiment/man/MultiAssayExperiment-methods.html">experiments</a></span>(<span class="no">gastru.mae</span>), <span class="no">rownames</span>) <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>()
+<div class="sourceCode" id="cb16"><html><body><pre class="r"><span class="no">all_features</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/MultiAssayExperiment/man/MultiAssayExperiment-methods.html">experiments</a></span>(<span class="no">gastru.mae</span>), <span class="no">rownames</span>) <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>()
 <span class="no">all_genes</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span>(<span class="kw">pattern</span> <span class="kw">=</span> <span class="st">'^ENSMUSG'</span>, <span class="kw">x</span> <span class="kw">=</span> <span class="no">all_features</span>, <span class="kw">value</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
 <span class="no">all_genes</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/duplicated.html">unique</a></span>(<span class="no">all_genes</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">all_genes</span>)
 <span class="co">#&gt; [1] 18359</span></pre></body></html></div>
 <p>Get the Ensembl gene name for these gene ids:</p>
-<div class="sourceCode" id="cb16"><html><body><pre class="r"><span class="no">ensembl</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/biomaRt/man/useMart.html">useMart</a></span>(<span class="st">"ensembl"</span>, <span class="kw">dataset</span><span class="kw">=</span><span class="st">"mmusculus_gene_ensembl"</span>)
+<div class="sourceCode" id="cb17"><html><body><pre class="r"><span class="no">ensembl</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/biomaRt/man/useMart.html">useMart</a></span>(<span class="st">"ensembl"</span>, <span class="kw">dataset</span><span class="kw">=</span><span class="st">"mmusculus_gene_ensembl"</span>)
 <span class="no">mouse_gene_ids</span>  <span class="kw">&lt;-</span> <span class="no">all_genes</span>
 
 <span class="no">symbols</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/biomaRt/man/getBM.html">getBM</a></span>(<span class="kw">attributes</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'ensembl_gene_id'</span>,
@@ -333,7 +348,7 @@ UMAP plot shows distinct cell populations corresponding to early-stage, mid-stag
 <div id="pls-integartion-of-all-modalities-with-feature-selection" class="section level2">
 <h2 class="hasAnchor">
 <a href="#pls-integartion-of-all-modalities-with-feature-selection" class="anchor"></a>PLS integartion of all modalities with feature selection</h2>
-<div class="sourceCode" id="cb17"><html><body><pre class="r"><span class="co"># data dimensions</span>
+<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="co"># data dimensions</span>
 <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/MultiAssayExperiment/man/MultiAssayExperiment-methods.html">experiments</a></span>(<span class="no">gastru.mae</span>), <span class="no">dim</span>)
 <span class="co">#&gt; $rna</span>
 <span class="co">#&gt; [1] 18345   749</span>
@@ -355,11 +370,11 @@ UMAP plot shows distinct cell populations corresponding to early-stage, mid-stag
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $met_DHS</span>
 <span class="co">#&gt; [1]  66 749</span></pre></body></html></div>
-<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="no">mmspls</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/reference/multimodal_analysis_wrapper.html">multimodal_analysis_wrapper</a></span>(<span class="kw">mae</span> <span class="kw">=</span> <span class="no">gastru.mae</span>, <span class="kw">study_assays</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">ncomp</span> <span class="kw">=</span> <span class="fl">2</span>, <span class="kw">scale</span> <span class="kw">=</span> <span class="fl">FALSE</span>, <span class="kw">design</span> <span class="kw">=</span> <span class="st">'null'</span>, <span class="kw">lineages</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">stages</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">DA</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">keepX</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">save</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
+<div class="sourceCode" id="cb19"><html><body><pre class="r"><span class="no">mmspls</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/reference/multimodal_analysis_wrapper.html">multimodal_analysis_wrapper</a></span>(<span class="kw">mae</span> <span class="kw">=</span> <span class="no">gastru.mae</span>, <span class="kw">study_assays</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">ncomp</span> <span class="kw">=</span> <span class="fl">2</span>, <span class="kw">scale</span> <span class="kw">=</span> <span class="fl">FALSE</span>, <span class="kw">design</span> <span class="kw">=</span> <span class="st">'null'</span>, <span class="kw">lineages</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">stages</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">DA</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">keepX</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">save</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
 <span class="co">#&gt; Making unique feature names by adding assay name to feature name for: met_genebody</span>
 <span class="co">#&gt; Making unique feature names by adding assay name to feature name for: met_promoter</span>
 <span class="co">#&gt; Warning in cor(A[[k]], variates.A[[k]]): the standard deviation is zero</span></pre></body></html></div>
-<div class="sourceCode" id="cb19"><html><body><pre class="r"><span class="no">plotIndiv_wrapper</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">pls_obj</span>, <span class="no">coldata</span>, <span class="no">col_cell</span> <span class="kw">=</span> <span class="st">'stage'</span>, <span class="no">legend.title</span> <span class="kw">=</span> <span class="st">'Stage'</span>, <span class="no">comp</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>), <span class="no">...</span>) {
+<div class="sourceCode" id="cb20"><html><body><pre class="r"><span class="no">plotIndiv_wrapper</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">pls_obj</span>, <span class="no">coldata</span>, <span class="no">col_cell</span> <span class="kw">=</span> <span class="st">'stage'</span>, <span class="no">legend.title</span> <span class="kw">=</span> <span class="st">'Stage'</span>, <span class="no">comp</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>), <span class="no">...</span>) {
   <span class="co">## order coldata cells based on matching cells in pls modalities</span>
   <span class="no">coldata</span> <span class="kw">&lt;-</span> <span class="no">coldata</span>[<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">pls_obj</span>$<span class="no">X</span><span class="kw">[[</span><span class="fl">1</span>]]),]
   <span class="no">cell_class</span> <span class="kw">&lt;-</span> <span class="no">coldata</span>[,<span class="no">col_cell</span>]  <span class="co">## col factor for cells</span>
@@ -373,15 +388,15 @@ UMAP plot shows distinct cell populations corresponding to early-stage, mid-stag
 <h2 class="hasAnchor">
 <a href="#score-plots" class="anchor"></a>score plots</h2>
 <p>Colored by stage:</p>
-<div class="sourceCode" id="cb20"><html><body><pre class="r"><span class="fu">plotIndiv_wrapper</span>(<span class="kw">pls_obj</span> <span class="kw">=</span> <span class="no">mmspls</span>, <span class="kw">coldata</span> <span class="kw">=</span> <span class="no">coldata</span>, <span class="kw">col_cell</span> <span class="kw">=</span> <span class="st">'stage'</span>, <span class="kw">legend.title</span> <span class="kw">=</span> <span class="st">'Stage'</span>, <span class="kw">comp</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>), <span class="kw">subtitle</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">mmspls</span>$<span class="no">X</span>), <span class="kw">col.per.group</span> <span class="kw">=</span> <span class="no">col_pallete</span>)</pre></body></html></div>
-<p><img src="index_files/figure-html/unnamed-chunk-27-1.png" width="768"></p>
+<div class="sourceCode" id="cb21"><html><body><pre class="r"><span class="fu">plotIndiv_wrapper</span>(<span class="kw">pls_obj</span> <span class="kw">=</span> <span class="no">mmspls</span>, <span class="kw">coldata</span> <span class="kw">=</span> <span class="no">coldata</span>, <span class="kw">col_cell</span> <span class="kw">=</span> <span class="st">'stage'</span>, <span class="kw">legend.title</span> <span class="kw">=</span> <span class="st">'Stage'</span>, <span class="kw">comp</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>), <span class="kw">subtitle</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">mmspls</span>$<span class="no">X</span>), <span class="kw">col.per.group</span> <span class="kw">=</span> <span class="no">col_pallete</span>)</pre></body></html></div>
+<p><img src="index_files/figure-html/unnamed-chunk-28-1.png" width="768"></p>
 </div>
 </div>
 <div id="concordancy-with-rna" class="section level1">
 <h1 class="hasAnchor">
 <a href="#concordancy-with-rna" class="anchor"></a>Concordancy with RNA</h1>
 <p>Here we calculate the average correlation between components from gene expression and different methylome modalities:</p>
-<div class="sourceCode" id="cb21"><html><body><pre class="r"><span class="no">concordancy</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">pls_obj</span>, <span class="no">comp</span> <span class="kw">=</span> <span class="fl">1</span>) {
+<div class="sourceCode" id="cb22"><html><body><pre class="r"><span class="no">concordancy</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">pls_obj</span>, <span class="no">comp</span> <span class="kw">=</span> <span class="fl">1</span>) {
 
   <span class="no">cor_with_y</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span>(<span class="no">pls_obj</span>$<span class="no">variates</span>[-<span class="fl">1</span>], <span class="kw">function</span>(<span class="no">x_variates</span>) {
     <span class="no">y_variates</span> <span class="kw">&lt;-</span> <span class="no">pls_obj</span>$<span class="no">variates</span><span class="kw">[[</span><span class="fl">1</span>]]
@@ -398,13 +413,13 @@ UMAP plot shows distinct cell populations corresponding to early-stage, mid-stag
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">cor_with_y</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">modality</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">concordancy</span>)) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col</a></span>(<span class="kw">fill</span> <span class="kw">=</span> <span class="st">"#35B779FF"</span>) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_classic</a></span>() +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">y</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Correlation with RNA (comp %s) '</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="no">comp</span>, <span class="kw">collapse</span> <span class="kw">=</span> <span class="st">', '</span>)), <span class="kw">x</span> <span class="kw">=</span> <span class="st">''</span>) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html">ylim</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1</span>)) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">45</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.8</span>, <span class="kw">hjust</span><span class="kw">=</span><span class="fl">1</span>))
 }</pre></body></html></div>
-<div class="sourceCode" id="cb22"><html><body><pre class="r"><span class="fu">concordancy</span>(<span class="kw">pls_obj</span> <span class="kw">=</span> <span class="no">mmspls</span>, <span class="kw">comp</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">2</span>))
+<div class="sourceCode" id="cb23"><html><body><pre class="r"><span class="fu">concordancy</span>(<span class="kw">pls_obj</span> <span class="kw">=</span> <span class="no">mmspls</span>, <span class="kw">comp</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">2</span>))
 <span class="co">#&gt; </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; |            | met_promoter| met_cgi| met_genebody| met_DHS| met_CTCF| met_p300|</span>
 <span class="co">#&gt; |:-----------|------------:|-------:|------------:|-------:|--------:|--------:|</span>
 <span class="co">#&gt; |concordancy |         0.78|    0.75|         0.69|    0.49|     0.29|     0.24|</span></pre></body></html></div>
-<p><img src="index_files/figure-html/unnamed-chunk-30-1.png" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-31-1.png" width="672"></p>
 <p>```</p>
 </div>
 <div class="footnotes">
