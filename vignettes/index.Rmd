@@ -297,17 +297,29 @@ ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf', width = 8, 
 
 # Concordancy with RNA
 
-Average correlation of the components of rna and different modalities:
+Here we calculate the average correlation between components from gene expression and different methylome modalities:
 ```{r}
-cor_with_rna <- sapply(mmspls$variates[-1], function(x) {
-  mean(diag(cor(mmspls$variates$rna, x)))
-}) 
+concordancy <- function(pls_obj, comp = 1) {
+  
+  cor_with_y <- sapply(pls_obj$variates[-1], function(x_variates) {
+    y_variates <- pls_obj$variates[[1]]
+    y_variates <- y_variates[, comp, drop = FALSE]
+    
+    avg_cor <- mean(diag(cor(y_variates, x_variates)))
+    avg_cor
+  }) 
+  cor_with_y <- cor_with_y %>% sort(decreasing = TRUE)
+  cor_with_y <- cor_with_y %>% as.data.frame() %>% set_colnames(c('concordancy'))
+  cor_with_y %>% round(digits = 2) %>% t() %>%  kable() %>% print()
+  
+  cor_with_y$modality <- factor(rownames(cor_with_y), levels = rownames(cor_with_y), ordered = TRUE)
+  ggplot(cor_with_y, aes(x = modality, y = concordancy)) + geom_col(fill = "#35B779FF") + theme_classic() +
+    labs(y = sprintf('Correlation with RNA (comp %s) ', paste(comp, collapse = ', ')), x = '') + ylim(c(0, 1)) + theme(axis.text.x = element_text(angle = 45, vjust = 0.8, hjust=1))
+}
+```
 
-cor_with_rna <- cor_with_rna %>% sort(decreasing = TRUE)
-cor_with_rna <- cor_with_rna %>% as.data.frame() %>% set_colnames(c('cor'))
-cor_with_rna$modality <- factor(rownames(cor_with_rna), levels = rownames(cor_with_rna), ordered = TRUE)
-
-ggplot(cor_with_rna, aes(x = modality, y = cor)) + geom_col(fill = "#35B779FF") + theme_classic() +
-  labs(y = 'Avg correlation with RNA', y = 'Modality')
+```{r}
+concordancy(pls_obj = mmspls, comp = c(1, 2))
+```
 
 ```
