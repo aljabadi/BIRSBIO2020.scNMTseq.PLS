@@ -8,7 +8,7 @@ params:
   keep_assays: !r c("rna", "met_genebody", "met_promoter", "met_cgi", "met_p300", "met_CTCF", "met_DHS")
   save_output: no
   data_path: "https://cloudstor.aarnet.edu.au/plus/s/Xzf5vCgAEUVgbfQ/download?path=%2Foutput&files=scnmtseq_gastrulation_mae_826-cells_orderedFeatures.rds"
-  umap_params: !r c(run.seed = 42, n_neighbors = 15, n_components = 4)
+  umap_params: !r c(run.seed = 42, n_neighbors = 15, n_components = 4, min_dist = 0.1)
   on_my_mac: !r Sys.info()['user'] == 'alabadi'
   not_on_my_mac: !r Sys.info()['user'] != 'alabadi'
 vignette: >
@@ -174,6 +174,7 @@ umap_rna_unsup <- uwot::umap(
   t(assay(gastru.mae, 'rna')),
   n_neighbors = params$umap_params['n_neighbors'],
   n_components = params$umap_params['n_components'],
+  min_dist = params$umap_params['min_dist'], ## continuity (min_dist >> 0)-discreteness (min_dist -> 0) trade-off
   metric = "euclidean",
   n_epochs = NULL,
   learning_rate = 1,
