@@ -4,13 +4,15 @@ author: Al JalalAbadi^[Melbourne Integrative Genomics, The University of Melbour
 date: "`r format(Sys.Date(), '%d %b %Y')`"
 output: rmarkdown::html_vignette
 params:
-  drop_lineages: !r c('Visceral_endoderm', 'ExE_ectoderm')
-  keep_assays: !r c("rna", "met_genebody", "met_promoter", "met_cgi", "met_p300", "met_CTCF", "met_DHS")
-  save_output: no
-  data_path: "https://cloudstor.aarnet.edu.au/plus/s/Xzf5vCgAEUVgbfQ/download?path=%2Foutput&files=scnmtseq_gastrulation_mae_826-cells_orderedFeatures.rds"
-  umap_params: !r c(run.seed = 42, n_neighbors = 15, n_components = 4, min_dist = 0.1)
+  ## setup params
   on_my_mac: !r Sys.info()['user'] == 'alabadi'
   not_on_my_mac: !r Sys.info()['user'] != 'alabadi'
+  save_output: no
+  ## run params
+  drop_lineages: !r c('Visceral_endoderm', 'ExE_ectoderm')
+  keep_assays: !r c("rna", "met_genebody", "met_promoter", "met_cgi", "met_p300", "met_CTCF", "met_DHS")
+  data_path: "https://cloudstor.aarnet.edu.au/plus/s/Xzf5vCgAEUVgbfQ/download?path=%2Foutput&files=scnmtseq_gastrulation_mae_826-cells_orderedFeatures.rds"
+  umap_params: !r c(run.seed = 42, n_neighbors = 15, n_components = 4, min_dist = 0.1)
 vignette: >
   %\VignetteIndexEntry{scNMTseq challenge analysis using a PLS-based approach}
   %\VignetteEngine{knitr::rmarkdown}
@@ -74,6 +76,11 @@ if (!dir.exists('savedata')) {
    cat('creating "savedata" folder ...\n')
   dir.create('savedata')
 }
+```
+
+```{r}
+# used run parameters from yaml
+params[-seq_len(3)]
 ```
 
 # Data
