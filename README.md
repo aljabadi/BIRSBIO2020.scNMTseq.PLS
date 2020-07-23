@@ -8,6 +8,8 @@ pkdown report available at: https://ajabadi.github.io/BIRSBIO2020.scNMTseq.PLS
 
 :one: Use https://github.com/seandavi/BuildABiocWorkshop2020 as template for your analysis package. You can simply click [here](https://github.com/seandavi/BuildABiocWorkshop2020/generate) to accomplish this. Make it public and include all branches (to keep `master` & `gh-pages`, you can delete the rest).
 
+   :exclamation: For python notebooks also see https://github.com/fastai/fastpages
+
 :two: Follow the steps outlined [here](https://github.com/seandavi/BuildABiocWorkshop2020/blob/master/vignettes/HOWTO_BUILD_WORKSHOP.Rmd) to set up your own workflow and create a package from your analyses. The notebooks should go in `./vignettes` folder and source files in `./R` (or simply include them in notebooks). Include all dependencies in `DESCRIPTION` and ensure it can be installed, Ensure `devtools::build_vignettes()` can successfully create the vignettes locally before testing using GitHub Actions.
 
    :bulb: If you use R and have python dependencies, [this setup](https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/commit/3155bbab63129e3734e155f9f245c3a386230627#diff-5822d7d51c0024ec80488aa8a41ba9caR5-R20) should help as an example.
