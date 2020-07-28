@@ -117,6 +117,7 @@
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">knitr</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">uwot</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">nipals</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">SingleCellMultiModal</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">biomaRt</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">magrittr</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">reshape2</span>)
@@ -131,9 +132,6 @@
 <span class="co">#&gt; [1] "rna"          "met_genebody" "met_promoter" "met_cgi"      "met_p300"    </span>
 <span class="co">#&gt; [6] "met_CTCF"     "met_DHS"     </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; $data_path</span>
-<span class="co">#&gt; [1] "https://cloudstor.aarnet.edu.au/plus/s/Xzf5vCgAEUVgbfQ/download?path=%2Foutput&amp;files=scnmtseq_gastrulation_mae_826-cells_orderedFeatures.rds"</span>
-<span class="co">#&gt; </span>
 <span class="co">#&gt; $umap_params</span>
 <span class="co">#&gt;     run.seed  n_neighbors n_components     min_dist </span>
 <span class="co">#&gt;         42.0         15.0          4.0          0.1</span></pre></body></html></div>
@@ -142,27 +140,104 @@
 <a href="#data" class="anchor"></a>Data</h1>
 <p>Details of the hackathon data and preprocessing steps: <a href="https://github.com/BIRSBiointegration/Hackathon/tree/master/scNMT-seq" class="uri">https://github.com/BIRSBiointegration/Hackathon/tree/master/scNMT-seq</a></p>
 <p>Load the <code>MultiAssayExperiment</code> object:</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'loading data from %s ...\n'</span>, <span class="no">params</span>$<span class="no">data_path</span>))
-<span class="co">#&gt; loading data from https://cloudstor.aarnet.edu.au/plus/s/Xzf5vCgAEUVgbfQ/download?path=%2Foutput&amp;files=scnmtseq_gastrulation_mae_826-cells_orderedFeatures.rds ...</span>
-<span class="no">gastru.mae</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/connections.html">url</a></span>(<span class="no">params</span>$<span class="no">data_path</span>))</pre></body></html></div>
+<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'loading the data using SingleCellMultiModal package ...\n'</span>)
+<span class="co">#&gt; loading the data using SingleCellMultiModal package ...</span>
+<span class="no">gastru.mae</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SingleCellMultiModal/man/scNMT.html">scNMT</a></span>(<span class="kw">dataType</span> <span class="kw">=</span> <span class="st">'mouse_gastrulation'</span>, <span class="kw">modes</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'rna'</span>, <span class="st">'met_*'</span>, <span class="st">'acc_*'</span>), <span class="kw">dry.run</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
+<span class="co">#&gt; using temporary cache /tmp/RtmpnQK4s9/BiocFileCache</span>
+<span class="co">#&gt; snapshotDate(): 2020-07-10</span>
+<span class="co">#&gt; Working on: scnmt_acc_cgi</span>
+<span class="co">#&gt; see ?SingleCellMultiModal and browseVignettes('SingleCellMultiModal') for documentation</span>
+<span class="co">#&gt; downloading 1 resources</span>
+<span class="co">#&gt; retrieving 1 resource</span>
+<span class="co">#&gt; loading from cache</span>
+<span class="co">#&gt; Working on: scnmt_acc_CTCF</span>
+<span class="co">#&gt; see ?SingleCellMultiModal and browseVignettes('SingleCellMultiModal') for documentation</span>
+<span class="co">#&gt; downloading 1 resources</span>
+<span class="co">#&gt; retrieving 1 resource</span>
+<span class="co">#&gt; loading from cache</span>
+<span class="co">#&gt; Working on: scnmt_acc_DHS</span>
+<span class="co">#&gt; see ?SingleCellMultiModal and browseVignettes('SingleCellMultiModal') for documentation</span>
+<span class="co">#&gt; downloading 1 resources</span>
+<span class="co">#&gt; retrieving 1 resource</span>
+<span class="co">#&gt; loading from cache</span>
+<span class="co">#&gt; Working on: scnmt_acc_genebody</span>
+<span class="co">#&gt; see ?SingleCellMultiModal and browseVignettes('SingleCellMultiModal') for documentation</span>
+<span class="co">#&gt; downloading 1 resources</span>
+<span class="co">#&gt; retrieving 1 resource</span>
+<span class="co">#&gt; loading from cache</span>
+<span class="co">#&gt; Working on: scnmt_acc_p300</span>
+<span class="co">#&gt; see ?SingleCellMultiModal and browseVignettes('SingleCellMultiModal') for documentation</span>
+<span class="co">#&gt; downloading 1 resources</span>
+<span class="co">#&gt; retrieving 1 resource</span>
+<span class="co">#&gt; loading from cache</span>
+<span class="co">#&gt; Working on: scnmt_acc_promoter</span>
+<span class="co">#&gt; see ?SingleCellMultiModal and browseVignettes('SingleCellMultiModal') for documentation</span>
+<span class="co">#&gt; downloading 1 resources</span>
+<span class="co">#&gt; retrieving 1 resource</span>
+<span class="co">#&gt; loading from cache</span>
+<span class="co">#&gt; Working on: scnmt_met_cgi</span>
+<span class="co">#&gt; see ?SingleCellMultiModal and browseVignettes('SingleCellMultiModal') for documentation</span>
+<span class="co">#&gt; downloading 1 resources</span>
+<span class="co">#&gt; retrieving 1 resource</span>
+<span class="co">#&gt; loading from cache</span>
+<span class="co">#&gt; Working on: scnmt_met_CTCF</span>
+<span class="co">#&gt; see ?SingleCellMultiModal and browseVignettes('SingleCellMultiModal') for documentation</span>
+<span class="co">#&gt; downloading 1 resources</span>
+<span class="co">#&gt; retrieving 1 resource</span>
+<span class="co">#&gt; loading from cache</span>
+<span class="co">#&gt; Working on: scnmt_met_DHS</span>
+<span class="co">#&gt; see ?SingleCellMultiModal and browseVignettes('SingleCellMultiModal') for documentation</span>
+<span class="co">#&gt; downloading 1 resources</span>
+<span class="co">#&gt; retrieving 1 resource</span>
+<span class="co">#&gt; loading from cache</span>
+<span class="co">#&gt; Working on: scnmt_met_genebody</span>
+<span class="co">#&gt; see ?SingleCellMultiModal and browseVignettes('SingleCellMultiModal') for documentation</span>
+<span class="co">#&gt; downloading 1 resources</span>
+<span class="co">#&gt; retrieving 1 resource</span>
+<span class="co">#&gt; loading from cache</span>
+<span class="co">#&gt; Working on: scnmt_met_p300</span>
+<span class="co">#&gt; see ?SingleCellMultiModal and browseVignettes('SingleCellMultiModal') for documentation</span>
+<span class="co">#&gt; downloading 1 resources</span>
+<span class="co">#&gt; retrieving 1 resource</span>
+<span class="co">#&gt; loading from cache</span>
+<span class="co">#&gt; Working on: scnmt_met_promoter</span>
+<span class="co">#&gt; see ?SingleCellMultiModal and browseVignettes('SingleCellMultiModal') for documentation</span>
+<span class="co">#&gt; downloading 1 resources</span>
+<span class="co">#&gt; retrieving 1 resource</span>
+<span class="co">#&gt; loading from cache</span>
+<span class="co">#&gt; Working on: scnmt_rna</span>
+<span class="co">#&gt; see ?SingleCellMultiModal and browseVignettes('SingleCellMultiModal') for documentation</span>
+<span class="co">#&gt; downloading 1 resources</span>
+<span class="co">#&gt; retrieving 1 resource</span>
+<span class="co">#&gt; loading from cache</span>
+<span class="co">#&gt; Working on: scnmt_colData</span>
+<span class="co">#&gt; see ?SingleCellMultiModal and browseVignettes('SingleCellMultiModal') for documentation</span>
+<span class="co">#&gt; downloading 1 resources</span>
+<span class="co">#&gt; retrieving 1 resource</span>
+<span class="co">#&gt; loading from cache</span>
+<span class="co">#&gt; Working on: scnmt_sampleMap</span>
+<span class="co">#&gt; see ?SingleCellMultiModal and browseVignettes('SingleCellMultiModal') for documentation</span>
+<span class="co">#&gt; downloading 1 resources</span>
+<span class="co">#&gt; retrieving 1 resource</span>
+<span class="co">#&gt; loading from cache</span></pre></body></html></div>
 <p>An overview of the data object:</p>
 <div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">gastru.mae</span>
 <span class="co">#&gt; A MultiAssayExperiment object of 13 listed</span>
 <span class="co">#&gt;  experiments with user-defined names and respective classes.</span>
 <span class="co">#&gt;  Containing an ExperimentList class object of length 13:</span>
-<span class="co">#&gt;  [1] rna: matrix with 18345 rows and 826 columns</span>
-<span class="co">#&gt;  [2] met_genebody: matrix with 15837 rows and 826 columns</span>
-<span class="co">#&gt;  [3] met_promoter: matrix with 12092 rows and 826 columns</span>
-<span class="co">#&gt;  [4] met_cgi: matrix with 5536 rows and 826 columns</span>
-<span class="co">#&gt;  [5] met_p300: matrix with 101 rows and 826 columns</span>
-<span class="co">#&gt;  [6] met_CTCF: matrix with 175 rows and 826 columns</span>
-<span class="co">#&gt;  [7] met_DHS: matrix with 66 rows and 826 columns</span>
-<span class="co">#&gt;  [8] acc_genebody: matrix with 17139 rows and 826 columns</span>
-<span class="co">#&gt;  [9] acc_promoter: matrix with 16518 rows and 826 columns</span>
-<span class="co">#&gt;  [10] acc_cgi: matrix with 4459 rows and 826 columns</span>
-<span class="co">#&gt;  [11] acc_p300: matrix with 138 rows and 826 columns</span>
-<span class="co">#&gt;  [12] acc_CTCF: matrix with 898 rows and 826 columns</span>
-<span class="co">#&gt;  [13] acc_DHS: matrix with 290 rows and 826 columns</span>
+<span class="co">#&gt;  [1] acc_cgi: matrix with 4459 rows and 826 columns</span>
+<span class="co">#&gt;  [2] acc_CTCF: matrix with 898 rows and 826 columns</span>
+<span class="co">#&gt;  [3] acc_DHS: matrix with 290 rows and 826 columns</span>
+<span class="co">#&gt;  [4] acc_genebody: matrix with 17139 rows and 826 columns</span>
+<span class="co">#&gt;  [5] acc_p300: matrix with 138 rows and 826 columns</span>
+<span class="co">#&gt;  [6] acc_promoter: matrix with 16518 rows and 826 columns</span>
+<span class="co">#&gt;  [7] met_cgi: matrix with 5536 rows and 826 columns</span>
+<span class="co">#&gt;  [8] met_CTCF: matrix with 175 rows and 826 columns</span>
+<span class="co">#&gt;  [9] met_DHS: matrix with 66 rows and 826 columns</span>
+<span class="co">#&gt;  [10] met_genebody: matrix with 15837 rows and 826 columns</span>
+<span class="co">#&gt;  [11] met_p300: matrix with 101 rows and 826 columns</span>
+<span class="co">#&gt;  [12] met_promoter: matrix with 12092 rows and 826 columns</span>
+<span class="co">#&gt;  [13] rna: matrix with 18345 rows and 826 columns</span>
 <span class="co">#&gt; Functionality:</span>
 <span class="co">#&gt;  experiments() - obtain the ExperimentList instance</span>
 <span class="co">#&gt;  colData() - the primary/phenotype DataFrame</span>
