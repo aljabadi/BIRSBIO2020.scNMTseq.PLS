@@ -21,7 +21,8 @@ Imports: MultiAssayExperiment,
         reshape2, 
         magrittr, 
         mixOmics, 
-        MOFA2
+        MOFA2,
+        SingleCellMultiModal
 Remotes: mixOmicsTeam/mixOmics@MultiAssayExperiment, 
         bioFAM/MOFA2/MOFA2
 Suggests: 

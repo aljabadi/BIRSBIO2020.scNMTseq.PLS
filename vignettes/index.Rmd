@@ -11,7 +11,6 @@ params:
   ## run params
   drop_lineages: !r c('Visceral_endoderm', 'ExE_ectoderm')
   keep_assays: !r c("rna", "met_genebody", "met_promoter", "met_cgi", "met_p300", "met_CTCF", "met_DHS")
-  data_path: "https://cloudstor.aarnet.edu.au/plus/s/Xzf5vCgAEUVgbfQ/download?path=%2Foutput&files=scnmtseq_gastrulation_mae_826-cells_orderedFeatures.rds"
   umap_params: !r c(run.seed = 42, n_neighbors = 15, n_components = 4, min_dist = 0.1)
 vignette: >
   %\VignetteIndexEntry{scNMTseq challenge analysis using a PLS-based approach}
@@ -58,6 +57,7 @@ library(ggplot2)
 library(knitr)
 library(uwot)
 library(nipals)
+library(SingleCellMultiModal)
 library(biomaRt)
 library(magrittr)
 library(reshape2)
@@ -95,8 +95,8 @@ gastru.mae <- readRDS('/Users/alabadi/Projects/analysis/R/multiOmics/scNMTseq/BI
 ```
 
 ```{r, eval=params$not_on_my_mac}
-cat(sprintf('loading data from %s ...\n', params$data_path))
-gastru.mae <- readRDS(url(params$data_path))
+cat('loading the data using SingleCellMultiModal package ...\n')
+gastru.mae <- scNMT(dataType = 'mouse_gastrulation', modes = c('rna', 'met_*', 'acc_*'), dry.run = FALSE)
 ```
 
 An overview of the data object:
