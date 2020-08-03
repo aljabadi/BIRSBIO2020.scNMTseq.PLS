@@ -35,8 +35,8 @@ knitr::opts_chunk$set(
 
 **Note:** These analyses are (slightly) different from the ones presented in the hackathon in the sense that:
 
-  - The cells used are different (only embryonic cells used)
-  - To enhance reproducibility on different machines, `uwot::umap` was used instead of `umap::umap` for dimensionality reduction of RNA data so that python dependencies are reduced
+  - The cells used are different (only embryonic cells used).
+  - To enhance reproducibility on different machines, `uwot::umap` was used instead of `umap::umap` for dimensionality reduction of RNA data to avoid python dependencies. This will give different results in dimension reduction, but the population structure remains the same.
   
 --------
 
