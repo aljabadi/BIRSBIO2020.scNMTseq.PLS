@@ -95,8 +95,8 @@ gastru.mae <- readRDS('/Users/alabadi/Projects/analysis/R/multiOmics/scNMTseq/BI
 ```
 
 ```{r, eval=params$not_on_my_mac}
-cat('loading the data using SingleCellMultiModal package ...\n')
-gastru.mae <- scNMT(dataType = 'mouse_gastrulation', modes = c('rna', 'met_*', 'acc_*'), dry.run = FALSE)
+cat(sprintf('loading the following assays using SingleCellMultiModal package: %s\n', paste(params$keep_assays, collapse = ', ')))
+gastru.mae <- scNMT(dataType = 'mouse_gastrulation', modes = params$keep_assays, dry.run = FALSE)
 ```
 
 An overview of the data object:
@@ -109,7 +109,6 @@ gastru.mae
 
 ```{r}
 cat(sprintf('Dropping cells from lineage(s) %s:\n', paste(sQuote(params$drop_lineages), collapse = ', ')))
-cat(sprintf('Retaining assays: %s: \n', paste(sQuote(params$keep_assays), collapse = ', ')))
 gastru.mae <- gastru.mae[, !(gastru.mae$lineage10x_2 %in% params$drop_lineages), params$keep_assays]
 ```
 
