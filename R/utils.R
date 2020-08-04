@@ -46,4 +46,10 @@ gg_color_hue <- function(n) {
   grDevices::hcl(h = hues, l = 65, c = 100)[1:n]
 }
 
+## ----------- get_pct_missing -----------
+## for array 'arr', output the percentage of NAs (0-100)
+#' @export
+get_pct_missing <- function(arr) {
+  100*sum(is.na(arr))/prod(dim(arr))
+}
 

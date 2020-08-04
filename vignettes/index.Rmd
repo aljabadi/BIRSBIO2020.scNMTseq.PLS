@@ -78,11 +78,6 @@ if (!dir.exists('savedata')) {
 }
 ```
 
-```{r}
-# used run parameters from yaml
-params[-seq_len(3)]
-```
-
 # Data
 
 Details of the hackathon data and preprocessing steps: https://github.com/BIRSBiointegration/Hackathon/tree/master/scNMT-seq
@@ -96,20 +91,30 @@ gastru.mae <- readRDS('/Users/alabadi/Projects/analysis/R/multiOmics/scNMTseq/BI
 
 ```{r, eval=params$not_on_my_mac}
 cat(sprintf('loading the following assays using SingleCellMultiModal package: %s\n', paste(params$keep_assays, collapse = ', ')))
-gastru.mae <- scNMT(dataType = 'mouse_gastrulation', modes = params$keep_assays, dry.run = FALSE)
+gastru.mae <- scNMT(dataType = 'mouse_gastrulation', modes = params$keep_assays, dry.run = FALSE, verbose = FALSE)
 ```
 
-An overview of the data object:
-
-```{r}
-gastru.mae
-```
 
 ## filter extra-embryonic cells
 
 ```{r}
-cat(sprintf('Dropping cells from lineage(s) %s:\n', paste(sQuote(params$drop_lineages), collapse = ', ')))
+cat(sprintf('Dropping cells from putative lineage(s) %s:\n', paste(sQuote(params$drop_lineages), collapse = ', ')))
 gastru.mae <- gastru.mae[, !(gastru.mae$lineage10x_2 %in% params$drop_lineages), params$keep_assays]
+```
+
+Overview of assays:
+
+```{r}
+df <- lapply(experiments(gastru.mae), function(w)
+     {
+     c(
+       n_cells = dim(w)[2],
+       n_features = dim(w)[1],
+       pct_missing = get_pct_missing(w)
+     )
+     })
+df <- round(data.frame(df))
+kable(df, align = 'l')
 ```
 
 ```{r}
