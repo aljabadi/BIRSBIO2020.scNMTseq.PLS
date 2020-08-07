@@ -8,7 +8,7 @@
 #' @param scale Logical, whether to scale the features
 #' @param DA NULL for unsupervised, or from names(colData(mae)) for supervised (PLSDA)
 #' @export
-multimodal_analysis_wrapper <- function(mae, study_assays, lineages=NULL, stages = NULL, ncomp = 2, scale = TRUE, design = 'null', DA=NULL, keepX = NULL, save = TRUE) {
+multimodal_sPLS_wrapper <- function(mae, study_assays, lineages=NULL, stages = NULL, ncomp = 2, scale = TRUE, design = 'null', DA=NULL, keepX = NULL, save = TRUE) {
 
   if (is.null(study_assays)) {
     study_assays <- names(experiments(mae))

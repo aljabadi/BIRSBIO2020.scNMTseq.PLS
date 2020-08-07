@@ -274,7 +274,7 @@ lapply(experiments(gastru.mae), dim)
 ```
 
 ```{r}
-mmspls <- multimodal_analysis_wrapper(mae = gastru.mae, study_assays = NULL, ncomp = 2, scale = FALSE, design = 'null', lineages = NULL, stages = NULL, DA = NULL, keepX = NULL, save = FALSE)
+mmspls <- multimodal_sPLS_wrapper(mae = gastru.mae, study_assays = NULL, ncomp = 2, scale = FALSE, design = 'null', lineages = NULL, stages = NULL, DA = NULL, keepX = NULL, save = FALSE)
 ```
 
 ```{r, eval=params$save_output, echo=FALSE}

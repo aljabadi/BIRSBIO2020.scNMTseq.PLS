@@ -2,6 +2,6 @@
 
 export(all_identical)
 export(gg_color_hue)
-export(multimodal_analysis_wrapper)
+export(multimodal_sPLS_wrapper)
 export(named_list)
 export(rbindListWithNames)
