@@ -9,7 +9,7 @@ params:
   not_on_my_mac: !r Sys.info()['user'] != 'alabadi'
   save_output: no
   ## run params
-  drop_lineages: !r c('Visceral_endoderm', 'ExE_ectoderm')
+  drop_lineages: c('Primitive_endoderm','Visceral_endoderm', 'ExE_ectoderm')
   keep_assays: !r c("rna", "met_genebody", "met_promoter", "met_cgi", "met_p300", "met_CTCF", "met_DHS")
   umap_params: !r c(run.seed = 42, n_neighbors = 15, n_components = 4, min_dist = 0.1)
 vignette: >
