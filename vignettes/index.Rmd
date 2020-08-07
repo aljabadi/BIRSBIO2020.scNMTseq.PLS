@@ -29,7 +29,7 @@ library(knitr)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.width = 7
+  fig.width = 8
 )
 ```
 
@@ -46,12 +46,14 @@ Load the required packages:
 local.lib <- '../lib'
 dir.create(local.lib)
 .libPaths(local.lib)
+## uncomment this if you are not building the vignette along with the package
 # remotes::install_github('mixOmicsTeam/mixOmics@MultiAssayExperiment', upgrade = 'never')
 ```
 
-```{r, warning=FALSE, message=FALSE}
+```{r load packages, warning=FALSE, message=FALSE}
 library(BIRSBIO2020.scNMTseq.PLS)
 library(MultiAssayExperiment)
+library(scater)
 library(mixOmics)
 library(ggplot2)
 library(knitr)
