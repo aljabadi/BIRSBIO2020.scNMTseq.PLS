@@ -6,12 +6,14 @@ output: rmarkdown::html_vignette
 params:
   ## setup params
   on_my_mac: !r Sys.info()['user'] == 'alabadi'
-  not_on_my_mac: !r Sys.info()['user'] != 'alabadi'
-  save_output: no
+  save_output: false
+  local_data: false
+  mini_run: false
+  # mini_run: !r Sys.info()['user'] == 'alabadi'
+  matching_rna_for_umap: false
   ## run params
   drop_lineages: c('Primitive_endoderm','Visceral_endoderm', 'ExE_ectoderm')
-  keep_assays: !r c("rna", "met_genebody", "met_promoter", "met_cgi", "met_p300", "met_CTCF", "met_DHS")
-  umap_params: !r c(run.seed = 42, n_neighbors = 15, n_components = 4, min_dist = 0.1)
+  umap_params: !r c(run.seed = 42, n_neighbors = 15, n_components = 2, min_dist = 0.55)
 vignette: >
   %\VignetteIndexEntry{scNMTseq challenge analysis using a PLS-based approach}
   %\VignetteEngine{knitr::rmarkdown}
@@ -23,11 +25,10 @@ vignette: >
 
 ```{r, include = FALSE}
 library(knitr)
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.width = 8
-)
+knitr::opts_chunk$set(collapse = TRUE, 
+                      comment = "#>", 
+                      fig.width = 8, 
+                      cache = FALSE)
 ```
 
 **Note:** These analyses are different from the ones presented in the hackathon due to updated preprocessing if data in order to harmonize the analyses for publication. For original analyses see https://github.com/ajabadi/scNMT_seq_gastrulation.
@@ -37,6 +38,7 @@ knitr::opts_chunk$set(
 Load the required packages:
 
 ```{r, eval=params$on_my_mac, include=FALSE}
+sapply(list.files('../R', full.names = TRUE), source)
 local.lib <- '../lib'
 dir.create(local.lib)
 .libPaths(local.lib)
@@ -48,9 +50,9 @@ dir.create(local.lib)
 library(BIRSBIO2020.scNMTseq.PLS)
 library(MultiAssayExperiment)
 library(scater)
+library(scran)
 library(mixOmics)
 library(ggplot2)
-library(knitr)
 library(magrittr)
 library(reshape2)
 ```
@@ -72,49 +74,78 @@ if (!dir.exists('savedata')) {
 
 Details of the hackathon data and preprocessing steps: https://github.com/BIRSBiointegration/Hackathon/tree/master/scNMT-seq
 
-Load the `MultiAssayExperiment` object:
-
-```{r, eval=params$on_my_mac, include=FALSE}
+Load the `MultiAssayExperiment` object from Cloudstor:
+```{r, eval=!params$mini_run}
 cat('loading data from Cloudstor ...\n')
-gastru.mae <- readRDS('/Users/alabadi/Projects/analysis/R/multiOmics/scNMTseq/BIRSBIO_scNMTseq/output/scnmtseq_gastrulation_mae_826-cells_orderedFeatures-weights.rds')
+gastru.mae_path <- url('https://cloudstor.aarnet.edu.au/plus/s/jsW7nh4YwThw8Q5/download')
 ```
 
-```{r, eval=params$not_on_my_mac}
-cat(sprintf('loading the following assays using SingleCellMultiModal package: %s\n', paste(params$keep_assays, collapse = ', ')))
-gastru.mae <- scNMT(dataType = 'mouse_gastrulation', modes = params$keep_assays, dry.run = FALSE, verbose = FALSE)
+```{r, eval=params$on_my_mac & !params$mini_run, include=FALSE}
+cat('loading data from local folder ...\n')
+gastru.mae_path <- 'savedata/scnmtseq_gastrulation_mae-sce.rds'
 ```
 
+```{r, eval=params$on_my_mac & params$mini_run, include=FALSE}
+cat('loading mini data from local folder ...\n')
+gastru.mae_path <- 'savedata/mini.gastru.mae.rds'
+```
 
-## filter extra-embryonic cells
+```{r load data}
+gastru.mae <- readRDS(gastru.mae_path)
+```
+
+<!-- ```{r, eval=!params$on_my_mac} -->
+<!-- cat(sprintf('loading the following assays using SingleCellMultiModal package: %s\n', paste(params$keep_assays, collapse = ', '))) -->
+<!-- gastru.mae <- scNMT(dataType = 'mouse_gastrulation', modes = params$keep_assays, dry.run = FALSE, verbose = FALSE) -->
+<!-- ``` -->
+
+## Filter MAE object
 
 ```{r}
-cat(sprintf('Dropping cells from putative lineage(s) %s:\n', paste(sQuote(params$drop_lineages), collapse = ', ')))
-gastru.mae <- gastru.mae[, !(gastru.mae$lineage10x_2 %in% params$drop_lineages), params$keep_assays]
+# Subset RNA expression and DNA methylation modalities
+keep_assays <- grep("rna|met",names(assays(gastru.mae)))
+# Remove putative extraembryonic cells
+keep_cells <- !(gastru.mae$lineage %in% params$drop_lineages)
+# Keep cells that pass QC for DNA methylation and RNA expression
+keep_cells <- keep_cells & (gastru.mae$pass_metQC==TRUE & gastru.mae$pass_rnaQC==TRUE)
+## keep full rna SCE for UMAP
+rna.sce <- gastru.mae@ExperimentList$rna
+## subset MAE
+gastru.mae <- gastru.mae[,keep_cells, keep_assays]
+## rna SCE for matching cells
+rna.sce.matching <- gastru.mae@ExperimentList$rna
+```
+
+Replace the rna SCE with logcounts in MAE object as the integration wrapper requires matrices in assays:
+
+```{r}
+gastru.mae@ExperimentList
+gastru.mae@ExperimentList$rna <- logcounts(gastru.mae@ExperimentList$rna)
 ```
 
 Overview of assays:
 
 ```{r}
+get_pct_missing <- function(arr) {
+  round(100*sum(is.na(arr))/prod(dim(arr)))
+}
+
 df <- lapply(experiments(gastru.mae), function(w)
      {
      c(
-       n_cells = dim(w)[2],
-       n_features = dim(w)[1],
-       pct_missing = get_pct_missing(w)
+       'N (# cells)' = dim(w)[2],
+       'P (# features)' = dim(w)[1],
+       '% data missing' = get_pct_missing(w)
      )
      })
-df <- round(data.frame(df))
-kable(df, align = 'l')
+df <- data.frame(df)
+kable(t(df), align = 'l')
 ```
 
-```{r}
-gastru.mae
-```
-
-Breakdown of the cells in each stage:
+Breakdown of the number of cells in each stage:
 
 ```{r}
-table(gastru.mae$stage) %>% as.data.frame() %>% set_colnames(c('stage', '# of cells')) %>% kable()
+table(gastru.mae$stage) %>% as.data.frame() %>% t() %>% set_rownames(c('stage', '# of cells')) %>% kable()
 ## create a data.frame from cell metadata
 coldata <- data.frame(colData(gastru.mae))
 ```
@@ -123,14 +154,13 @@ coldata <- data.frame(colData(gastru.mae))
 
 Create density plots of the feature detection rate across all cells for all modalities:
 
-```{r}
+```{r, message=FALSE}
 # get the methylation assays
 met_assays <- grep(names(gastru.mae), pattern = '^met', value = TRUE)
 # add dimensions to labels for ggplot
 dims <- lapply(experiments(gastru.mae[,,met_assays]), dim)
 dims <- sapply(dims, function(x) sprintf(' (%s, %s)', x[2], x[1]))
 names(met_assays) <- paste0(met_assays, dims) %>% as.list()
-met_assays
 # calculate the feature detection in a data.frame for methylation assays
 coverages <- lapply(met_assays, function(assay_name) {
   mat <- assay(gastru.mae, assay_name)
@@ -144,7 +174,7 @@ coverages$dataset <- factor(coverages$dataset, levels = unique(coverages$dataset
 
 Genomic contexts vary in level of feature detection rates:
 
-```{r, fig.width=8, fig.asp=0.4, fig.cap="density plots for methylation data show that shorter genomic regions tend to have less feture coverage. Dashed blue line indicates the average across all modalities."}
+```{r, fig.width=8, fig.asp=0.4}
 cov_plot <- ggplot(coverages, aes(x = pct_NAs)) + geom_density(fill = 'lightblue', show.legend = FALSE) +
   geom_vline(aes(xintercept=mean(pct_NAs)),
              color="blue", linetype="dashed", size=0.5) +
@@ -153,6 +183,7 @@ cov_plot <- ggplot(coverages, aes(x = pct_NAs)) + geom_density(fill = 'lightblue
   
 cov_plot
 ```
+Density plots for methylation data show that shorter genomic regions tend to have less feature coverage. Dashed blue line indicates the average across all modalities.
 
 ```{r, eval=params$save_output, include=params$save_output}
 ggsave(cov_plot, filename = 'figures/covplots.pdf', width = 8, height = 4)
@@ -160,114 +191,178 @@ ggsave(cov_plot, filename = 'figures/covplots.pdf', width = 8, height = 4)
 
 # RNA
 
+
 ## UMAP
 
-Here we use `uwot` package for Uniform Manifold Approximation Projection. The original study used the `umap` package with `method = 'umap-learn'` parameter which requires the 'umap-learn' python library and can add complexity to set up on a VM.
-
 ```{r}
-RNGversion('4.0.1')
-set.seed(params$umap_params['run.seed'])
-## all params use defaults except for 'n_components' and 'min_dist'
-cat(sprintf('running umap on RNA data with parameters: %s ...\n ',
-            paste(names(params$umap_params[-1]), ':',
-                  params$umap_params[-1], collapse = ', ')))
-umap_rna_unsup <- uwot::umap(
-  t(assay(gastru.mae, 'rna')),
-  n_neighbors = params$umap_params['n_neighbors'],
-  n_components = params$umap_params['n_components'],
-  min_dist = params$umap_params['min_dist'], ## continuity (min_dist >> 0)-discreteness (min_dist -> 0) trade-off
-  metric = "euclidean",
-  n_epochs = NULL,
-  learning_rate = 1,
-  scale = FALSE,
-  init = "spectral",
-  init_sdev = NULL,
-  spread = 1,
-  set_op_mix_ratio = 1,
-  local_connectivity = 1)
-```
-
-```{r, eval=params$save_output, include=params$save_output}
-saveRDS(umap_rna_unsup, file = sprintf('savedata/umap-result-ncomp-%s.rds', params$umap_params['n_components']))
-# umap_rna_unsup <- readRDS(sprintf('savedata/umap-result-ncomp-%s.rds', params$umap_params['n_components']))
-```
-
-Create a data.frame of embeddings:
-```{r}
-df <- data.frame(umap_rna_unsup)
-colnames(df) <- paste0('UMAP_', seq_along(df))
-df <- cbind(df, coldata)
-```
-
-Create colour palettes for stages and lineages:
-
-```{r}
-# col_pallete <- viridisLite::viridis(n = 4)
+# Create colour palettes for stages:
+# col_pallete <-dput( viridisLite::viridis(n = 4) )
 col_pallete <- c("#440154FF", "#31688EFF", "#35B779FF", "#FDE725FF")
 names(col_pallete) <- c("E4.5", "E5.5", "E6.5", "E7.5")
-```
 
-
-```{r}
-## helper function to create both plots coloured by stage
+## helper function to create UMAP plots coloured by stage
 plot_umap_by_stage <- function(df, dims = c(1,2)) {
   axes <- paste0('UMAP_', dims)
   ggplot(df, aes_string(axes[1], axes[2])) + geom_point(aes(col=stage)) +
-    theme_classic()+ scale_color_manual(values = col_pallete)
+    theme_classic()+ scale_color_manual(values = col_pallete) + labs(col = 'Stage')
 }
 ```
 
-First two components:
+### All RNA cells
 
-```{r, fig.asp=0.6, fig.cap="UMAP plot shows distinct cell populations corresponding to early-stage, mid-stage, and late-stage cells as well as the within-stage variation for mainly E4.5 and E6.5 which could correspond to different lineages."}
+Select highly variable genes after accounting for technical variation:
+
+```{r}
+decomp <- modelGeneVar(rna.sce)
+## filter by mean expression and significance of biological variation signal
+hvgs <- rownames(decomp)[decomp$p.value<0.01 & decomp$mean > 0.01]
+length(hvgs)
+```
+
+Run PCA and then UMAP using PCs:
+
+```{r}
+## PCA first: retrieve 25 PCs
+rna.sce <- runPCA(rna.sce,  ncomponents = 25, subset_row=hvgs)
+
+RNGversion('4.0.0')
+set.seed(params$umap_params['run.seed'])
+rna.sce <- runUMAP(rna.sce, dimred="PCA", 
+                   ncomponents = params$umap_params['n_components'], 
+                   n_neighbors = params$umap_params['n_neighbors'], 
+                   min_dist = params$umap_params['min_dist'])
+```
+
+data.frame of embeddings with cell metadata:
+
+```{r}
+# data.frame of embeddings with cell metadata
+df <-  data.frame(reducedDim(rna.sce,"UMAP"))
+colnames(df) <- paste0('UMAP_', seq_along(df))
+df <- cbind(df, colData(rna.sce))
+```
+
+Plot the first two UMAP components:
+
+```{r, fig.asp=0.7}
+plot_umap_by_stage(df = df, dims = c(1,2))
+```
+UMAP plot shows distinct cell populations corresponding to early-stage, mid-stage, and late-stage cells as well as the within-stage variation for mainly E4.5 and E6.5 which could correspond to different lineages.
+
+### Matching RNA cells
+
+Select highly variable genes after accounting for technical variation:
+
+```{r}
+decomp <- modelGeneVar(rna.sce.matching)
+## filter by mean expression and significance of biological variation signal
+hvgs <- rownames(decomp)[decomp$p.value<0.01 & decomp$mean > 0.01]
+length(hvgs)
+```
+
+Run PCA and then UMAP using PCs:
+
+```{r}
+## PCA first: retrieve 25 PCs
+rna.sce.matching <- runPCA(rna.sce.matching,  ncomponents = 25, subset_row=hvgs)
+
+RNGversion('4.0.0')
+set.seed(params$umap_params['run.seed'])
+rna.sce.matching <- runUMAP(rna.sce.matching, dimred="PCA", 
+                   ncomponents = params$umap_params['n_components'], 
+                   n_neighbors = params$umap_params['n_neighbors'], 
+                   min_dist = params$umap_params['min_dist'])
+```
+
+data.frame of embeddings with cell metadata:
+
+```{r}
+# data.frame of embeddings with cell metadata
+df <-  data.frame(reducedDim(rna.sce.matching,"UMAP"))
+colnames(df) <- paste0('UMAP_', seq_along(df))
+df <- cbind(df, colData(rna.sce.matching))
+```
+
+Plot the first two UMAP components:
+
+```{r, fig.asp=0.7}
 plot_umap_by_stage(df = df, dims = c(1,2))
 ```
 
 
+
 # Integration
 
-## gene id to gene symbol conversion data.frame
+<!-- ## gene id to gene symbol conversion data.frame -->
 
-Get all the gene names from all modalities:
+<!-- Here we create a reference data.frame to convert Ensembl gene ids to gene symbols for GSEA. -->
 
-```{r}
-all_features <- sapply(experiments(gastru.mae), rownames) %>% unlist()
-all_genes <- grep(pattern = '^ENSMUSG', x = all_features, value = TRUE)
-all_genes <- unique(all_genes)
-length(all_genes)
-```
+<!-- Get all the gene names from all modalities: -->
 
-Get the Ensembl gene name for these gene ids:
+<!-- ```{r} -->
+<!-- all_features <- sapply(experiments(gastru.mae), rownames) %>% unlist() -->
+<!-- all_genes <- grep(pattern = '^ENSMUSG', x = all_features, value = TRUE) -->
+<!-- all_genes <- unique(all_genes) -->
+<!-- length(all_genes) -->
+<!-- ``` -->
 
-```{r}
-ensembl <- useMart("ensembl", dataset="mmusculus_gene_ensembl")
-mouse_gene_ids  <- all_genes
+<!-- Get the Ensembl gene name for these gene ids: -->
 
-symbols <- getBM(attributes=c('ensembl_gene_id',
-                          'external_gene_name'),
-             filters = "ensembl_gene_id",
-             values = all_genes,
-             mart = ensembl)
-symbols <- data.frame(symbols, row.names = 1)
-```
+<!-- ```{r} -->
+<!-- ensembl <- useMart("ensembl", dataset="mmusculus_gene_ensembl") -->
+<!-- mouse_gene_ids  <- all_genes -->
 
-```{r, eval=params$save_output, echo=FALSE}
-save(symbols, file = 'savedata/all-gene-symbols.RData')
-# load('savedata/all-gene-symbols.RData')
-```
+<!-- symbols <- getBM(attributes=c('ensembl_gene_id', -->
+<!--                               'external_gene_name'), -->
+<!--                  filters = "ensembl_gene_id", -->
+<!--                  values = all_genes, -->
+<!--                  mart = ensembl) -->
+<!-- symbols <- data.frame(symbols, row.names = 1) -->
+<!-- ``` -->
 
-## PLS integartion of all modalities with feature selection 
+<!-- ```{r, eval=params$save_output, echo=FALSE} -->
+<!-- save(symbols, file = 'savedata/all-gene-symbols.RData') -->
+<!-- # load('savedata/all-gene-symbols.RData') -->
+<!-- ``` -->
+
+## PLS
+
+data dimensions overview:
 
 ```{r}
 # data dimensions
 lapply(experiments(gastru.mae), dim)
 ```
 
+integration of all modalities with feature selection:
+
 ```{r}
-mmspls <- multimodal_sPLS_wrapper(mae = gastru.mae, study_assays = NULL, ncomp = 2, scale = FALSE, design = 'null', lineages = NULL, stages = NULL, DA = NULL, keepX = NULL, save = FALSE)
+## number of components
+ncomp <- 2
+## feature scaling
+scale <- TRUE
 ```
 
-```{r, eval=params$save_output, echo=FALSE}
+<!-- ```{r, eval=params$save_output, echo=params$save_output} -->
+<!-- pls_output_name <- sprintf('multimodal_spls-ncomp_%s-scale_.rds', ncomp, scale) -->
+<!-- ``` -->
+
+Here we select for 50 features on each component in `multimodal_sPLS_wrapper`:
+
+```{r run pls}
+cat(sprintf('Running PLS with %s components performing variable selection\n', ncomp))
+st <- system.time({
+  mmspls <-
+    multimodal_sPLS_wrapper(mae = gastru.mae, study_assays = NULL,
+                            ncomp = ncomp, scale = TRUE, design = 'null', lineages = NULL,
+                            stages = NULL, DA = NULL, keepX = NULL, save = FALSE)
+})['elapsed']
+st <- round(st/60, 1)
+
+cat('\nPLS run finished. Runtime: ', st, 'min\n')
+```
+
+```{r, eval=params$save_output, echo=params$save_output}
 saveRDS(mmspls, file = 'savedata/MultiModalSparsePLS-All.rds')
 # mmspls <- readRDS('savedata/MultiModalSparsePLS-All.rds')
 ```
@@ -277,7 +372,7 @@ plotIndiv_wrapper <- function(pls_obj, coldata, col_cell = 'stage', legend.title
   ## order coldata cells based on matching cells in pls modalities
   coldata <- coldata[rownames(pls_obj$X[[1]]),]
   cell_class <- coldata[,col_cell]  ## col factor for cells
-  cell_class <- factor(cell_class)  
+  cell_class <- factor(cell_class)
   suppressWarnings({
     plotIndiv(pls_obj, pch = 16, comp = comp,group = cell_class, legend = TRUE, legend.title = legend.title, size.subtitle = 10, cex=0.8, ...)
   })
@@ -288,7 +383,7 @@ plotIndiv_wrapper <- function(pls_obj, coldata, col_cell = 'stage', legend.title
 
 Colored by stage:
 
-```{r, fig.width=8}
+```{r, fig.width=8, fig.height=8}
 plotIndiv_wrapper(pls_obj = mmspls, coldata = coldata, col_cell = 'stage', legend.title = 'Stage', comp = c(1,2), subtitle = names(mmspls$X), col.per.group = col_pallete)
 ```
 
@@ -296,31 +391,42 @@ plotIndiv_wrapper(pls_obj = mmspls, coldata = coldata, col_cell = 'stage', legen
 ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf', width = 8, height = 6)
 ```
 
-# Concordancy with RNA
+# concordance with RNA
 
-Here we calculate the average correlation between components from gene expression and different methylome modalities:
+Here we calculate the correlations between components from gene expression and different methylome modalities:
+
 ```{r}
-concordancy <- function(pls_obj, comp = 1) {
+concordance <- function(pls_obj, comp = 1) {
   
+  ## correlation of components with RNA components
   cor_with_y <- sapply(pls_obj$variates[-1], function(x_variates) {
     y_variates <- pls_obj$variates[[1]]
     y_variates <- y_variates[, comp, drop = FALSE]
-    
-    avg_cor <- mean(diag(cor(y_variates, x_variates)))
-    avg_cor
-  }) 
-  cor_with_y <- cor_with_y %>% sort(decreasing = TRUE)
-  cor_with_y <- cor_with_y %>% as.data.frame() %>% set_colnames(c('concordancy'))
-  cor_with_y %>% round(digits = 2) %>% t() %>%  kable() %>% print()
-  
-  cor_with_y$modality <- factor(rownames(cor_with_y), levels = rownames(cor_with_y), ordered = TRUE)
-  ggplot(cor_with_y, aes(x = modality, y = concordancy)) + geom_col(fill = "#35B779FF") + theme_classic() +
-    labs(y = sprintf('Correlation with RNA (comp %s) ', paste(comp, collapse = ', ')), x = '') + ylim(c(0, 1)) + theme(axis.text.x = element_text(angle = 45, vjust = 0.8, hjust=1))
+    cor <- cor(y_variates, x_variates)
+    cor <- diag(cor)
+    names(cor) <- paste0('Component ', comp)
+    cor['mean'] <- mean(cor)
+    cor <- round(cor, 2)
+    cor
+  })
+  ## make a long data.frame
+  cor_with_y <- cor_with_y %>% as.data.frame() %>% t() %>% 
+    reshape2::melt(id.vars = 1:3) %>% 
+    set_colnames(c('Modality', 'Component', 'Concordance'))
+  ## print concordance measures for each componet and the average:
+  # sapply(unique(as.character(cor_with_y$Component)), function(z){
+  #   cat('#> Component:', z )
+  #   dplyr::filter(cor_with_y, Component == z)[,c('Modality', 'Concordance')] %>% 
+  #     kable() 
+  # })
+
+  ggplot(cor_with_y, aes(x = Modality, y = Concordance)) + geom_col(aes(fill = Component), position = 'dodge2') + theme_classic() +
+    labs(y = sprintf('Correlation with RNA (comp %s) ', paste(comp, collapse = ', ')), x = '', fill = '') + ylim(c(0, 1)) + theme(axis.text.x = element_text(angle = 45, vjust = 0.8, hjust=1))
 }
 ```
 
 ```{r}
-concordancy(pls_obj = mmspls, comp = c(1, 2))
+concordance(pls_obj = mmspls, comp = c(1, 2))
 ```
 
-```
+
