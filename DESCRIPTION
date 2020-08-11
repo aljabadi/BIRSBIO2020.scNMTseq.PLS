@@ -14,16 +14,16 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
 Depends: Biobase
 Imports: MultiAssayExperiment, 
-        ggplot2, 
-        data.table,
-        uwot, 
-        biomaRt,
-        reshape2, 
-        magrittr, 
-        mixOmics, 
-        MOFA2,
-        SingleCellMultiModal,
-        scater
+         ggplot2, 
+         data.table,
+         uwot, 
+         biomaRt,
+         reshape2, 
+         magrittr, 
+         mixOmics, 
+         MOFA2,
+         SingleCellMultiModal,
+         scater
 Remotes: mixOmicsTeam/mixOmics@MultiAssayExperiment, 
         bioFAM/MOFA2/MOFA2
 Suggests: 
