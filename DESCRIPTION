@@ -19,6 +19,7 @@ Imports: MultiAssayExperiment,
          magrittr, 
          mixOmics, 
          scater,
+         scran,
          cpp11
 Remotes: 
         mixOmicsTeam/mixOmics@MultiAssayExperiment,
