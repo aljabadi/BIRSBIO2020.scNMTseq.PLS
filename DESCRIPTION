@@ -16,7 +16,6 @@ Depends: Biobase
 Imports: MultiAssayExperiment, 
          ggplot2, 
          data.table,
-         uwot, 
          biomaRt,
          reshape2, 
          magrittr, 
