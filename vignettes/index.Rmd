@@ -107,10 +107,10 @@ closeAllConnections()
 keep_assays <- grep("rna|met",names(assays(gastru.mae)))
 # Remove putative extraembryonic cells
 keep_cells <- !(gastru.mae$lineage %in% params$drop_lineages)
+## keep full rna SCE for UMAP
+rna.sce <- gastru.mae[,keep_cells,]@ExperimentList$rna
 # Keep cells that pass QC for DNA methylation and RNA expression
 keep_cells <- keep_cells & (gastru.mae$pass_metQC==TRUE & gastru.mae$pass_rnaQC==TRUE)
-## keep full rna SCE for UMAP
-rna.sce <- gastru.mae@ExperimentList$rna
 ## subset MAE
 gastru.mae <- gastru.mae[,keep_cells, keep_assays]
 ## rna SCE for matching cells
