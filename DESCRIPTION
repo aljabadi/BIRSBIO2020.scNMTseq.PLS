@@ -18,7 +18,6 @@ Imports: MultiAssayExperiment,
          reshape2, 
          magrittr, 
          mixOmics, 
-         SingleCellMultiModal,
          scater
 Remotes: mixOmicsTeam/mixOmics@MultiAssayExperiment
 Suggests: 

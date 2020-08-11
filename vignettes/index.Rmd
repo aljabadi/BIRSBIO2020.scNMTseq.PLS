@@ -52,7 +52,6 @@ library(mixOmics)
 library(ggplot2)
 library(knitr)
 library(nipals)
-library(SingleCellMultiModal)
 library(magrittr)
 library(reshape2)
 ```
