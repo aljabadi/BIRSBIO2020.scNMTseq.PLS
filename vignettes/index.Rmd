@@ -92,6 +92,7 @@ gastru.mae_path <- 'savedata/mini.gastru.mae.rds'
 
 ```{r load data}
 gastru.mae <- readRDS(gastru.mae_path)
+closeAllConnections()
 ```
 
 <!-- ```{r, eval=!params$on_my_mac} -->
