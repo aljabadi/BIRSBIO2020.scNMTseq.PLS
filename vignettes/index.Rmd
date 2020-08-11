@@ -223,10 +223,10 @@ length(hvgs)
 Run PCA and then UMAP using PCs:
 
 ```{r}
-## PCA first: retrieve 25 PCs
-rna.sce <- runPCA(rna.sce,  ncomponents = 25, subset_row=hvgs)
+npcs <- 15
+## PCA first: retrieve npcs PCs
+rna.sce <- runPCA(rna.sce,  ncomponents = npcs, subset_row=hvgs)
 
-RNGversion('4.0.0')
 set.seed(params$umap_params['run.seed'])
 rna.sce <- runUMAP(rna.sce, dimred="PCA", 
                    ncomponents = params$umap_params['n_components'], 
