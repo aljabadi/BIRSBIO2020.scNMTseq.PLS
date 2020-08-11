@@ -56,7 +56,6 @@ library(SingleCellMultiModal)
 library(biomaRt)
 library(magrittr)
 library(reshape2)
-library(data.table)
 library(MOFA2)
 ```
 

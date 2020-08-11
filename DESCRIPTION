@@ -15,7 +15,6 @@ RoxygenNote: 7.1.0
 Depends: Biobase
 Imports: MultiAssayExperiment, 
          ggplot2, 
-         data.table,
          biomaRt,
          reshape2, 
          magrittr, 
