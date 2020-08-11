@@ -18,8 +18,7 @@ Imports: MultiAssayExperiment,
          reshape2, 
          magrittr, 
          mixOmics, 
-         scater,
-         nipals
+         scater
 Remotes: mixOmicsTeam/mixOmics@MultiAssayExperiment
 Suggests: 
     knitr,
