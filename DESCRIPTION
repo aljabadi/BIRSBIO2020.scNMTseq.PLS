@@ -19,7 +19,9 @@ Imports: MultiAssayExperiment,
          magrittr, 
          mixOmics, 
          scater
-Remotes: mixOmicsTeam/mixOmics@MultiAssayExperiment
+Remotes: 
+        mixOmicsTeam/mixOmics@MultiAssayExperiment,
+        r-lib/cpp11@v0.1.0
 Suggests: 
     knitr,
     rmarkdown,
