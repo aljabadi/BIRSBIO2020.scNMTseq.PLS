@@ -18,7 +18,8 @@ Imports: MultiAssayExperiment,
          reshape2, 
          magrittr, 
          mixOmics, 
-         scater
+         scater,
+         cpp11
 Remotes: 
         mixOmicsTeam/mixOmics@MultiAssayExperiment,
         r-lib/cpp11@v0.1.0
