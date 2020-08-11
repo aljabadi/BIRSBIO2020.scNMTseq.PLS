@@ -18,11 +18,9 @@ Imports: MultiAssayExperiment,
          reshape2, 
          magrittr, 
          mixOmics, 
-         MOFA2,
          SingleCellMultiModal,
          scater
-Remotes: mixOmicsTeam/mixOmics@MultiAssayExperiment, 
-        bioFAM/MOFA2/MOFA2
+Remotes: mixOmicsTeam/mixOmics@MultiAssayExperiment
 Suggests: 
     knitr,
     rmarkdown,

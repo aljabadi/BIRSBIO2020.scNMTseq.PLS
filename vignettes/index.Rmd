@@ -55,7 +55,6 @@ library(nipals)
 library(SingleCellMultiModal)
 library(magrittr)
 library(reshape2)
-library(MOFA2)
 ```
 
 ```{r, eval=params$save_output, include=params$save_output}
