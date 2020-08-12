@@ -464,6 +464,7 @@ axes <- colnames(all_pls_umap)[1:2]
     facet_wrap(.~Modality, ncol = 2) +
     scale_color_manual(values = col_palette)
 ```
+
 UMAP projection using `r ncomp` PLS components for each modality shows the distinct states of early stage cells on transcriptional and DNA methylation level. These states are coordinated across both molecular levels. The projection also demonstrates the transition from mid-stage to late-stage for single cells across different views.
 
 ```{r, eval=params$save_output, echo=FALSE}
