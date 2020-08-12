@@ -14,6 +14,7 @@ params:
   drop_lineages: !r c('Primitive_endoderm','Visceral_endoderm', 'ExE_ectoderm')
   umap_params: !r c(run.seed = 42, n_neighbors = 15, n_components = 2, min_dist = 0.55)
   ggplot_alpha: 0.8
+  pls_ncomp: 5
 vignette: >
   %\VignetteIndexEntry{scNMTseq challenge analysis using a PLS-based approach}
   %\VignetteEngine{knitr::rmarkdown}
@@ -372,7 +373,7 @@ format_runtime <- function(dsec) {
 
 ```{r}
 ## number of components
-ncomp <- 5
+ncomp <- params$pls_ncomp
 ## feature scaling
 scale <- TRUE
 ```
