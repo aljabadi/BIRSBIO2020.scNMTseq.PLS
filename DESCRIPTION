@@ -18,12 +18,10 @@ Imports: MultiAssayExperiment,
          reshape2, 
          magrittr, 
          mixOmics, 
-         scran,
-         scater
-
+         scater,
+         scran
 Remotes: 
-        mixOmicsTeam/mixOmics@MultiAssayExperiment,
-        r-lib/cpp11@v0.1.0
+        mixOmicsTeam/mixOmics@MultiAssayExperiment
 Suggests: 
     knitr,
     rmarkdown,
