@@ -284,7 +284,7 @@ set.seed(params$umap_params['run.seed'])
 rna.sce.matching <- runUMAP(rna.sce.matching, dimred="PCA", 
                    ncomponents = params$umap_params['n_components'], 
                    n_neighbors = params$umap_params['n_neighbors'], 
-                   min_dist = 0.35)
+                   min_dist = params$umap_params['min_dist'])
 ```
 
 ### PCA
