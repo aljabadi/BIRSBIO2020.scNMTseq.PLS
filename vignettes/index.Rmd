@@ -55,6 +55,7 @@ library(mixOmics)
 library(ggplot2)
 library(magrittr)
 library(reshape2)
+library(uwot)
 ```
 
 ```{r, eval=params$save_output, include=params$save_output}
