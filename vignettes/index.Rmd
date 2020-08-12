@@ -13,7 +13,7 @@ params:
   matching_rna_for_umap: false
   ## run params
   drop_lineages: c('Primitive_endoderm','Visceral_endoderm', 'ExE_ectoderm')
-  umap_params: !r c(run.seed = 42, n_neighbors = 15, n_components = 2, min_dist = 0.55)
+  umap_params: c(run.seed = 42, n_neighbors = 15, n_components = 2, min_dist = 0.55)
 vignette: >
   %\VignetteIndexEntry{scNMTseq challenge analysis using a PLS-based approach}
   %\VignetteEngine{knitr::rmarkdown}
@@ -103,17 +103,18 @@ gastru.mae <- readRDS(gastru.mae_path)
 ## Filter MAE object
 
 ```{r}
-# Subset RNA expression and DNA methylation modalities
+## subset RNA expression and DNA methylation modalities
 keep_assays <- grep("rna|met",names(assays(gastru.mae)))
-# Remove putative extraembryonic cells
-keep_cells <- !(gastru.mae$lineage %in% params$drop_lineages)
-## keep full rna SCE for UMAP
-rna.sce <- gastru.mae[,keep_cells,]@ExperimentList$rna
-# Keep cells that pass QC for DNA methylation and RNA expression
-keep_cells <- keep_cells & (gastru.mae$pass_metQC==TRUE & gastru.mae$pass_rnaQC==TRUE)
-## subset MAE
-gastru.mae <- gastru.mae[,keep_cells, keep_assays]
-## rna SCE for matching cells
+gastru.mae <- gastru.mae[,,keep_assays]
+## remove putative extraembryonic cells
+gastru.mae <- gastru.mae[,!(gastru.mae$lineage %in% params$drop_lineages),]
+## keep cells which pass RNA QC
+gastru.mae <- gastru.mae[,gastru.mae$pass_rnaQC==TRUE,]
+## Keep full rna SCE for UMAP
+rna.sce <- gastru.mae@ExperimentList$rna
+## keep cells that also pass QC for DNA methylation
+gastru.mae <- gastru.mae[,gastru.mae$pass_metQC==TRUE,]
+## rna SCE for cells passing met and rna QC
 rna.sce.matching <- gastru.mae@ExperimentList$rna
 ```
 
@@ -121,6 +122,7 @@ Replace the rna SCE with logcounts in MAE object as the integration wrapper requ
 
 ```{r}
 gastru.mae@ExperimentList
+## replace SCE with logcounts
 gastru.mae@ExperimentList$rna <- logcounts(gastru.mae@ExperimentList$rna)
 ```
 
