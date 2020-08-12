@@ -351,13 +351,6 @@ lapply(experiments(gastru.mae), dim)
 
 integration of all modalities with feature selection:
 
-```{r}
-## number of components
-ncomp <- 2
-## feature scaling
-scale <- TRUE
-```
-
 <!-- ```{r, eval=params$save_output, echo=params$save_output} -->
 <!-- pls_output_name <- sprintf('multimodal_spls-ncomp_%s-scale_.rds', ncomp, scale) -->
 <!-- ``` -->
@@ -377,12 +370,19 @@ format_runtime <- function(dsec) {
 }
 ```
 
+```{r}
+## number of components
+ncomp <- 5
+## feature scaling
+scale <- TRUE
+```
+
 ```{r run pls, warning=FALSE}
 cat(sprintf('Running PLS with %s components performing variable selection\n', ncomp))
 st <- system.time({
   mmspls <-
     multimodal_sPLS_wrapper(mae = gastru.mae, study_assays = NULL,
-                            ncomp = ncomp, scale = TRUE, design = 'null', lineages = NULL,
+                            ncomp = ncomp, scale = scale, design = 'null', lineages = NULL,
                             stages = NULL, DA = NULL, keepX = NULL, save = FALSE)
 })['elapsed']
 
