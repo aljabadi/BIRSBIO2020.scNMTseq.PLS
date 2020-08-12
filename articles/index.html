@@ -289,8 +289,8 @@
 <span class="no">rna.sce</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runPCA.html">runPCA</a></span>(<span class="no">rna.sce</span>,  <span class="kw">ncomponents</span> <span class="kw">=</span> <span class="no">npcs</span>, <span class="kw">subset_row</span><span class="kw">=</span><span class="no">hvgs</span>, <span class="kw">name</span> <span class="kw">=</span> <span class="st">'PCA'</span>)
 
 <span class="co">## UMAP parameters used:</span>
-<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Running UMAP with parameters %s\n'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="no">params</span>$<span class="no">umap_params</span>, <span class="kw">collapse</span> <span class="kw">=</span> <span class="st">', '</span>)))
-<span class="co">#&gt; Running UMAP with parameters 42, 15, 2, 0.55</span>
+<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Running UMAP with parameters %s\n'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">params</span>$<span class="no">umap_params</span>), <span class="st">':'</span>,<span class="no">params</span>$<span class="no">umap_params</span>, <span class="kw">collapse</span> <span class="kw">=</span> <span class="st">', '</span>)))
+<span class="co">#&gt; Running UMAP with parameters run.seed : 42, n_neighbors : 15, n_components : 2, min_dist : 0.55</span>
 
 <span class="co">## run UMAP</span>
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'run.seed'</span>])
@@ -323,9 +323,8 @@
 <span class="no">rna.sce.matching</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runPCA.html">runPCA</a></span>(<span class="no">rna.sce.matching</span>,  <span class="kw">ncomponents</span> <span class="kw">=</span> <span class="no">npcs</span>, <span class="kw">subset_row</span><span class="kw">=</span><span class="no">hvgs</span>, <span class="kw">name</span> <span class="kw">=</span> <span class="st">'PCA'</span>)
 
 <span class="co">## UMAP parameters used:</span>
-<span class="no">params</span>$<span class="no">umap_params</span>
-<span class="co">#&gt;     run.seed  n_neighbors n_components     min_dist </span>
-<span class="co">#&gt;        42.00        15.00         2.00         0.55</span>
+<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Running UMAP with parameters %s\n'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">params</span>$<span class="no">umap_params</span>), <span class="st">':'</span>,<span class="no">params</span>$<span class="no">umap_params</span>, <span class="kw">collapse</span> <span class="kw">=</span> <span class="st">', '</span>)))
+<span class="co">#&gt; Running UMAP with parameters run.seed : 42, n_neighbors : 15, n_components : 2, min_dist : 0.55</span>
 
 <span class="co">## run UMAP</span>
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'run.seed'</span>])
@@ -414,7 +413,7 @@
 
 <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'\nPLS run finished. Runtime: '</span>, <span class="no">st</span>, <span class="st">'min\n'</span>)
 <span class="co">#&gt; </span>
-<span class="co">#&gt; PLS run finished. Runtime:  1.5 min</span></pre></body></html></div>
+<span class="co">#&gt; PLS run finished. Runtime:  1.6 min</span></pre></body></html></div>
 <div class="sourceCode" id="cb23"><html><body><pre class="r"><span class="no">plotIndiv_wrapper</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">pls_obj</span>, <span class="no">coldata</span>, <span class="no">col_cell</span> <span class="kw">=</span> <span class="st">'stage'</span>, <span class="no">legend.title</span> <span class="kw">=</span> <span class="st">'Stage'</span>, <span class="no">comp</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>), <span class="no">...</span>) {
   <span class="co">## order coldata cells based on matching cells in pls modalities</span>
   <span class="no">coldata</span> <span class="kw">&lt;-</span> <span class="no">coldata</span>[<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">pls_obj</span>$<span class="no">X</span><span class="kw">[[</span><span class="fl">1</span>]]),]
