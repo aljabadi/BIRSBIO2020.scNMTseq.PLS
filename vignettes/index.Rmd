@@ -421,6 +421,49 @@ plot_pls(pls_obj = mmspls, stage = gastru.mae$stage, col_palette = col_palette)
 
 The derived latent components which seek to maximise the sum of concordant variation b/w rna and other modalities show phenotypic relevance in terms of the embryonic stages. It indicates coordinated changes across the methylomes associated with the distinct transcriptional states of cells in the regions of study during gastrulation.
 
+## UMAP using PLS components
+
+add PLS embeddings to SCE so scater::runUMAP can be applied:
+
+```{r}
+for (block in names(mmspls$variates)) {
+  variates <- mmspls$variates[block]
+  dimred.name <- paste0('PLS_', block)
+  umap.name <- paste0('UMAP_PLS_', block)
+  reducedDim(rna.sce.matching, dimred.name) <- mmspls$variates[[block]]
+  set.seed(params$umap_params['run.seed'])
+  rna.sce.matching <- runUMAP(rna.sce.matching, dimred=dimred.name, 
+                              ncomponents = params$umap_params['n_components'], 
+                              n_neighbors = params$umap_params['n_neighbors'], 
+                              min_dist = params$umap_params['min_dist'], 
+                              name = umap.name)
+}
+```
+
+Create a long data.frame of all variates for facet plotting: 
+```{r}
+all_pls_umap <- list()
+for (block in names(mmspls$variates)) {
+  umap.name <- paste0('UMAP_PLS_', block)
+  umap_df <- as.data.frame(reducedDim(rna.sce.matching, umap.name))
+  colnames(umap_df) <- paste0('UMAP_', seq_along(umap_df))
+  umap_df$stage <- gastru.mae$stage
+  all_pls_umap[[block]] <- umap_df
+}
+all_pls_umap <- rbindListWithNames(all_pls_umap, new_col = 'Modality')
+```
+
+Plot UMAP:
+
+```{r}
+axes <- colnames(all_pls_umap)[1:2]
+  ggplot(all_pls_umap) + 
+    theme_classic() +
+    geom_point(aes_string(x = axes[1], y = axes[2], col = 'stage'), alpha = params$ggplot_alph) +
+    facet_wrap(.~Modality, ncol = 2) +
+    scale_color_manual(values = col_palette)
+```
+
 
 ```{r, eval=params$save_output, echo=FALSE}
 ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf', width = 8, height = 6)
