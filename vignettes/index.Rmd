@@ -9,7 +9,6 @@ params:
   save_output: false
   local_data: false
   mini_run: false
-  # mini_run: !r Sys.info()['user'] == 'alabadi'
   matching_rna_for_umap: false
   ## run params
   drop_lineages: !r c('Primitive_endoderm','Visceral_endoderm', 'ExE_ectoderm')
@@ -122,18 +121,22 @@ rna.sce.matching <- gastru.mae@ExperimentList$rna
 Replace the rna SCE with logcounts in MAE object as the integration wrapper requires matrices in assays:
 
 ```{r}
+## rna is an SCE object
 gastru.mae@ExperimentList
 ## replace SCE with logcounts
 gastru.mae@ExperimentList$rna <- logcounts(gastru.mae@ExperimentList$rna)
+## rna updated to matrix of logcounts
+gastru.mae@ExperimentList
 ```
 
 Overview of assays:
 
 ```{r}
+## helper to get % of missing values in an array
 get_pct_missing <- function(arr) {
   round(100*sum(is.na(arr))/prod(dim(arr)))
 }
-
+## get dimensions and % of missing values for all assays
 df <- lapply(experiments(gastru.mae), function(w)
      {
      c(
@@ -149,9 +152,8 @@ kable(t(df), align = 'l')
 Breakdown of the number of cells in each stage:
 
 ```{r, warning=FALSE}
-table(gastru.mae$stage) %>% as.data.frame() %>% t() %>% set_rownames(c('stage', '# of cells')) %>% kable()
-## create a data.frame from cell metadata
-coldata <- data.frame(colData(gastru.mae))
+table(gastru.mae$stage) %>% as.data.frame() %>% t() %>% 
+  set_rownames(c('stage', '# of cells')) %>% kable()
 ```
 
 ## Feature detection
@@ -195,18 +197,18 @@ ggsave(cov_plot, filename = 'figures/covplots.pdf', width = 8, height = 4)
 
 # RNA
 
-
 ```{r}
 # Create colour palettes for stages:
-# col_pallete <-dput( viridisLite::viridis(n = 4) )
-col_pallete <- c("#440154FF", "#31688EFF", "#35B779FF", "#FDE725FF")
-names(col_pallete) <- c("E4.5", "E5.5", "E6.5", "E7.5")
+stages <- c("E4.5", "E5.5", "E6.5", "E7.5")
+# col_palette <- dput(viridisLite::viridis(n = length(stages)))
+col_palette <- c("#440154FF", "#31688EFF", "#35B779FF", "#FDE725FF")
+names(col_palette) <- stages
 
 ## helper function to create UMAP plots coloured by stage
 plot_umap_by_stage <- function(df, dims = c(1,2)) {
   axes <- paste0('UMAP_', dims)
   ggplot(df, aes_string(axes[1], axes[2])) + geom_point(aes(col=stage)) +
-    theme_classic()+ scale_color_manual(values = col_pallete) + labs(col = 'Stage')
+    theme_classic()+ scale_color_manual(values = col_palette) + labs(col = 'Stage')
 }
 ```
 
@@ -272,7 +274,7 @@ Run PCA and then UMAP using PCs:
 ```{r}
 npcs <- 15
 ## PCA first: retrieve npcs PCs
-rna.sce.matching <- runPCA(rna.sce.matching,  ncomponents = npcs, subset_row=hvgs, name = 'PCA')
+rna.sce.matching <- runPCA(rna.sce.matching, ncomponents = npcs, subset_row=hvgs, name = 'PCA')
 
 ## UMAP parameters used:
 cat(sprintf('Running UMAP with parameters %s\n', paste(names(params$umap_params), ':',params$umap_params, collapse = ', ')))
@@ -360,7 +362,20 @@ scale <- TRUE
 
 Here we select for 50 features on each component in `multimodal_sPLS_wrapper`:
 
-```{r run pls}
+```{r, echo=FALSE}
+## helper function to format runtime
+format_runtime <- function(dsec) {
+  hours <- floor(dsec / 3600)
+  minutes <- floor((dsec - 3600 * hours) / 60)
+  seconds <- dsec - 3600*hours - 60*minutes
+  paste0(
+    sapply(c(hours, minutes, seconds), function(x) {
+      formatC(x, width = 2, format = "d", flag = "0")
+    }), collapse = ":")
+}
+```
+
+```{r run pls, warning=FALSE}
 cat(sprintf('Running PLS with %s components performing variable selection\n', ncomp))
 st <- system.time({
   mmspls <-
@@ -368,9 +383,8 @@ st <- system.time({
                             ncomp = ncomp, scale = TRUE, design = 'null', lineages = NULL,
                             stages = NULL, DA = NULL, keepX = NULL, save = FALSE)
 })['elapsed']
-st <- round(st/60, 1)
 
-cat('\nPLS run finished. Runtime: ', st, 'min\n')
+cat('\nPLS run finished. Runtime: ', format_runtime(st), '\n')
 ```
 
 ```{r, eval=params$save_output, echo=params$save_output}
@@ -391,6 +405,11 @@ plotIndiv_wrapper <- function(pls_obj, coldata, col_cell = 'stage', legend.title
 ```
 
 ## score plots
+
+```{r}
+## create a data.frame from cell metadata
+coldata <- data.frame(colData(gastru.mae))
+```
 
 Colored by stage:
 
