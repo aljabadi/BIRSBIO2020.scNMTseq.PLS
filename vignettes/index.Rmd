@@ -12,8 +12,8 @@ params:
   # mini_run: !r Sys.info()['user'] == 'alabadi'
   matching_rna_for_umap: false
   ## run params
-  drop_lineages: c('Primitive_endoderm','Visceral_endoderm', 'ExE_ectoderm')
-  umap_params: c(run.seed = 42, n_neighbors = 15, n_components = 2, min_dist = 0.55)
+  drop_lineages: !r c('Primitive_endoderm','Visceral_endoderm', 'ExE_ectoderm')
+  umap_params: !r c(run.seed = 42, n_neighbors = 15, n_components = 2, min_dist = 0.55)
 vignette: >
   %\VignetteIndexEntry{scNMTseq challenge analysis using a PLS-based approach}
   %\VignetteEngine{knitr::rmarkdown}
@@ -107,6 +107,7 @@ gastru.mae <- readRDS(gastru.mae_path)
 keep_assays <- grep("rna|met",names(assays(gastru.mae)))
 gastru.mae <- gastru.mae[,,keep_assays]
 ## remove putative extraembryonic cells
+cat(sprintf('dropping lineages %s\n', paste(params$drop_lineages, collapse = ', ')))
 gastru.mae <- gastru.mae[,!(gastru.mae$lineage %in% params$drop_lineages),]
 ## keep cells which pass RNA QC
 gastru.mae <- gastru.mae[,gastru.mae$pass_rnaQC==TRUE,]
@@ -228,7 +229,7 @@ npcs <- 15
 rna.sce <- runPCA(rna.sce,  ncomponents = npcs, subset_row=hvgs)
 
 ## UMAP parameters used:
-params$umap_params
+cat(sprintf('Running UMAP with parameters %s\n', paste(params$umap_params, collapse = ', ')))
 
 ## run UMAP
 set.seed(params$umap_params['run.seed'])
