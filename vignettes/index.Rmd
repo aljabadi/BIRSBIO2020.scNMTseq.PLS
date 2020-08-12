@@ -414,7 +414,7 @@ coldata <- data.frame(colData(gastru.mae))
 Colored by stage:
 
 ```{r, fig.width=8, fig.height=8}
-plotIndiv_wrapper(pls_obj = mmspls, coldata = coldata, col_cell = 'stage', legend.title = 'Stage', comp = c(1,2), subtitle = names(mmspls$X), col.per.group = col_pallete)
+plotIndiv_wrapper(pls_obj = mmspls, coldata = coldata, col_cell = 'stage', legend.title = 'Stage', comp = c(1,2), subtitle = names(mmspls$X), col.per.group = col_palette)
 ```
 
 ```{r, eval=params$save_output, echo=FALSE}
