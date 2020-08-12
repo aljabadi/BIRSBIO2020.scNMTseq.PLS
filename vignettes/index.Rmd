@@ -106,8 +106,8 @@ gastru.mae <- readRDS(gastru.mae_path)
 keep_assays <- grep("rna|met",names(assays(gastru.mae)))
 gastru.mae <- gastru.mae[,,keep_assays]
 ## remove putative extraembryonic cells
-cat(sprintf('dropping lineages %s\n', paste(params$drop_lineages, collapse = ', ')))
-gastru.mae <- gastru.mae[,!(gastru.mae$lineage %in% params$drop_lineages),]
+cat(sprintf('dropping lineages %s, plus the unassigned lineages.\n', paste(params$drop_lineages, collapse = ', ')))
+gastru.mae <- gastru.mae[,!(gastru.mae$lineage %in% params$drop_lineages || is.na(gastru.mae$lineage)),]
 ## keep cells which pass RNA QC
 gastru.mae <- gastru.mae[,gastru.mae$pass_rnaQC==TRUE,]
 ## Keep full rna SCE for UMAP
