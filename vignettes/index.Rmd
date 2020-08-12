@@ -229,7 +229,7 @@ npcs <- 15
 rna.sce <- runPCA(rna.sce,  ncomponents = npcs, subset_row=hvgs, name = 'PCA')
 
 ## UMAP parameters used:
-cat(sprintf('Running UMAP with parameters %s\n', paste(params$umap_params, collapse = ', ')))
+cat(sprintf('Running UMAP with parameters %s\n', paste(names(params$umap_params), ':',params$umap_params, collapse = ', ')))
 
 ## run UMAP
 set.seed(params$umap_params['run.seed'])
@@ -275,7 +275,7 @@ npcs <- 15
 rna.sce.matching <- runPCA(rna.sce.matching,  ncomponents = npcs, subset_row=hvgs, name = 'PCA')
 
 ## UMAP parameters used:
-params$umap_params
+cat(sprintf('Running UMAP with parameters %s\n', paste(names(params$umap_params), ':',params$umap_params, collapse = ', ')))
 
 ## run UMAP
 set.seed(params$umap_params['run.seed'])
