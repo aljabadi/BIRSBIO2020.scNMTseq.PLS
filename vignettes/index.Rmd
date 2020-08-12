@@ -226,7 +226,7 @@ Run PCA and then UMAP using PCs:
 ```{r}
 npcs <- 15
 ## PCA first: retrieve npcs PCs
-rna.sce <- runPCA(rna.sce,  ncomponents = npcs, subset_row=hvgs)
+rna.sce <- runPCA(rna.sce,  ncomponents = npcs, subset_row=hvgs, name = 'PCA')
 
 ## UMAP parameters used:
 cat(sprintf('Running UMAP with parameters %s\n', paste(params$umap_params, collapse = ', ')))
@@ -272,7 +272,7 @@ Run PCA and then UMAP using PCs:
 ```{r}
 npcs <- 15
 ## PCA first: retrieve npcs PCs
-rna.sce <- runPCA(rna.sce.matching,  ncomponents = npcs, subset_row=hvgs)
+rna.sce.matching <- runPCA(rna.sce.matching,  ncomponents = npcs, subset_row=hvgs, name = 'PCA')
 
 ## UMAP parameters used:
 params$umap_params
