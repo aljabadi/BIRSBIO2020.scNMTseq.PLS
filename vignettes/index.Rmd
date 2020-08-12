@@ -13,6 +13,7 @@ params:
   ## run params
   drop_lineages: !r c('Primitive_endoderm','Visceral_endoderm', 'ExE_ectoderm')
   umap_params: !r c(run.seed = 42, n_neighbors = 15, n_components = 2, min_dist = 0.55)
+  ggplot_alpha: 0.8
 vignette: >
   %\VignetteIndexEntry{scNMTseq challenge analysis using a PLS-based approach}
   %\VignetteEngine{knitr::rmarkdown}
@@ -213,7 +214,7 @@ plot_reducedDims <- function(sce, reducedDim = 'UMAP',
   df <- data.frame(reducedDim(sce, reducedDim))[,dims]
   axes <- colnames(df) <- paste0(comps.prefix, dims)
   df$stage <- sce$stage
-  ggplot(df, aes_string(axes[1], axes[2])) + geom_point(aes(col=stage)) +
+  ggplot(df, aes_string(axes[1], axes[2])) + geom_point(aes(col=stage), alpha = params$ggplot_alpha) +
     theme_classic()+ scale_color_manual(values = col_palette) + labs(col = 'Stage')
 }
 ```
@@ -414,7 +415,7 @@ plot_pls <- function(pls_obj, stage, legend.title = 'Stage', comp = c(1,2), col_
   axes <- colnames(variates)[1:2]
   ggplot(variates) + 
     theme_classic() +
-    geom_point(aes_string(x = axes[1], y = axes[2], col = 'stage')) +
+    geom_point(aes_string(x = axes[1], y = axes[2], col = 'stage'), alpha = params$ggplot_alph) +
     facet_wrap(.~Modality, ncol = 2) +
     scale_color_manual(values = col_palette)
 }
