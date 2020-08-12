@@ -147,7 +147,7 @@ kable(t(df), align = 'l')
 
 Breakdown of the number of cells in each stage:
 
-```{r}
+```{r, warning=FALSE}
 table(gastru.mae$stage) %>% as.data.frame() %>% t() %>% set_rownames(c('stage', '# of cells')) %>% kable()
 ## create a data.frame from cell metadata
 coldata <- data.frame(colData(gastru.mae))
@@ -195,8 +195,6 @@ ggsave(cov_plot, filename = 'figures/covplots.pdf', width = 8, height = 4)
 # RNA
 
 
-## UMAP
-
 ```{r}
 # Create colour palettes for stages:
 # col_pallete <-dput( viridisLite::viridis(n = 4) )
@@ -211,7 +209,7 @@ plot_umap_by_stage <- function(df, dims = c(1,2)) {
 }
 ```
 
-### All RNA cells
+## UMAP projection all of RNA cells
 
 Select highly variable genes after accounting for technical variation:
 
@@ -229,6 +227,10 @@ npcs <- 15
 ## PCA first: retrieve npcs PCs
 rna.sce <- runPCA(rna.sce,  ncomponents = npcs, subset_row=hvgs)
 
+## UMAP parameters used:
+params$umap_params
+
+## run UMAP
 set.seed(params$umap_params['run.seed'])
 rna.sce <- runUMAP(rna.sce, dimred="PCA", 
                    ncomponents = params$umap_params['n_components'], 
@@ -250,9 +252,10 @@ Plot the first two UMAP components:
 ```{r, fig.asp=0.7}
 plot_umap_by_stage(df = df, dims = c(1,2))
 ```
+
 UMAP plot shows distinct cell populations corresponding to early-stage, mid-stage, and late-stage cells as well as the within-stage variation for mainly E4.5 and E6.5 which could correspond to different lineages.
 
-### Matching RNA cells
+## UMAP projection all matching RNA cells used in integration
 
 Select highly variable genes after accounting for technical variation:
 
@@ -266,10 +269,14 @@ length(hvgs)
 Run PCA and then UMAP using PCs:
 
 ```{r}
-## PCA first: retrieve 25 PCs
-rna.sce.matching <- runPCA(rna.sce.matching,  ncomponents = 25, subset_row=hvgs)
+npcs <- 15
+## PCA first: retrieve npcs PCs
+rna.sce <- runPCA(rna.sce.matching,  ncomponents = npcs, subset_row=hvgs)
 
-RNGversion('4.0.0')
+## UMAP parameters used:
+params$umap_params
+
+## run UMAP
 set.seed(params$umap_params['run.seed'])
 rna.sce.matching <- runUMAP(rna.sce.matching, dimred="PCA", 
                    ncomponents = params$umap_params['n_components'], 
@@ -281,15 +288,15 @@ data.frame of embeddings with cell metadata:
 
 ```{r}
 # data.frame of embeddings with cell metadata
-df <-  data.frame(reducedDim(rna.sce.matching,"UMAP"))
-colnames(df) <- paste0('UMAP_', seq_along(df))
-df <- cbind(df, colData(rna.sce.matching))
+df.matching <-  data.frame(reducedDim(rna.sce.matching,"UMAP"))
+colnames(df.matching) <- paste0('UMAP_', seq_along(df.matching))
+df.matching <- cbind(df.matching, colData(rna.sce.matching))
 ```
 
 Plot the first two UMAP components:
 
 ```{r, fig.asp=0.7}
-plot_umap_by_stage(df = df, dims = c(1,2))
+plot_umap_by_stage(df = df.matching, dims = c(1,2))
 ```
 
 
