@@ -430,7 +430,7 @@
 
 <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'\nPLS run finished. Runtime: '</span>, <span class="fu">format_runtime</span>(<span class="no">st</span>), <span class="st">'\n'</span>)
 <span class="co">#&gt; </span>
-<span class="co">#&gt; PLS run finished. Runtime:  00:03:54</span></pre></body></html></div>
+<span class="co">#&gt; PLS run finished. Runtime:  00:04:27</span></pre></body></html></div>
 <div class="sourceCode" id="cb22"><html><body><pre class="r"><span class="no">plot_pls</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">pls_obj</span>, <span class="no">stage</span>, <span class="no">legend.title</span> <span class="kw">=</span> <span class="st">'Stage'</span>, <span class="no">comp</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>), <span class="no">col_palette</span>) {
   <span class="no">variates</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="no">pls_obj</span>$<span class="no">variates</span>, <span class="kw">function</span>(<span class="no">arr</span>){
     <span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="no">arr</span>[,<span class="no">comp</span>])
@@ -454,12 +454,47 @@
 <p><img src="index_files/figure-html/unnamed-chunk-28-1.png" width="768"></p>
 <p>The derived latent components which seek to maximise the sum of concordant variation b/w rna and other modalities show phenotypic relevance in terms of the embryonic stages. It indicates coordinated changes across the methylomes associated with the distinct transcriptional states of cells in the regions of study during gastrulation.</p>
 </div>
+<div id="umap-using-pls-components" class="section level2">
+<h2 class="hasAnchor">
+<a href="#umap-using-pls-components" class="anchor"></a>UMAP using PLS components</h2>
+<p>add PLS embeddings to SCE so scater::runUMAP can be applied:</p>
+<div class="sourceCode" id="cb24"><html><body><pre class="r"><span class="kw">for</span> (<span class="no">block</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">mmspls</span>$<span class="no">variates</span>)) {
+  <span class="no">variates</span> <span class="kw">&lt;-</span> <span class="no">mmspls</span>$<span class="no">variates</span>[<span class="no">block</span>]
+  <span class="no">dimred.name</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">'PLS_'</span>, <span class="no">block</span>)
+  <span class="no">umap.name</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">'UMAP_PLS_'</span>, <span class="no">block</span>)
+  <span class="fu">reducedDim</span>(<span class="no">rna.sce.matching</span>, <span class="no">dimred.name</span>) <span class="kw">&lt;-</span> <span class="no">mmspls</span>$<span class="no">variates</span><span class="kw">[[</span><span class="no">block</span>]]
+  <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'run.seed'</span>])
+  <span class="no">rna.sce.matching</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runUMAP.html">runUMAP</a></span>(<span class="no">rna.sce.matching</span>, <span class="kw">dimred</span><span class="kw">=</span><span class="no">dimred.name</span>,
+                              <span class="kw">ncomponents</span> <span class="kw">=</span> <span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'n_components'</span>],
+                              <span class="kw">n_neighbors</span> <span class="kw">=</span> <span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'n_neighbors'</span>],
+                              <span class="kw">min_dist</span> <span class="kw">=</span> <span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'min_dist'</span>],
+                              <span class="kw">name</span> <span class="kw">=</span> <span class="no">umap.name</span>)
+}</pre></body></html></div>
+<p>Create a long data.frame of all variates for facet plotting:</p>
+<div class="sourceCode" id="cb25"><html><body><pre class="r"><span class="no">all_pls_umap</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>()
+<span class="kw">for</span> (<span class="no">block</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">mmspls</span>$<span class="no">variates</span>)) {
+  <span class="no">umap.name</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">'UMAP_PLS_'</span>, <span class="no">block</span>)
+  <span class="no">umap_df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="fu">reducedDim</span>(<span class="no">rna.sce.matching</span>, <span class="no">umap.name</span>))
+  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">umap_df</span>) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">'UMAP_'</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span>(<span class="no">umap_df</span>))
+  <span class="no">umap_df</span>$<span class="no">stage</span> <span class="kw">&lt;-</span> <span class="no">gastru.mae</span>$<span class="no">stage</span>
+  <span class="no">all_pls_umap</span><span class="kw">[[</span><span class="no">block</span>]] <span class="kw">&lt;-</span> <span class="no">umap_df</span>
+}
+<span class="no">all_pls_umap</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/reference/utils.html">rbindListWithNames</a></span>(<span class="no">all_pls_umap</span>, <span class="kw">new_col</span> <span class="kw">=</span> <span class="st">'Modality'</span>)</pre></body></html></div>
+<p>Plot UMAP:</p>
+<div class="sourceCode" id="cb26"><html><body><pre class="r"><span class="no">axes</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">all_pls_umap</span>)[<span class="fl">1</span>:<span class="fl">2</span>]
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">all_pls_umap</span>) +
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_classic</a></span>() +
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_.html">aes_string</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">axes</span>[<span class="fl">1</span>], <span class="kw">y</span> <span class="kw">=</span> <span class="no">axes</span>[<span class="fl">2</span>], <span class="kw">col</span> <span class="kw">=</span> <span class="st">'stage'</span>), <span class="kw">alpha</span> <span class="kw">=</span> <span class="no">params</span>$<span class="no">ggplot_alph</span>) +
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="no">.</span>~<span class="no">Modality</span>, <span class="kw">ncol</span> <span class="kw">=</span> <span class="fl">2</span>) +
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="no">col_palette</span>)</pre></body></html></div>
+<p><img src="index_files/figure-html/unnamed-chunk-31-1.png" width="768"></p>
+</div>
 </div>
 <div id="concordance-with-rna" class="section level1">
 <h1 class="hasAnchor">
 <a href="#concordance-with-rna" class="anchor"></a>concordance with RNA</h1>
 <p>Here we calculate the correlations between components from gene expression and different methylome modalities:</p>
-<div class="sourceCode" id="cb24"><html><body><pre class="r"><span class="co">## For a pls object which includes pls cell embeddings from a computed latent space</span>
+<div class="sourceCode" id="cb27"><html><body><pre class="r"><span class="co">## For a pls object which includes pls cell embeddings from a computed latent space</span>
 <span class="co">## where covariance with rna is maximal, calculate the correlation b/w rna embeddings</span>
 <span class="co">## and those of a given modality's (per component and average) as a measure of concordant variation with rna</span>
 <span class="no">concordance</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">pls_obj</span>, <span class="no">comp</span> <span class="kw">=</span> <span class="fl">1</span>) {
@@ -490,7 +525,7 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">cor_with_y</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">Modality</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">Concordance</span>)) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">fill</span> <span class="kw">=</span> <span class="no">Component</span>), <span class="kw">position</span> <span class="kw">=</span> <span class="st">'dodge2'</span>) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_classic</a></span>() +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">y</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Correlation with RNA (comp %s) '</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="no">comp</span>, <span class="kw">collapse</span> <span class="kw">=</span> <span class="st">', '</span>)), <span class="kw">x</span> <span class="kw">=</span> <span class="st">''</span>, <span class="kw">fill</span> <span class="kw">=</span> <span class="st">''</span>) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html">ylim</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1</span>)) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">45</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.8</span>, <span class="kw">hjust</span><span class="kw">=</span><span class="fl">1</span>))
 }</pre></body></html></div>
-<div class="sourceCode" id="cb25"><html><body><pre class="r"><span class="fu">concordance</span>(<span class="kw">pls_obj</span> <span class="kw">=</span> <span class="no">mmspls</span>, <span class="kw">comp</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">2</span>))
+<div class="sourceCode" id="cb28"><html><body><pre class="r"><span class="fu">concordance</span>(<span class="kw">pls_obj</span> <span class="kw">=</span> <span class="no">mmspls</span>, <span class="kw">comp</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">2</span>))
 <span class="co">#&gt; </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; |            | met_genebody| met_promoter| met_cgi| met_DHS|</span>
@@ -498,7 +533,12 @@
 <span class="co">#&gt; |Component 1 |         0.95|         0.92|    0.91|    0.92|</span>
 <span class="co">#&gt; |Component 2 |         0.46|         0.59|    0.49|    0.39|</span>
 <span class="co">#&gt; |mean        |         0.71|         0.75|    0.70|    0.66|</span></pre></body></html></div>
-<p><img src="index_files/figure-html/unnamed-chunk-31-1.png" width="768"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-34-1.png" width="768"></p>
+</div>
+<div id="conclusion" class="section level1">
+<h1 class="hasAnchor">
+<a href="#conclusion" class="anchor"></a>Conclusion</h1>
+<p>Multi-modal PLS derives the common variation between transcriptome and methylome in different genomic regions for 796 single cells during mouse gastrulation. The measurements include high levels of masked values and the method ignores these missing elements during integration. The common axes of variation are mainly driven by the stages of embryo and there is high coordination between transcriptional and CpG methylation states.</p>
 </div>
 <div class="footnotes">
 <hr>
