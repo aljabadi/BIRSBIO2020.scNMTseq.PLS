@@ -511,4 +511,6 @@ concordance <- function(pls_obj, comp = 1) {
 concordance(pls_obj = mmspls, comp = c(1, 2))
 ```
 
+# Conclusion
 
+Multi-modal PLS derives the common variation between transcriptome and methylome in different genomic regions for `r dim(gastru.mae@ExperimentList$rna)[2]` single cells during mouse gastrulation. The measurements include high levels of masked values and the method ignores these missing elements during integration. The common axes of variation are mainly driven by the stages of embryo and there is high coordination between transcriptional and CpG methylation states.
