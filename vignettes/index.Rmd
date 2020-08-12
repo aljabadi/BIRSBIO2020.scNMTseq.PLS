@@ -414,66 +414,7 @@ coldata <- data.frame(colData(gastru.mae))
 Colored by stage:
 
 ```{r, fig.width=8, fig.height=8}
-plotIndiv_wrapper(pls_obj = mmspls, coldata = coldata, col_cell = 'stage', legend.title = 'Stage', comp = c(1,2), subtitle = names(mmspls$X), col.per.group = col_palette)
-```
-Look into the outlier cell:
-
-```{r}
-## ------------- PLS outlier
-df_PLS <- data.frame(mmspls$variates$rna)
-# plot(df_PLS)
-# which.max(mmspls$variates$rna[,2])
-pls_outlier <- rownames(df_PLS)[which.max(df_PLS[,2])]
-
-ggplot(df_PLS, aes(comp1, comp2)) +  theme_classic() +
-  geom_point(aes(col = factor(rna.sce.matching$stage))) +
-  scale_color_manual(values = col_palette) + 
-  geom_point(data = df_PLS[pls_outlier,], aes(comp1, comp2), col='red', size = 2) +
-  geom_text(data = df_PLS[pls_outlier,], aes(comp1, comp2), col='red', label = rownames(df_PLS[pls_outlier,]), vjust = 1.5) + labs(col = 'Stage')
-```
-
-Check on PCA plot:
-
-```{r}
-df_PCA <- data.frame(reducedDims(rna.sce.matching)$PCA)
-pls_outlier_PCA <- df_PCA[pls_outlier,]
-
-ggplot(df_PCA, aes(PC1, PC2)) +  theme_classic() +
-  geom_point(aes(col = factor(rna.sce.matching$stage))) +
-  scale_color_manual(values = col_palette) + 
-  geom_point(data = df_PCA[pls_outlier,], aes(PC1, PC2), col='red', size = 2) +
-  geom_text(data = df_PCA[pls_outlier,], aes(PC1, PC2), col='red', label = rownames(df_PCA[pls_outlier,]), vjust = -0.8) + labs(col = 'Stage')
-```
-
-It looks like the sample is also an outlier in the PCA plot compared to other early stage cells.
-
-Filter outlier cell:
-
-```{r}
-keep_cells <- !(rownames(colData(gastru.mae)) %in% rownames(pls_outlier_PCA))
-gastru.mae.filter.outlier <- gastru.mae[,keep_cells,]
-```
-
-
-```{r run pls 2, warning=FALSE}
-cat(sprintf('Running PLS on filtered MAE with %s components performing variable selection\n', ncomp))
-st <- system.time({
-  mmspls_filter.outlier <-
-    multimodal_sPLS_wrapper(mae = gastru.mae.filter.outlier, study_assays = NULL,
-                            ncomp = ncomp, scale = TRUE, design = 'null', lineages = NULL,
-                            stages = NULL, DA = NULL, keepX = NULL, save = FALSE)
-})['elapsed']
-
-cat('\nPLS run finished. Runtime: ', format_runtime(st), '\n')
-```
-
-```{r, eval=params$save_output, echo=params$save_output}
-saveRDS(mmspls_filter.outlier, file = 'savedata/MultiModalSparsePLS-All-filtered.rds')
-# mmspls <- readRDS('savedata/MultiModalSparsePLS-All.rds')
-```
-
-```{r, fig.width=8, fig.height=8}
-plotIndiv_wrapper(pls_obj = mmspls_filter.outlier, coldata = data.frame(colData(gastru.mae.filter.outlier)), col_cell = 'stage', legend.title = 'Stage', comp = c(1,2), subtitle = names(mmspls_filter.outlier$X), col.per.group = col_palette)
+plotIndiv_wrapper(pls_obj = mmspls, coldata = coldata, col_cell = 'stage', legend.title = 'Stage', comp = c(1,2), subtitle = names(mmspls$X), col.per.group = col_pallete)
 ```
 
 ```{r, eval=params$save_output, echo=FALSE}
@@ -519,7 +460,7 @@ concordance <- function(pls_obj, comp = 1) {
 ```
 
 ```{r}
-concordance(pls_obj = mmspls_filter.outlier, comp = c(1, 2))
+concordance(pls_obj = mmspls, comp = c(1, 2))
 ```
 
 
