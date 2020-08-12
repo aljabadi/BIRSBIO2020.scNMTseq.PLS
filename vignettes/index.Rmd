@@ -404,28 +404,28 @@ saveRDS(mmspls, file = 'savedata/MultiModalSparsePLS-All.rds')
 ```
 
 ```{r}
-plotIndiv_wrapper <- function(pls_obj, coldata, col_cell = 'stage', legend.title = 'Stage', comp = c(1,2), ...) {
-  ## order coldata cells based on matching cells in pls modalities
-  coldata <- coldata[rownames(pls_obj$X[[1]]),]
-  cell_class <- coldata[,col_cell]  ## col factor for cells
-  cell_class <- factor(cell_class)
-  suppressWarnings({
-    plotIndiv(pls_obj, pch = 16, comp = comp,group = cell_class, legend = TRUE, legend.title = legend.title, size.subtitle = 10, cex=0.8, ...)
+plot_pls <- function(pls_obj, stage, legend.title = 'Stage', comp = c(1,2), col_palette) {
+  variates <- lapply(pls_obj$variates, function(arr){
+    df <- as.data.frame(arr[,comp])
+    df$stage <- stage
+    df
   })
+  variates <- rbindListWithNames(variates, new_col = 'Modality')
+  axes <- colnames(variates)[1:2]
+  ggplot(variates) + 
+    theme_classic() +
+    geom_point(aes_string(x = axes[1], y = axes[2], col = 'stage')) +
+    facet_wrap(.~Modality, ncol = 2) +
+    scale_color_manual(values = col_palette)
 }
 ```
 
 ## score plots
 
-```{r}
-## create a data.frame from cell metadata
-coldata <- data.frame(colData(gastru.mae))
-```
-
 Colored by stage:
 
 ```{r, fig.width=8, fig.height=8}
-plotIndiv_wrapper(pls_obj = mmspls, coldata = coldata, col_cell = 'stage', legend.title = 'Stage', comp = c(1,2), subtitle = names(mmspls$X), col.per.group = col_palette)
+plot_pls(pls_obj = mmspls, stage = gastru.mae$stage, col_palette = col_palette)
 ```
 
 ```{r, eval=params$save_output, echo=FALSE}
