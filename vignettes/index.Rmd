@@ -248,16 +248,6 @@ rna.sce <- runUMAP(rna.sce, dimred="PCA",
                    min_dist = params$umap_params['min_dist'])
 ```
 
-### PCA
-
-Plot the first two UMAP components:
-
-```{r, fig.asp=0.7}
-plot_reducedDims(sce = rna.sce, reducedDim = 'PCA', dims = c(1,2), col_palette = col_palette)
-```
-
-First two PCs highlight the within-stage variation which could potentially correspond to different distinct cell lineages.
-
 ### UMAP
 
 Plot the first two UMAP components:
