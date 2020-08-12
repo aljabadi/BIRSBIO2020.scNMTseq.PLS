@@ -414,7 +414,7 @@
 <!-- ``` -->
 <p>Here we select for 50 features on each component in <code>multimodal_sPLS_wrapper</code>:</p>
 <div class="sourceCode" id="cb20"><html><body><pre class="r"><span class="co">## number of components</span>
-<span class="no">ncomp</span> <span class="kw">&lt;-</span> <span class="fl">5</span>
+<span class="no">ncomp</span> <span class="kw">&lt;-</span> <span class="no">params</span>$<span class="no">pls_ncomp</span>
 <span class="co">## feature scaling</span>
 <span class="no">scale</span> <span class="kw">&lt;-</span> <span class="fl">TRUE</span></pre></body></html></div>
 <div class="sourceCode" id="cb21"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Running PLS with %s components performing variable selection\n'</span>, <span class="no">ncomp</span>))
@@ -430,7 +430,7 @@
 
 <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'\nPLS run finished. Runtime: '</span>, <span class="fu">format_runtime</span>(<span class="no">st</span>), <span class="st">'\n'</span>)
 <span class="co">#&gt; </span>
-<span class="co">#&gt; PLS run finished. Runtime:  00:04:27</span></pre></body></html></div>
+<span class="co">#&gt; PLS run finished. Runtime:  00:04:00</span></pre></body></html></div>
 <div class="sourceCode" id="cb22"><html><body><pre class="r"><span class="no">plot_pls</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">pls_obj</span>, <span class="no">stage</span>, <span class="no">legend.title</span> <span class="kw">=</span> <span class="st">'Stage'</span>, <span class="no">comp</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>), <span class="no">col_palette</span>) {
   <span class="no">variates</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="no">pls_obj</span>$<span class="no">variates</span>, <span class="kw">function</span>(<span class="no">arr</span>){
     <span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="no">arr</span>[,<span class="no">comp</span>])
@@ -487,7 +487,7 @@
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_.html">aes_string</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">axes</span>[<span class="fl">1</span>], <span class="kw">y</span> <span class="kw">=</span> <span class="no">axes</span>[<span class="fl">2</span>], <span class="kw">col</span> <span class="kw">=</span> <span class="st">'stage'</span>), <span class="kw">alpha</span> <span class="kw">=</span> <span class="no">params</span>$<span class="no">ggplot_alph</span>) +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="no">.</span>~<span class="no">Modality</span>, <span class="kw">ncol</span> <span class="kw">=</span> <span class="fl">2</span>) +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="no">col_palette</span>)</pre></body></html></div>
-<p><img src="index_files/figure-html/unnamed-chunk-31-1.png" width="768"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-31-1.png" width="768"> UMAP projection using 5 PLS components for each modality shows the distinct states of early stage cells on transcriptional and DNA methylation level. These states are coordinated across both molecular levels. The projection also demonstrates the transition from mid-stage to late-stage for single cells across different views.</p>
 </div>
 </div>
 <div id="concordance-with-rna" class="section level1">
