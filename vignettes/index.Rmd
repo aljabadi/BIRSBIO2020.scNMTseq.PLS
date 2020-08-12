@@ -406,6 +406,9 @@ ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf', width = 8, 
 Here we calculate the correlations between components from gene expression and different methylome modalities:
 
 ```{r}
+## For a pls object which includes pls cell embeddings from a computed latent space
+## where covariance with rna is maximal, calculate the correlation b/w rna embeddings
+## and those of a given modality's (per component and average) as a measure of concordant variation with rna
 concordance <- function(pls_obj, comp = 1) {
   
   ## correlation of components with RNA components
@@ -419,6 +422,7 @@ concordance <- function(pls_obj, comp = 1) {
     cor <- round(cor, 2)
     cor
   })
+  print(kable(cor_with_y))
   ## make a long data.frame
   cor_with_y <- cor_with_y %>% as.data.frame() %>% t() %>% 
     reshape2::melt(id.vars = 1:3) %>% 
