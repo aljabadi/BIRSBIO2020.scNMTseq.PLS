@@ -145,7 +145,8 @@
 <span class="co">## rna SCE for cells passing met and rna QC</span>
 <span class="no">rna.sce.matching</span> <span class="kw">&lt;-</span> <span class="no">gastru.mae</span>@<span class="kw">ExperimentList</span>$<span class="no">rna</span></pre></body></html></div>
 <p>Replace the rna SCE with logcounts in MAE object as the integration wrapper requires matrices in assays:</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">gastru.mae</span>@<span class="kw">ExperimentList</span>
+<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="co">## rna is an SCE object</span>
+<span class="no">gastru.mae</span>@<span class="kw">ExperimentList</span>
 <span class="co">#&gt; ExperimentList class object of length 5:</span>
 <span class="co">#&gt;  [1] rna: SingleCellExperiment with 18345 rows and 799 columns</span>
 <span class="co">#&gt;  [2] met_genebody: matrix with 17559 rows and 799 columns</span>
@@ -153,12 +154,21 @@
 <span class="co">#&gt;  [4] met_cgi: matrix with 14080 rows and 799 columns</span>
 <span class="co">#&gt;  [5] met_DHS: matrix with 6673 rows and 799 columns</span>
 <span class="co">## replace SCE with logcounts</span>
-<span class="no">gastru.mae</span>@<span class="kw">ExperimentList</span>$<span class="no">rna</span> <span class="kw">&lt;-</span> <span class="fu">logcounts</span>(<span class="no">gastru.mae</span>@<span class="kw">ExperimentList</span>$<span class="no">rna</span>)</pre></body></html></div>
+<span class="no">gastru.mae</span>@<span class="kw">ExperimentList</span>$<span class="no">rna</span> <span class="kw">&lt;-</span> <span class="fu">logcounts</span>(<span class="no">gastru.mae</span>@<span class="kw">ExperimentList</span>$<span class="no">rna</span>)
+<span class="co">## rna updated to matrix of logcounts</span>
+<span class="no">gastru.mae</span>@<span class="kw">ExperimentList</span>
+<span class="co">#&gt; ExperimentList class object of length 5:</span>
+<span class="co">#&gt;  [1] rna: matrix with 18345 rows and 799 columns</span>
+<span class="co">#&gt;  [2] met_genebody: matrix with 17559 rows and 799 columns</span>
+<span class="co">#&gt;  [3] met_promoter: matrix with 17179 rows and 799 columns</span>
+<span class="co">#&gt;  [4] met_cgi: matrix with 14080 rows and 799 columns</span>
+<span class="co">#&gt;  [5] met_DHS: matrix with 6673 rows and 799 columns</span></pre></body></html></div>
 <p>Overview of assays:</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">get_pct_missing</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">arr</span>) {
+<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="co">## helper to get % of missing values in an array</span>
+<span class="no">get_pct_missing</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">arr</span>) {
   <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="fl">100</span>*<span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="no">arr</span>))/<span class="fu"><a href="https://rdrr.io/r/base/prod.html">prod</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span>(<span class="no">arr</span>)))
 }
-
+<span class="co">## get dimensions and % of missing values for all assays</span>
 <span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/MultiAssayExperiment/man/MultiAssayExperiment-methods.html">experiments</a></span>(<span class="no">gastru.mae</span>), <span class="kw">function</span>(<span class="no">w</span>)
      {
      <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(
@@ -210,7 +220,8 @@
 </tbody>
 </table>
 <p>Breakdown of the number of cells in each stage:</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span>(<span class="no">gastru.mae</span>$<span class="no">stage</span>) <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>() <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>() <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/magrittr/man/aliases.html">set_rownames</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'stage'</span>, <span class="st">'# of cells'</span>)) <span class="kw">%&gt;%</span> <span class="fu">kable</span>()</pre></body></html></div>
+<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span>(<span class="no">gastru.mae</span>$<span class="no">stage</span>) <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>() <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>() <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/magrittr/man/aliases.html">set_rownames</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'stage'</span>, <span class="st">'# of cells'</span>)) <span class="kw">%&gt;%</span> <span class="fu">kable</span>()</pre></body></html></div>
 <table class="table"><tbody>
 <tr class="odd">
 <td align="left">stage</td>
@@ -227,14 +238,12 @@
 <td align="left">374</td>
 </tr>
 </tbody></table>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="co">## create a data.frame from cell metadata</span>
-<span class="no">coldata</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="fu">colData</span>(<span class="no">gastru.mae</span>))</pre></body></html></div>
 </div>
 <div id="feature-detection" class="section level2">
 <h2 class="hasAnchor">
 <a href="#feature-detection" class="anchor"></a>Feature detection</h2>
 <p>Create density plots of the feature detection rate across all cells for all modalities:</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="co"># get the methylation assays</span>
+<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="co"># get the methylation assays</span>
 <span class="no">met_assays</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">gastru.mae</span>), <span class="kw">pattern</span> <span class="kw">=</span> <span class="st">'^met'</span>, <span class="kw">value</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
 <span class="co"># add dimensions to labels for ggplot</span>
 <span class="no">dims</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/MultiAssayExperiment/man/MultiAssayExperiment-methods.html">experiments</a></span>(<span class="no">gastru.mae</span>[,,<span class="no">met_assays</span>]), <span class="no">dim</span>)
@@ -250,7 +259,7 @@
 <span class="no">coverages</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/reference/utils.html">rbindListWithNames</a></span>(<span class="no">coverages</span>)
 <span class="no">coverages</span>$<span class="no">dataset</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">coverages</span>$<span class="no">dataset</span>, <span class="kw">levels</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(<span class="no">coverages</span>$<span class="no">dataset</span>), <span class="kw">ordered</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
 <p>Genomic contexts vary in level of feature detection rates:</p>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="no">cov_plot</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">coverages</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">pct_NAs</span>)) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span>(<span class="kw">fill</span> <span class="kw">=</span> <span class="st">'lightblue'</span>, <span class="kw">show.legend</span> <span class="kw">=</span> <span class="fl">FALSE</span>) +
+<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="no">cov_plot</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">coverages</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">pct_NAs</span>)) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span>(<span class="kw">fill</span> <span class="kw">=</span> <span class="st">'lightblue'</span>, <span class="kw">show.legend</span> <span class="kw">=</span> <span class="fl">FALSE</span>) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_vline</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">xintercept</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="no">pct_NAs</span>)),
              <span class="kw">color</span><span class="kw">=</span><span class="st">"blue"</span>, <span class="kw">linetype</span><span class="kw">=</span><span class="st">"dashed"</span>, <span class="kw">size</span><span class="kw">=</span><span class="fl">0.5</span>) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">'% of cells detecting the feature'</span>) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="no">.</span>~<span class="no">dataset</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">2</span>) +
@@ -263,28 +272,29 @@
 <div id="rna" class="section level1">
 <h1 class="hasAnchor">
 <a href="#rna" class="anchor"></a>RNA</h1>
-<div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="co"># Create colour palettes for stages:</span>
-<span class="co"># col_pallete &lt;-dput( viridisLite::viridis(n = 4) )</span>
-<span class="no">col_pallete</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"#440154FF"</span>, <span class="st">"#31688EFF"</span>, <span class="st">"#35B779FF"</span>, <span class="st">"#FDE725FF"</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">col_pallete</span>) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"E4.5"</span>, <span class="st">"E5.5"</span>, <span class="st">"E6.5"</span>, <span class="st">"E7.5"</span>)
+<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="co"># Create colour palettes for stages:</span>
+<span class="no">stages</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"E4.5"</span>, <span class="st">"E5.5"</span>, <span class="st">"E6.5"</span>, <span class="st">"E7.5"</span>)
+<span class="co"># col_palette &lt;- dput(viridisLite::viridis(n = length(stages)))</span>
+<span class="no">col_palette</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"#440154FF"</span>, <span class="st">"#31688EFF"</span>, <span class="st">"#35B779FF"</span>, <span class="st">"#FDE725FF"</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">col_palette</span>) <span class="kw">&lt;-</span> <span class="no">stages</span>
 
 <span class="co">## helper function to create UMAP plots coloured by stage</span>
 <span class="no">plot_umap_by_stage</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">df</span>, <span class="no">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>)) {
   <span class="no">axes</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">'UMAP_'</span>, <span class="no">dims</span>)
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_.html">aes_string</a></span>(<span class="no">axes</span>[<span class="fl">1</span>], <span class="no">axes</span>[<span class="fl">2</span>])) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">col</span><span class="kw">=</span><span class="no">stage</span>)) +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_classic</a></span>()+ <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="no">col_pallete</span>) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">col</span> <span class="kw">=</span> <span class="st">'Stage'</span>)
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_classic</a></span>()+ <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="no">col_palette</span>) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">col</span> <span class="kw">=</span> <span class="st">'Stage'</span>)
 }</pre></body></html></div>
 <div id="umap-projection-all-of-rna-cells" class="section level2">
 <h2 class="hasAnchor">
 <a href="#umap-projection-all-of-rna-cells" class="anchor"></a>UMAP projection all of RNA cells</h2>
 <p>Select highly variable genes after accounting for technical variation:</p>
-<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="no">decomp</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/modelGeneVar.html">modelGeneVar</a></span>(<span class="no">rna.sce</span>)
+<div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="no">decomp</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/modelGeneVar.html">modelGeneVar</a></span>(<span class="no">rna.sce</span>)
 <span class="co">## filter by mean expression and significance of biological variation signal</span>
 <span class="no">hvgs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">decomp</span>)[<span class="no">decomp</span>$<span class="no">p.value</span><span class="kw">&lt;</span><span class="fl">0.01</span> <span class="kw">&amp;</span> <span class="no">decomp</span>$<span class="no">mean</span> <span class="kw">&gt;</span> <span class="fl">0.01</span>]
 <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">hvgs</span>)
 <span class="co">#&gt; [1] 337</span></pre></body></html></div>
 <p>Run PCA and then UMAP using PCs:</p>
-<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="no">npcs</span> <span class="kw">&lt;-</span> <span class="fl">15</span>
+<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="no">npcs</span> <span class="kw">&lt;-</span> <span class="fl">15</span>
 <span class="co">## PCA first: retrieve npcs PCs</span>
 <span class="no">rna.sce</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runPCA.html">runPCA</a></span>(<span class="no">rna.sce</span>,  <span class="kw">ncomponents</span> <span class="kw">=</span> <span class="no">npcs</span>, <span class="kw">subset_row</span><span class="kw">=</span><span class="no">hvgs</span>, <span class="kw">name</span> <span class="kw">=</span> <span class="st">'PCA'</span>)
 
@@ -299,12 +309,12 @@
                    <span class="kw">n_neighbors</span> <span class="kw">=</span> <span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'n_neighbors'</span>],
                    <span class="kw">min_dist</span> <span class="kw">=</span> <span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'min_dist'</span>])</pre></body></html></div>
 <p>data.frame of embeddings with cell metadata:</p>
-<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="co"># data.frame of embeddings with cell metadata</span>
+<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="co"># data.frame of embeddings with cell metadata</span>
 <span class="no">df</span> <span class="kw">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="fu">reducedDim</span>(<span class="no">rna.sce</span>,<span class="st">"UMAP"</span>))
 <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">df</span>) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">'UMAP_'</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span>(<span class="no">df</span>))
 <span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(<span class="no">df</span>, <span class="fu">colData</span>(<span class="no">rna.sce</span>))</pre></body></html></div>
 <p>Plot the first two UMAP components:</p>
-<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="fu">plot_umap_by_stage</span>(<span class="kw">df</span> <span class="kw">=</span> <span class="no">df</span>, <span class="kw">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>))</pre></body></html></div>
+<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="fu">plot_umap_by_stage</span>(<span class="kw">df</span> <span class="kw">=</span> <span class="no">df</span>, <span class="kw">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>))</pre></body></html></div>
 <p><img src="index_files/figure-html/unnamed-chunk-18-1.png" width="768"></p>
 <p>UMAP plot shows distinct cell populations corresponding to early-stage, mid-stage, and late-stage cells as well as the within-stage variation for mainly E4.5 and E6.5 which could correspond to different lineages.</p>
 </div>
@@ -312,15 +322,15 @@
 <h2 class="hasAnchor">
 <a href="#umap-projection-all-matching-rna-cells-used-in-integration" class="anchor"></a>UMAP projection all matching RNA cells used in integration</h2>
 <p>Select highly variable genes after accounting for technical variation:</p>
-<div class="sourceCode" id="cb16"><html><body><pre class="r"><span class="no">decomp</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/modelGeneVar.html">modelGeneVar</a></span>(<span class="no">rna.sce.matching</span>)
+<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="no">decomp</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/modelGeneVar.html">modelGeneVar</a></span>(<span class="no">rna.sce.matching</span>)
 <span class="co">## filter by mean expression and significance of biological variation signal</span>
 <span class="no">hvgs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">decomp</span>)[<span class="no">decomp</span>$<span class="no">p.value</span><span class="kw">&lt;</span><span class="fl">0.01</span> <span class="kw">&amp;</span> <span class="no">decomp</span>$<span class="no">mean</span> <span class="kw">&gt;</span> <span class="fl">0.01</span>]
 <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">hvgs</span>)
 <span class="co">#&gt; [1] 350</span></pre></body></html></div>
 <p>Run PCA and then UMAP using PCs:</p>
-<div class="sourceCode" id="cb17"><html><body><pre class="r"><span class="no">npcs</span> <span class="kw">&lt;-</span> <span class="fl">15</span>
+<div class="sourceCode" id="cb16"><html><body><pre class="r"><span class="no">npcs</span> <span class="kw">&lt;-</span> <span class="fl">15</span>
 <span class="co">## PCA first: retrieve npcs PCs</span>
-<span class="no">rna.sce.matching</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runPCA.html">runPCA</a></span>(<span class="no">rna.sce.matching</span>,  <span class="kw">ncomponents</span> <span class="kw">=</span> <span class="no">npcs</span>, <span class="kw">subset_row</span><span class="kw">=</span><span class="no">hvgs</span>, <span class="kw">name</span> <span class="kw">=</span> <span class="st">'PCA'</span>)
+<span class="no">rna.sce.matching</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runPCA.html">runPCA</a></span>(<span class="no">rna.sce.matching</span>, <span class="kw">ncomponents</span> <span class="kw">=</span> <span class="no">npcs</span>, <span class="kw">subset_row</span><span class="kw">=</span><span class="no">hvgs</span>, <span class="kw">name</span> <span class="kw">=</span> <span class="st">'PCA'</span>)
 
 <span class="co">## UMAP parameters used:</span>
 <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Running UMAP with parameters %s\n'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">params</span>$<span class="no">umap_params</span>), <span class="st">':'</span>,<span class="no">params</span>$<span class="no">umap_params</span>, <span class="kw">collapse</span> <span class="kw">=</span> <span class="st">', '</span>)))
@@ -333,12 +343,12 @@
                    <span class="kw">n_neighbors</span> <span class="kw">=</span> <span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'n_neighbors'</span>],
                    <span class="kw">min_dist</span> <span class="kw">=</span> <span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'min_dist'</span>])</pre></body></html></div>
 <p>data.frame of embeddings with cell metadata:</p>
-<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="co"># data.frame of embeddings with cell metadata</span>
+<div class="sourceCode" id="cb17"><html><body><pre class="r"><span class="co"># data.frame of embeddings with cell metadata</span>
 <span class="no">df.matching</span> <span class="kw">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="fu">reducedDim</span>(<span class="no">rna.sce.matching</span>,<span class="st">"UMAP"</span>))
 <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">df.matching</span>) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">'UMAP_'</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span>(<span class="no">df.matching</span>))
 <span class="no">df.matching</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(<span class="no">df.matching</span>, <span class="fu">colData</span>(<span class="no">rna.sce.matching</span>))</pre></body></html></div>
 <p>Plot the first two UMAP components:</p>
-<div class="sourceCode" id="cb19"><html><body><pre class="r"><span class="fu">plot_umap_by_stage</span>(<span class="kw">df</span> <span class="kw">=</span> <span class="no">df.matching</span>, <span class="kw">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>))</pre></body></html></div>
+<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="fu">plot_umap_by_stage</span>(<span class="kw">df</span> <span class="kw">=</span> <span class="no">df.matching</span>, <span class="kw">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>))</pre></body></html></div>
 <p><img src="index_files/figure-html/unnamed-chunk-22-1.png" width="768"></p>
 </div>
 </div>
@@ -373,7 +383,7 @@
 <h2 class="hasAnchor">
 <a href="#pls" class="anchor"></a>PLS</h2>
 <p>data dimensions overview:</p>
-<div class="sourceCode" id="cb20"><html><body><pre class="r"><span class="co"># data dimensions</span>
+<div class="sourceCode" id="cb19"><html><body><pre class="r"><span class="co"># data dimensions</span>
 <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/MultiAssayExperiment/man/MultiAssayExperiment-methods.html">experiments</a></span>(<span class="no">gastru.mae</span>), <span class="no">dim</span>)
 <span class="co">#&gt; $rna</span>
 <span class="co">#&gt; [1] 18345   799</span>
@@ -390,7 +400,7 @@
 <span class="co">#&gt; $met_DHS</span>
 <span class="co">#&gt; [1] 6673  799</span></pre></body></html></div>
 <p>integration of all modalities with feature selection:</p>
-<div class="sourceCode" id="cb21"><html><body><pre class="r"><span class="co">## number of components</span>
+<div class="sourceCode" id="cb20"><html><body><pre class="r"><span class="co">## number of components</span>
 <span class="no">ncomp</span> <span class="kw">&lt;-</span> <span class="fl">2</span>
 <span class="co">## feature scaling</span>
 <span class="no">scale</span> <span class="kw">&lt;-</span> <span class="fl">TRUE</span></pre></body></html></div>
@@ -398,7 +408,7 @@
 <!-- pls_output_name <- sprintf('multimodal_spls-ncomp_%s-scale_.rds', ncomp, scale) -->
 <!-- ``` -->
 <p>Here we select for 50 features on each component in <code>multimodal_sPLS_wrapper</code>:</p>
-<div class="sourceCode" id="cb22"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Running PLS with %s components performing variable selection\n'</span>, <span class="no">ncomp</span>))
+<div class="sourceCode" id="cb21"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Running PLS with %s components performing variable selection\n'</span>, <span class="no">ncomp</span>))
 <span class="co">#&gt; Running PLS with 2 components performing variable selection</span>
 <span class="no">st</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>({
   <span class="no">mmspls</span> <span class="kw">&lt;-</span>
@@ -408,13 +418,11 @@
 })[<span class="st">'elapsed'</span>]
 <span class="co">#&gt; Making unique feature names by adding assay name to feature name for: met_genebody</span>
 <span class="co">#&gt; Making unique feature names by adding assay name to feature name for: met_promoter</span>
-<span class="co">#&gt; Warning in cor(A[[k]], variates.A[[k]]): the standard deviation is zero</span>
-<span class="no">st</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="no">st</span>/<span class="fl">60</span>, <span class="fl">1</span>)
 
-<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'\nPLS run finished. Runtime: '</span>, <span class="no">st</span>, <span class="st">'min\n'</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'\nPLS run finished. Runtime: '</span>, <span class="fu">format_runtime</span>(<span class="no">st</span>), <span class="st">'\n'</span>)
 <span class="co">#&gt; </span>
-<span class="co">#&gt; PLS run finished. Runtime:  1.6 min</span></pre></body></html></div>
-<div class="sourceCode" id="cb23"><html><body><pre class="r"><span class="no">plotIndiv_wrapper</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">pls_obj</span>, <span class="no">coldata</span>, <span class="no">col_cell</span> <span class="kw">=</span> <span class="st">'stage'</span>, <span class="no">legend.title</span> <span class="kw">=</span> <span class="st">'Stage'</span>, <span class="no">comp</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>), <span class="no">...</span>) {
+<span class="co">#&gt; PLS run finished. Runtime:  00:01:30</span></pre></body></html></div>
+<div class="sourceCode" id="cb22"><html><body><pre class="r"><span class="no">plotIndiv_wrapper</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">pls_obj</span>, <span class="no">coldata</span>, <span class="no">col_cell</span> <span class="kw">=</span> <span class="st">'stage'</span>, <span class="no">legend.title</span> <span class="kw">=</span> <span class="st">'Stage'</span>, <span class="no">comp</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>), <span class="no">...</span>) {
   <span class="co">## order coldata cells based on matching cells in pls modalities</span>
   <span class="no">coldata</span> <span class="kw">&lt;-</span> <span class="no">coldata</span>[<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">pls_obj</span>$<span class="no">X</span><span class="kw">[[</span><span class="fl">1</span>]]),]
   <span class="no">cell_class</span> <span class="kw">&lt;-</span> <span class="no">coldata</span>[,<span class="no">col_cell</span>]  <span class="co">## col factor for cells</span>
@@ -427,16 +435,60 @@
 <div id="score-plots" class="section level2">
 <h2 class="hasAnchor">
 <a href="#score-plots" class="anchor"></a>score plots</h2>
+<div class="sourceCode" id="cb23"><html><body><pre class="r"><span class="co">## create a data.frame from cell metadata</span>
+<span class="no">coldata</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="fu">colData</span>(<span class="no">gastru.mae</span>))</pre></body></html></div>
 <p>Colored by stage:</p>
-<div class="sourceCode" id="cb24"><html><body><pre class="r"><span class="fu">plotIndiv_wrapper</span>(<span class="kw">pls_obj</span> <span class="kw">=</span> <span class="no">mmspls</span>, <span class="kw">coldata</span> <span class="kw">=</span> <span class="no">coldata</span>, <span class="kw">col_cell</span> <span class="kw">=</span> <span class="st">'stage'</span>, <span class="kw">legend.title</span> <span class="kw">=</span> <span class="st">'Stage'</span>, <span class="kw">comp</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>), <span class="kw">subtitle</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">mmspls</span>$<span class="no">X</span>), <span class="kw">col.per.group</span> <span class="kw">=</span> <span class="no">col_pallete</span>)</pre></body></html></div>
-<p><img src="index_files/figure-html/unnamed-chunk-27-1.png" width="768"></p>
+<div class="sourceCode" id="cb24"><html><body><pre class="r"><span class="fu">plotIndiv_wrapper</span>(<span class="kw">pls_obj</span> <span class="kw">=</span> <span class="no">mmspls</span>, <span class="kw">coldata</span> <span class="kw">=</span> <span class="no">coldata</span>, <span class="kw">col_cell</span> <span class="kw">=</span> <span class="st">'stage'</span>, <span class="kw">legend.title</span> <span class="kw">=</span> <span class="st">'Stage'</span>, <span class="kw">comp</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>), <span class="kw">subtitle</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">mmspls</span>$<span class="no">X</span>), <span class="kw">col.per.group</span> <span class="kw">=</span> <span class="no">col_palette</span>)</pre></body></html></div>
+<p><img src="index_files/figure-html/unnamed-chunk-29-1.png" width="768"> Look into the outlier cell:</p>
+<div class="sourceCode" id="cb25"><html><body><pre class="r"><span class="co">## ------------- PLS outlier</span>
+<span class="no">df_PLS</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">mmspls</span>$<span class="no">variates</span>$<span class="no">rna</span>)
+<span class="co"># plot(df_PLS)</span>
+<span class="co"># which.max(mmspls$variates$rna[,2])</span>
+<span class="no">pls_outlier</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">df_PLS</span>)[<span class="fu"><a href="https://rdrr.io/r/base/which.min.html">which.max</a></span>(<span class="no">df_PLS</span>[,<span class="fl">2</span>])]
+
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">df_PLS</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="no">comp1</span>, <span class="no">comp2</span>)) +  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_classic</a></span>() +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">col</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">rna.sce.matching</span>$<span class="no">stage</span>))) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="no">col_palette</span>) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">df_PLS</span>[<span class="no">pls_outlier</span>,], <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="no">comp1</span>, <span class="no">comp2</span>), <span class="kw">col</span><span class="kw">=</span><span class="st">'red'</span>, <span class="kw">size</span> <span class="kw">=</span> <span class="fl">2</span>) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">df_PLS</span>[<span class="no">pls_outlier</span>,], <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="no">comp1</span>, <span class="no">comp2</span>), <span class="kw">col</span><span class="kw">=</span><span class="st">'red'</span>, <span class="kw">label</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">df_PLS</span>[<span class="no">pls_outlier</span>,]), <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">1.5</span>) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">col</span> <span class="kw">=</span> <span class="st">'Stage'</span>)</pre></body></html></div>
+<p><img src="index_files/figure-html/unnamed-chunk-30-1.png" width="768"></p>
+<p>Check on PCA plot:</p>
+<div class="sourceCode" id="cb26"><html><body><pre class="r"><span class="no">df_PCA</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="fu">reducedDims</span>(<span class="no">rna.sce.matching</span>)$<span class="no">PCA</span>)
+<span class="no">pls_outlier_PCA</span> <span class="kw">&lt;-</span> <span class="no">df_PCA</span>[<span class="no">pls_outlier</span>,]
+
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">df_PCA</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="no">PC1</span>, <span class="no">PC2</span>)) +  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_classic</a></span>() +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">col</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">rna.sce.matching</span>$<span class="no">stage</span>))) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="no">col_palette</span>) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">df_PCA</span>[<span class="no">pls_outlier</span>,], <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="no">PC1</span>, <span class="no">PC2</span>), <span class="kw">col</span><span class="kw">=</span><span class="st">'red'</span>, <span class="kw">size</span> <span class="kw">=</span> <span class="fl">2</span>) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">df_PCA</span>[<span class="no">pls_outlier</span>,], <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="no">PC1</span>, <span class="no">PC2</span>), <span class="kw">col</span><span class="kw">=</span><span class="st">'red'</span>, <span class="kw">label</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">df_PCA</span>[<span class="no">pls_outlier</span>,]), <span class="kw">vjust</span> <span class="kw">=</span> -<span class="fl">0.8</span>) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">col</span> <span class="kw">=</span> <span class="st">'Stage'</span>)</pre></body></html></div>
+<p><img src="index_files/figure-html/unnamed-chunk-31-1.png" width="768"></p>
+<p>It looks like the sample is also an outlier in the PCA plot compared to other early stage cells.</p>
+<p>Filter outlier cell:</p>
+<div class="sourceCode" id="cb27"><html><body><pre class="r"><span class="no">keep_cells</span> <span class="kw">&lt;-</span> !(<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="fu">colData</span>(<span class="no">gastru.mae</span>)) <span class="kw">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">pls_outlier_PCA</span>))
+<span class="no">gastru.mae.filter.outlier</span> <span class="kw">&lt;-</span> <span class="no">gastru.mae</span>[,<span class="no">keep_cells</span>,]</pre></body></html></div>
+<div class="sourceCode" id="cb28"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Running PLS on filtered MAE with %s components performing variable selection\n'</span>, <span class="no">ncomp</span>))
+<span class="co">#&gt; Running PLS on filtered MAE with 2 components performing variable selection</span>
+<span class="no">st</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>({
+  <span class="no">mmspls_filter.outlier</span> <span class="kw">&lt;-</span>
+    <span class="fu"><a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/reference/multimodal_sPLS_wrapper.html">multimodal_sPLS_wrapper</a></span>(<span class="kw">mae</span> <span class="kw">=</span> <span class="no">gastru.mae.filter.outlier</span>, <span class="kw">study_assays</span> <span class="kw">=</span> <span class="kw">NULL</span>,
+                            <span class="kw">ncomp</span> <span class="kw">=</span> <span class="no">ncomp</span>, <span class="kw">scale</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">design</span> <span class="kw">=</span> <span class="st">'null'</span>, <span class="kw">lineages</span> <span class="kw">=</span> <span class="kw">NULL</span>,
+                            <span class="kw">stages</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">DA</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">keepX</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">save</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
+})[<span class="st">'elapsed'</span>]
+<span class="co">#&gt; Making unique feature names by adding assay name to feature name for: met_genebody</span>
+<span class="co">#&gt; Making unique feature names by adding assay name to feature name for: met_promoter</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'\nPLS run finished. Runtime: '</span>, <span class="fu">format_runtime</span>(<span class="no">st</span>), <span class="st">'\n'</span>)
+<span class="co">#&gt; </span>
+<span class="co">#&gt; PLS run finished. Runtime:  00:02:23</span></pre></body></html></div>
+<div class="sourceCode" id="cb29"><html><body><pre class="r"><span class="fu">plotIndiv_wrapper</span>(<span class="kw">pls_obj</span> <span class="kw">=</span> <span class="no">mmspls_filter.outlier</span>, <span class="kw">coldata</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="fu">colData</span>(<span class="no">gastru.mae.filter.outlier</span>)), <span class="kw">col_cell</span> <span class="kw">=</span> <span class="st">'stage'</span>, <span class="kw">legend.title</span> <span class="kw">=</span> <span class="st">'Stage'</span>, <span class="kw">comp</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>), <span class="kw">subtitle</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">mmspls_filter.outlier</span>$<span class="no">X</span>), <span class="kw">col.per.group</span> <span class="kw">=</span> <span class="no">col_palette</span>)</pre></body></html></div>
+<p><img src="index_files/figure-html/unnamed-chunk-34-1.png" width="768"></p>
 </div>
 </div>
 <div id="concordance-with-rna" class="section level1">
 <h1 class="hasAnchor">
 <a href="#concordance-with-rna" class="anchor"></a>concordance with RNA</h1>
 <p>Here we calculate the correlations between components from gene expression and different methylome modalities:</p>
-<div class="sourceCode" id="cb25"><html><body><pre class="r"><span class="co">## For a pls object which includes pls cell embeddings from a computed latent space</span>
+<div class="sourceCode" id="cb30"><html><body><pre class="r"><span class="co">## For a pls object which includes pls cell embeddings from a computed latent space</span>
 <span class="co">## where covariance with rna is maximal, calculate the correlation b/w rna embeddings</span>
 <span class="co">## and those of a given modality's (per component and average) as a measure of concordant variation with rna</span>
 <span class="no">concordance</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">pls_obj</span>, <span class="no">comp</span> <span class="kw">=</span> <span class="fl">1</span>) {
@@ -467,15 +519,15 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">cor_with_y</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">Modality</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">Concordance</span>)) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">fill</span> <span class="kw">=</span> <span class="no">Component</span>), <span class="kw">position</span> <span class="kw">=</span> <span class="st">'dodge2'</span>) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_classic</a></span>() +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">y</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Correlation with RNA (comp %s) '</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="no">comp</span>, <span class="kw">collapse</span> <span class="kw">=</span> <span class="st">', '</span>)), <span class="kw">x</span> <span class="kw">=</span> <span class="st">''</span>, <span class="kw">fill</span> <span class="kw">=</span> <span class="st">''</span>) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html">ylim</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1</span>)) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">45</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.8</span>, <span class="kw">hjust</span><span class="kw">=</span><span class="fl">1</span>))
 }</pre></body></html></div>
-<div class="sourceCode" id="cb26"><html><body><pre class="r"><span class="fu">concordance</span>(<span class="kw">pls_obj</span> <span class="kw">=</span> <span class="no">mmspls</span>, <span class="kw">comp</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">2</span>))
+<div class="sourceCode" id="cb31"><html><body><pre class="r"><span class="fu">concordance</span>(<span class="kw">pls_obj</span> <span class="kw">=</span> <span class="no">mmspls_filter.outlier</span>, <span class="kw">comp</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">2</span>))
 <span class="co">#&gt; </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; |            | met_genebody| met_promoter| met_cgi| met_DHS|</span>
 <span class="co">#&gt; |:-----------|------------:|------------:|-------:|-------:|</span>
 <span class="co">#&gt; |Component 1 |         0.95|         0.92|    0.91|    0.92|</span>
-<span class="co">#&gt; |Component 2 |         0.42|         0.43|    0.57|    0.44|</span>
-<span class="co">#&gt; |mean        |         0.68|         0.67|    0.74|    0.68|</span></pre></body></html></div>
-<p><img src="index_files/figure-html/unnamed-chunk-30-1.png" width="768"></p>
+<span class="co">#&gt; |Component 2 |         0.46|         0.59|    0.49|    0.39|</span>
+<span class="co">#&gt; |mean        |         0.71|         0.75|    0.70|    0.66|</span></pre></body></html></div>
+<p><img src="index_files/figure-html/unnamed-chunk-37-1.png" width="768"></p>
 </div>
 <div class="footnotes">
 <hr>
