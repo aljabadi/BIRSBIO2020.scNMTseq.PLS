@@ -203,16 +203,22 @@ stages <- c("E4.5", "E5.5", "E6.5", "E7.5")
 # col_palette <- dput(viridisLite::viridis(n = length(stages)))
 col_palette <- c("#440154FF", "#31688EFF", "#35B779FF", "#FDE725FF")
 names(col_palette) <- stages
+```
 
+```{r}
 ## helper function to create UMAP plots coloured by stage
-plot_umap_by_stage <- function(df, dims = c(1,2)) {
-  axes <- paste0('UMAP_', dims)
+plot_reducedDims <- function(sce, reducedDim = 'UMAP', 
+                             dims = c(1,2), col_palette) {
+  comps.prefix <- ifelse(reducedDim == 'UMAP', 'UMAP_', 'PC_')
+  df <- data.frame(reducedDim(sce, reducedDim))[,dims]
+  axes <- colnames(df) <- paste0(comps.prefix, dims)
+  df$stage <- sce$stage
   ggplot(df, aes_string(axes[1], axes[2])) + geom_point(aes(col=stage)) +
     theme_classic()+ scale_color_manual(values = col_palette) + labs(col = 'Stage')
 }
 ```
 
-## UMAP projection all of RNA cells
+## Dimension reduction all of RNA cells
 
 Select highly variable genes after accounting for technical variation:
 
@@ -241,24 +247,27 @@ rna.sce <- runUMAP(rna.sce, dimred="PCA",
                    min_dist = params$umap_params['min_dist'])
 ```
 
-data.frame of embeddings with cell metadata:
-
-```{r}
-# data.frame of embeddings with cell metadata
-df <-  data.frame(reducedDim(rna.sce,"UMAP"))
-colnames(df) <- paste0('UMAP_', seq_along(df))
-df <- cbind(df, colData(rna.sce))
-```
+### PCA
 
 Plot the first two UMAP components:
 
 ```{r, fig.asp=0.7}
-plot_umap_by_stage(df = df, dims = c(1,2))
+plot_reducedDims(sce = rna.sce, reducedDim = 'PCA', dims = c(1,2), col_palette = col_palette)
 ```
 
-UMAP plot shows distinct cell populations corresponding to early-stage, mid-stage, and late-stage cells as well as the within-stage variation for mainly E4.5 and E6.5 which could correspond to different lineages.
+First two PCs highlight the within-stage variation which could potentially correspond to different distinct cell lineages.
 
-## UMAP projection all matching RNA cells used in integration
+### UMAP
+
+Plot the first two UMAP components:
+
+```{r, fig.asp=0.7}
+plot_reducedDims(sce = rna.sce, reducedDim = 'UMAP', dims = c(1,2), col_palette = col_palette)
+```
+
+UMAP plot separates the cell populations from early-stage, mid-stage, and late-stage cells and captures the the within-stage variation for early-stage and mid-stage cells.
+
+## Dimension reduction of all matching RNA cells used in integration
 
 Select highly variable genes after accounting for technical variation:
 
@@ -284,25 +293,27 @@ set.seed(params$umap_params['run.seed'])
 rna.sce.matching <- runUMAP(rna.sce.matching, dimred="PCA", 
                    ncomponents = params$umap_params['n_components'], 
                    n_neighbors = params$umap_params['n_neighbors'], 
-                   min_dist = params$umap_params['min_dist'])
+                   min_dist = 0.35)
 ```
 
-data.frame of embeddings with cell metadata:
-
-```{r}
-# data.frame of embeddings with cell metadata
-df.matching <-  data.frame(reducedDim(rna.sce.matching,"UMAP"))
-colnames(df.matching) <- paste0('UMAP_', seq_along(df.matching))
-df.matching <- cbind(df.matching, colData(rna.sce.matching))
-```
+### PCA
 
 Plot the first two UMAP components:
 
 ```{r, fig.asp=0.7}
-plot_umap_by_stage(df = df.matching, dims = c(1,2))
+plot_reducedDims(sce = rna.sce.matching, reducedDim = 'PCA', dims = c(1,2), col_palette = col_palette)
 ```
 
 
+### UMAP
+
+Plot the first two UMAP components:
+
+```{r, fig.asp=0.7}
+plot_reducedDims(sce = rna.sce.matching, reducedDim = 'UMAP', dims = c(1,2), col_palette = col_palette)
+```
+
+Similar results to the analysis with all cells.
 
 # Integration
 
