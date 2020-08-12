@@ -428,6 +428,8 @@ Colored by stage:
 plot_pls(pls_obj = mmspls, stage = gastru.mae$stage, col_palette = col_palette)
 ```
 
+The derived latent components which seek to maximise the sum of concordant variation b/w rna and other modalities show phenotypic relevance in terms of the embryonic stages. It indicates coordinated changes across the methylomes in the regions of study during gastrulation.
+
 ```{r, eval=params$save_output, echo=FALSE}
 ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf', width = 8, height = 6)
 ```
