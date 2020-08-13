@@ -576,6 +576,7 @@ for (assay_type in met_assays) {
                colmax = 0.99,  
                rng.seed=42)$data
 }
+saveRDS(gastru.mae.imputed, file = 'savedata/gastru.mae.imputed.rds')
 ```
 ```{r, eval=params$save_output, echo=params$save_output}
 saveRDS(gastru.mae.imputed, file = 'savedata/gastru.mae.imputed.rds')
