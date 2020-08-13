@@ -376,7 +376,7 @@ format_runtime <- function(dsec) {
 ## number of components
 ncomp <- params$pls_ncomp
 ## feature scaling
-scale <- TRUE
+scale <- FALSE
 ```
 
 ```{r run pls, warning=FALSE}
