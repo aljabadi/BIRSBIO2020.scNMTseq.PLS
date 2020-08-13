@@ -450,6 +450,7 @@ for (block in names(mmspls$variates)) {
   umap_df <- as.data.frame(reducedDim(rna.sce.matching, umap.name))
   colnames(umap_df) <- paste0('UMAP_', seq_along(umap_df))
   umap_df$stage <- gastru.mae$stage
+  umap_df$lineage <- gastru.mae$lineage
   all_pls_umap[[block]] <- umap_df
 }
 all_pls_umap <- rbindListWithNames(all_pls_umap, new_col = 'Modality')
@@ -458,18 +459,42 @@ all_pls_umap <- rbindListWithNames(all_pls_umap, new_col = 'Modality')
 Plot UMAP:
 
 ```{r}
+## ------------- stage
 axes <- colnames(all_pls_umap)[1:2]
-  ggplot(all_pls_umap) + 
-    theme_classic() +
-    geom_point(aes_string(x = axes[1], y = axes[2], col = 'stage'), alpha = params$ggplot_alph) +
-    scale_color_manual(values = col_palette)
+gg_stage <- ggplot(all_pls_umap) + 
+  theme_classic() +
+  geom_point(aes_string(x = axes[1], y = axes[2], col = 'stage'), alpha = params$ggplot_alph) +
   facet_wrap(.~Modality, ncol = 2, scales = 'free') +
+  scale_color_manual(values = col_palette) +
+  labs(col = 'Stage')
+
+## ------------- lineage
+# lineage_col_palette <- viridisLite::viridis(n=length(unique(unique(gastru.mae$lineage))))
+lineage_col_palette <- c("#440154FF", "#3B528BFF", "#21908CFF", "#5DC863FF", "#FDE725FF")
+names(lineage_col_palette) <- unique(gastru.mae$lineage)
+axes <- colnames(all_pls_umap)[1:2]
+gg_lineage <- ggplot(all_pls_umap) + 
+  theme_classic() +
+  geom_point(aes_string(x = axes[1], y = axes[2], col = 'lineage'), alpha = params$ggplot_alph) +
+  facet_wrap(.~Modality, ncol = 2, scales = 'free') +
+  scale_color_manual(values = lineage_col_palette) +
+  labs(col = 'Putative Lineage')
 ```
 
-UMAP projection using `r ncomp` PLS components for each modality shows the distinct states of early stage cells on transcriptional and DNA methylation level. These states are coordinated across both molecular levels. The projection also demonstrates the transition from mid-stage to late-stage for single cells across different views.
+```{r, fig.width=12, fig.height=6}
+gg_stage_lineage <- gridExtra::grid.arrange(gg_stage + labs(x = ''),
+                        ggplot() + theme_minimal() + labs(x = 'UMAP_1'), 
+                        gg_lineage + labs(y = '', x = ''), 
+                        widths = c(10,1,10), 
+                        nrow=1)
+```
+
+
+UMAP projection using `r ncomp` PLS components for each modality shows the distinct states cells from each stage on transcriptional and DNA methylation level in the projected space. This suggests that the molecular changes during mouse gastrulation are coordinated across the study modalities. The projection also highlights the different patterns of transcriptional variation among different putative lineages in late-stage cells.
 
 ```{r, eval=params$save_output, echo=FALSE}
-ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf', width = 8, height = 6)
+ggsave(plot = gg_stage_lineage, filename = 'figures/plotIndiv-MultiModalSparsePLS-stage-lineage.pdf', width = 12, height = 6)
+ggsave(plot = gg_stage, filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf', width = 10, height = 9)
 ```
 
 # concordance with RNA
