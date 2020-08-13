@@ -14,7 +14,7 @@ params:
   drop_lineages: !r c('Primitive_endoderm','Visceral_endoderm', 'ExE_ectoderm')
   umap_params: !r c(run.seed = 42, n_neighbors = 15, n_components = 2, min_dist = 0.55)
   ggplot_alpha: 0.8
-  pls_ncomp: 5
+  pls_ncomp:  4
 vignette: >
   %\VignetteIndexEntry{scNMTseq challenge analysis using a PLS-based approach}
   %\VignetteEngine{knitr::rmarkdown}
@@ -423,7 +423,7 @@ plot_pls(pls_obj = mmspls, stage = gastru.mae$stage, col_palette = col_palette)
 
 The derived latent components which seek to maximise the sum of concordant variation b/w rna and other modalities show phenotypic relevance in terms of the embryonic stages. It indicates coordinated changes across the methylomes associated with the distinct transcriptional states of cells in the regions of study during gastrulation.
 
-## UMAP using PLS components
+## UMAP using `r ncomp` PLS components
 
 Add PLS embeddings to SCE so UMAP is applied using `scater::runUMAP`:
 
