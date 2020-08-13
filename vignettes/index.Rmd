@@ -191,6 +191,7 @@ cov_plot <- ggplot(coverages, aes(x = pct_NAs)) + geom_density(fill = 'lightblue
   
 cov_plot
 ```
+
 Density plots for methylation data show that shorter genomic regions tend to have less feature coverage. Dashed blue line indicates the average across all modalities.
 
 ```{r, eval=params$save_output, include=params$save_output}
@@ -343,14 +344,14 @@ Similar results to the analysis with all cells.
 
 ## PLS
 
-data dimensions overview:
+Data dimensions overview:
 
 ```{r}
 # data dimensions
 lapply(experiments(gastru.mae), dim)
 ```
 
-integration of all modalities with feature selection:
+I   ntegration of all modalities with feature selection:
 
 <!-- ```{r, eval=params$save_output, echo=params$save_output} -->
 <!-- pls_output_name <- sprintf('multimodal_spls-ncomp_%s-scale_.rds', ncomp, scale) -->
@@ -424,7 +425,7 @@ The derived latent components which seek to maximise the sum of concordant varia
 
 ## UMAP using PLS components
 
-add PLS embeddings to SCE so scater::runUMAP can be applied:
+Add PLS embeddings to SCE so UMAP is applied using `scater::runUMAP`:
 
 ```{r}
 for (block in names(mmspls$variates)) {
