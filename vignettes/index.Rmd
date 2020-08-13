@@ -532,10 +532,10 @@ concordance <- function(pls_obj,
     } else {
       weight <- pls_obj$explained_variance$rna
     }
-    
-    cor['mean'] <- mean(cor)
-    cor['weighted.mean'] <- weighted.mean(x = cor, w = weight)
-    
+    cor.mean <- mean(cor)
+    wtd.cor.mean <- weighted.mean(x = cor, w = weight)
+    cor['mean'] <- cor.mean
+    cor['weighted.mean'] <- wtd.cor.mean
     cor <- round(cor, 2)
     cor
   })
@@ -576,7 +576,6 @@ for (assay_type in met_assays) {
                colmax = 0.99,  
                rng.seed=42)$data
 }
-saveRDS(gastru.mae.imputed, file = 'savedata/gastru.mae.imputed.rds')
 ```
 ```{r, eval=params$save_output, echo=params$save_output}
 saveRDS(gastru.mae.imputed, file = 'savedata/gastru.mae.imputed.rds')
