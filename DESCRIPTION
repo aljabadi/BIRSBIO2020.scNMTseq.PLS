@@ -20,6 +20,7 @@ Imports: MultiAssayExperiment,
          mixOmics, 
          scater,
          uwot,
+         impute,
          scran
 Remotes: 
         mixOmicsTeam/mixOmics@MultiAssayExperiment

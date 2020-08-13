@@ -57,6 +57,7 @@ library(ggplot2)
 library(magrittr)
 library(reshape2)
 library(uwot)
+library(impute)
 ```
 
 ```{r, eval=params$save_output, include=params$save_output}
@@ -500,7 +501,7 @@ ggsave(plot = gg_stage_lineage, filename = 'figures/UMAP-MultiModalSparsePLS-sta
 ggsave(plot = gg_stage, filename = 'figures/UMAP-MultiModalSparsePLS-stage.pdf', width = 10, height = 9)
 ```
 
-# concordance with RNA
+## concordance with RNA
 
 Here we calculate the correlations between components from gene expression and different methylome modalities as a measure of concordnat variation:
 
@@ -555,6 +556,137 @@ concordance <- function(pls_obj,
 ```{r}
 concordance(pls_obj = mmspls, comp = c(1:4), which.plot = NULL)
 ```
+
+# Imputation
+
+Impute methylation data
+
+```{r, results='hide', message=FALSE}
+# sum(!gastru.mae$pass_metQC)
+#> 0
+gastru.mae.imputed <- gastru.mae
+met_assays <- grep(pattern = '^met', names(experiments(gastru.mae.imputed)), value = TRUE)
+for (assay_type in met_assays) {
+  assay_values <- gastru.mae.imputed@ExperimentList[[assay_type]]
+  cat('\nimputing values for:', assay_type, '\n')
+  gastru.mae.imputed@ExperimentList[[assay_type]] <- 
+    impute.knn(data = assay_values, 
+               k = 30, 
+               rowmax = 0.99, 
+               colmax = 0.99,  
+               rng.seed=42)$data
+}
+```
+```{r, eval=params$save_output, echo=params$save_output}
+saveRDS(gastru.mae.imputed, file = 'savedata/gastru.mae.imputed.rds')
+# gastru.mae.imputed <- readRDS('gastru.mae.imputed.rds')
+```
+
+
+```{r run pls imputed, warning=FALSE}
+cat(sprintf('Running PLS on imputed data with %s components performing variable selection\n', ncomp))
+st <- system.time({
+  mmspls.imputed <-
+    multimodal_sPLS_wrapper(mae = gastru.mae.imputed, study_assays = NULL,
+                            ncomp = ncomp, scale = scale, design = 'null', lineages = NULL,
+                            stages = NULL, DA = NULL, keepX = NULL, save = FALSE)
+})['elapsed']
+
+cat('\nPLS run finished. Runtime: ', format_runtime(st), '\n')
+```
+
+```{r, eval=params$save_output, echo=params$save_output}
+saveRDS(mmspls.imputed, file = 'savedata/MultiModalSparsePLS-All-imputed.rds')
+# mmspls.imputed <- readRDS('savedata/MultiModalSparsePLS-All.rds')
+```
+
+## score plots
+
+```{r, fig.width=8, fig.height=8}
+plot_pls(pls_obj = mmspls.imputed, stage = gastru.mae.imputed$stage, col_palette = col_palette)
+```
+```{r, eval=params$save_output, echo=FALSE}
+ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-imputed-stage.pdf')
+```
+
+## UMAP using `r ncomp` PLS components from imputed data
+
+```{r}
+for (block in names(mmspls.imputed$variates)) {
+  variates <- mmspls.imputed$variates[block]
+  dimred.name <- paste0('PLS_imputed_', block)
+  umap.name <- paste0('UMAP_PLS_imputed_', block)
+  reducedDim(rna.sce.matching, dimred.name) <- mmspls.imputed$variates[[block]]
+  set.seed(params$umap_params['run.seed'])
+  rna.sce.matching <- runUMAP(rna.sce.matching, dimred=dimred.name, 
+                              ncomponents = params$umap_params['n_components'], 
+                              n_neighbors = params$umap_params['n_neighbors'], 
+                              min_dist = params$umap_params['min_dist'], 
+                              name = umap.name)
+}
+```
+
+Create a long data.frame of all variates for facet plotting: 
+```{r}
+all_pls_umap <- list()
+for (block in names(mmspls.imputed$variates)) {
+  umap.name <- paste0('UMAP_PLS_imputed_', block)
+  umap_df <- as.data.frame(reducedDim(rna.sce.matching, umap.name))
+  colnames(umap_df) <- paste0('UMAP_', seq_along(umap_df))
+  umap_df$stage <- gastru.mae.imputed$stage
+  umap_df$lineage <- gastru.mae.imputed$lineage
+  all_pls_umap[[block]] <- umap_df
+}
+all_pls_umap <- rbindListWithNames(all_pls_umap, new_col = 'Modality')
+```
+
+Plot UMAP:
+
+```{r}
+## ------------- stage
+axes <- colnames(all_pls_umap)[1:2]
+gg_stage <- ggplot(all_pls_umap) + 
+  theme_classic() +
+  geom_point(aes_string(x = axes[1], y = axes[2], col = 'stage'), alpha = params$ggplot_alph) +
+  facet_wrap(.~Modality, ncol = 2, scales = 'free') +
+  scale_color_manual(values = col_palette) +
+  labs(col = 'Stage')
+
+## ------------- lineage
+# lineage_col_palette <- viridisLite::viridis(n=length(unique(unique(gastru.mae.imputed$lineage))))
+lineage_col_palette <- c("#440154FF", "#3B528BFF", "#21908CFF", "#5DC863FF", "#FDE725FF")
+names(lineage_col_palette) <- unique(gastru.mae.imputed$lineage)
+axes <- colnames(all_pls_umap)[1:2]
+gg_lineage <- ggplot(all_pls_umap) + 
+  theme_classic() +
+  geom_point(aes_string(x = axes[1], y = axes[2], col = 'lineage'), alpha = params$ggplot_alph) +
+  facet_wrap(.~Modality, ncol = 2, scales = 'free') +
+  scale_color_manual(values = lineage_col_palette) +
+  labs(col = 'Putative Lineage')
+```
+
+```{r, fig.width=12, fig.height=6}
+gg_stage_lineage <- gridExtra::grid.arrange(gg_stage + labs(x = ''),
+                        ggplot() + theme_minimal() + labs(x = 'UMAP_1'), 
+                        gg_lineage + labs(y = '', x = ''), 
+                        widths = c(10,1,10), 
+                        nrow=1)
+```
+
+UMAP projection using imputed data:
+
+```{r, eval=params$save_output, echo=FALSE}
+ggsave(plot = gg_stage_lineage, filename = 'figures/UMAP-MultiModalSparsePLS-imputed-stage-lineage.pdf', width = 12, height = 6)
+ggsave(plot = gg_stage, filename = 'figures/UMAP-MultiModalSparsePLS-imputed-stage.pdf', width = 10, height = 9)
+```
+
+## concordance with RNA
+
+```{r}
+concordance(pls_obj = mmspls.imputed, comp = c(1:4), which.plot = NULL)
+```
+
+Imputation does not considerably improve the method's performance as it inherently ignores the missing values during integration.
 
 # Conclusion
 
