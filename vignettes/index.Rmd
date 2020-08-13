@@ -420,6 +420,9 @@ Colored by stage:
 ```{r, fig.width=8, fig.height=8}
 plot_pls(pls_obj = mmspls, stage = gastru.mae$stage, col_palette = col_palette)
 ```
+```{r, eval=params$save_output, echo=FALSE}
+ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf')
+```
 
 The derived latent components which seek to maximise the sum of concordant variation b/w rna and other modalities show phenotypic relevance in terms of the embryonic stages. It indicates coordinated changes across the methylomes associated with the distinct transcriptional states of cells in the regions of study during gastrulation.
 
@@ -493,8 +496,8 @@ gg_stage_lineage <- gridExtra::grid.arrange(gg_stage + labs(x = ''),
 UMAP projection using `r ncomp` PLS components for each modality shows the distinct states cells from each stage on transcriptional and DNA methylation level in the projected space. This suggests that the molecular changes during mouse gastrulation are coordinated across the study modalities. The projection also highlights the different patterns of transcriptional variation among different putative lineages in late-stage cells.
 
 ```{r, eval=params$save_output, echo=FALSE}
-ggsave(plot = gg_stage_lineage, filename = 'figures/plotIndiv-MultiModalSparsePLS-stage-lineage.pdf', width = 12, height = 6)
-ggsave(plot = gg_stage, filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf', width = 10, height = 9)
+ggsave(plot = gg_stage_lineage, filename = 'figures/UMAP-MultiModalSparsePLS-stage-lineage.pdf', width = 12, height = 6)
+ggsave(plot = gg_stage, filename = 'figures/UMAP-MultiModalSparsePLS-stage.pdf', width = 10, height = 9)
 ```
 
 # concordance with RNA
