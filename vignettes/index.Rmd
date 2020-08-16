@@ -427,7 +427,7 @@ plot_pls(pls_obj = mmspls, stage = gastru.mae$stage, col_palette = col_palette)
 ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf')
 ```
 
-The derived latent components which seek to maximise the sum of concordant variation b/w rna and other modalities show phenotypic relevance in terms of the embryonic stages. It indicates coordinated changes across the methylomes associated with the distinct transcriptional states of cells in the regions of study during gastrulation.
+The derived latent components which seek to maximise the sum of concordant variation b/w rna and other modalities separate early-stage cells from late-stage cells. It indicates coordinated changes across the methylomes associated with the distinct transcriptional states of cells in the regions of study during gastrulation. 
 
 ## UMAP using `r ncomp` PLS components
 
