@@ -311,11 +311,19 @@ We apply NIPALS dimension reduction algorithm on all data:
 met_assays <- names(gastru.mae@ExperimentList)
 nipals_comps <- list()
 cat('\nRunning nipals on', parallel::detectCores(), ' cpus...\n')
-nipals_comps <- mclapply(named_list(met_assays), FUN = function(M){
-  nipals::nipals(t(gastru.mae@ExperimentList[[M]]), 
-                 ncomp = 2, center = TRUE, scale = FALSE, 
-                 maxiter = ifelse(params$mini_run, 10, 500))
-}, mc.cores = parallel::detectCores())
+for (M in met_assays) {
+  d <- t(gastru.mae@ExperimentList[[M]])
+  cat('Performing nipals on:', M, '\n')
+  nipals_comps[[M]] <- 
+    nipals::nipals(d, 
+                   ncomp = 2, center = TRUE, scale = FALSE, 
+                   maxiter = ifelse(params$mini_run, 2, 500))
+}
+# nipals_comps <- mclapply(named_list(met_assays), FUN = function(M){
+#   nipals::nipals(t(gastru.mae@ExperimentList[[M]]), 
+#                  ncomp = 2, center = TRUE, scale = FALSE, 
+#                  maxiter = ifelse(params$mini_run, 10, 500))
+# }, mc.cores = parallel::detectCores())
 ```
 
 ```{r save nipals, eval=params$save_output, include=params$save_output}
