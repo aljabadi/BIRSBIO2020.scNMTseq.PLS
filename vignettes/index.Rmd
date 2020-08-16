@@ -79,19 +79,19 @@ if (!dir.exists('savedata')) {
 Details of the hackathon data and preprocessing steps: https://github.com/BIRSBiointegration/Hackathon/tree/master/scNMT-seq
 
 Load the `MultiAssayExperiment` object from Cloudstor:
-```{r, eval=!params$mini_run}
+```{r}
 cat('loading data from Cloudstor ...\n')
 gastru.mae_path <- url('https://cloudstor.aarnet.edu.au/plus/s/jsW7nh4YwThw8Q5/download')
+```
+
+```{r, eval=params$mini_run}
+cat('loading mini data from Cloudstor ...\n')
+gastru.mae_path <- url('https://cloudstor.aarnet.edu.au/plus/s/v3UxkANKkUgmGKm/download')
 ```
 
 ```{r, eval=params$on_my_mac & !params$mini_run, include=FALSE}
 cat('loading data from local folder ...\n')
 gastru.mae_path <- 'savedata/scnmtseq_gastrulation_mae-sce.rds'
-```
-
-```{r, eval=params$on_my_mac & params$mini_run, include=FALSE}
-cat('loading mini data from local folder ...\n')
-gastru.mae_path <- 'savedata/mini.gastru.mae.rds'
 ```
 
 ```{r load data}
