@@ -94,7 +94,7 @@ cat('loading data from local folder ...\n')
 gastru.mae_path <- 'savedata/scnmtseq_gastrulation_mae-sce.rds'
 ```
 
-```{r load data}
+```{r load MAE}
 gastru.mae <- readRDS(gastru.mae_path)
 ```
 
@@ -107,7 +107,7 @@ gastru.mae <- readRDS(gastru.mae_path)
 
 Keep cells which pass QC metrics and exclude putative extra-embryonic cells as they are starkly different in methylation patterns and will drive most of variation in the relatively small population of matching cells, not allowing to fully explore cell to cell variation intended to explore in this hackathon:
 
-```{r}
+```{r filter MAE}
 ## subset RNA expression and DNA methylation modalities
 keep_assays <- grep("rna|met",names(assays(gastru.mae)))
 gastru.mae <- gastru.mae[,,keep_assays]
@@ -236,7 +236,7 @@ length(hvgs)
 
 Run PCA and then UMAP using PCs:
 
-```{r}
+```{r umap on all cells}
 npcs <- 15
 ## PCA first: retrieve npcs PCs
 rna.sce <- runPCA(rna.sce,  ncomponents = npcs, subset_row=hvgs, name = 'PCA')
@@ -265,7 +265,7 @@ UMAP plot separates the cell populations from early-stage, mid-stage, and late-s
 ## Dimension reduction of all matching RNA cells used in integration
 
 Same procedure as before with the matching cells:
-```{r}
+```{r umap on matching cells}
 decomp <- modelGeneVar(rna.sce.matching)
 ## filter by mean expression and significance of biological variation signal
 hvgs <- rownames(decomp)[decomp$p.value<0.01 & decomp$mean > 0.01]
@@ -556,7 +556,7 @@ plot_pls(mmspls, mmspls$lineage,
 
 Impute methylation data:
 
-```{r, results='hide', message=FALSE}
+```{r impute data, results='hide', message=FALSE}
 # sum(!gastru.mae$pass_metQC)
 #> 0
 gastru.mae.imputed <- gastru.mae
