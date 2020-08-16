@@ -334,7 +334,7 @@ nipals_comps_df <- rbindListWithNames(nipals_comps_df, new_col = 'Modality')
 
 ## plot
 ggplot(nipals_comps_df, aes(PC1, PC2)) + geom_point(aes(col = stage)) +
-  scale_color_manual(values = col_palette) + facet_wrap(.~Modality, scales = 'free') +
+  scale_color_manual(values = col_palette) + facet_wrap(.~Modality, scales = 'free', ncol = 2) +
   theme_classic() +  theme(legend.position = c(0.93, .05),
                                                        legend.justification = c(0.8, 0),
                                                        legend.box.background = element_rect(colour = "black"),
@@ -453,13 +453,14 @@ ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf')
 
 The derived latent components which seek to maximise the sum of concordant variation between rna and other modalities separate early-stage cells from late-stage cells. It indicates coordinated changes across the methylomes associated with the distinct transcriptional states of cells in the regions of study during gastrulation. 
 
-Coloring the cells by putative lineages mapped using rna cluster signature genes highlights the variation within the late-stage cells driven by disparate cell subpopulations in the transcriptome view:
-
+Colour by putative lineages:
 ```{r, fig.width=8, fig.height=8}
 plot_pls(mmspls, mmspls$lineage, 
          col_palette = gg_color_hue(length(unique(gastru.mae$lineage))), 
          legend.title = 'Lineage')
 ```
+
+Colouring the cells by putative lineages mapped using rna cluster signature genes highlights the variation within the late-stage cells driven by disparate cell subpopulations in the transcriptome view.
 
 <!-- ## UMAP using `r ncomp` PLS components -->
 
@@ -593,7 +594,7 @@ plot_pls(mmspls, mmspls$lineage,
 
 # Imputation
 
-Impute methylation data:
+Impute the missing methylation data using a nearest neighbours algorithm:
 
 ```{r impute data, results='hide', message=FALSE}
 # sum(!gastru.mae$pass_metQC)
@@ -774,7 +775,7 @@ kable(round(t(df), 2))
 
 The shared axes of variation across assays are more predictive of the embryonic stage than PCA components derived using Expectation Maximization PCA.
 
-Without imputation, except genebody methylation, the components from all assays are equally predictive. After imputation, the accuracy of the prediction is improved particularly for genebody methylation components.
+Without imputation, with the exception of genebody methylation, the components from all assays are nearly equally predictive. After imputation, the accuracy of the prediction is improved particularly for genebody methylation components.
 
 The integrative components show stronger phenotypic relevance in terms of embryonic stage for genebody and CGI methylation measurements. This was also apparent from score plots where different stages were better separated for these views after imputation.
 
