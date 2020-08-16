@@ -104,6 +104,8 @@ gastru.mae <- readRDS(gastru.mae_path)
 
 ## Filter MAE object
 
+Keep cells which pass QC metrics and exclude putative extra-embryonic cells as they are starkly different in methylation patterns and will drive most of variation in the relatively small population of matching cells, not allowing to fully explore cell to cell variation intended to explore in this hackathon:
+
 ```{r}
 ## subset RNA expression and DNA methylation modalities
 keep_assays <- grep("rna|met",names(assays(gastru.mae)))
@@ -121,7 +123,7 @@ gastru.mae <- gastru.mae[,gastru.mae$pass_metQC==TRUE,]
 rna.sce.matching <- gastru.mae@ExperimentList$rna
 ```
 
-Replace the rna SCE with logcounts in MAE object as the integration wrapper requires matrices in assays:
+Replace the rna SCE with normalised counts in MAE object as the integration wrapper requires matrices in assays:
 
 ```{r}
 ## rna is an SCE object
@@ -163,7 +165,7 @@ table(gastru.mae$stage) %>% as.data.frame() %>% t() %>%
 
 Create density plots of the feature detection rate across all cells for all modalities:
 
-```{r, message=FALSE}
+```{r, message=FALSE, echo=FALSE}
 # get the methylation assays
 met_assays <- grep(names(gastru.mae), pattern = '^met', value = TRUE)
 # add dimensions to labels for ggplot
@@ -180,8 +182,6 @@ coverages <- lapply(met_assays, function(assay_name) {
 coverages <- rbindListWithNames(coverages)
 coverages$dataset <- factor(coverages$dataset, levels = unique(coverages$dataset), ordered = TRUE)
 ```
-
-Genomic contexts vary in level of feature detection rates:
 
 ```{r, fig.width=8, fig.asp=0.4}
 cov_plot <- ggplot(coverages, aes(x = pct_NAs)) + geom_density(fill = 'lightblue', show.legend = FALSE) +
@@ -263,18 +263,13 @@ UMAP plot separates the cell populations from early-stage, mid-stage, and late-s
 
 ## Dimension reduction of all matching RNA cells used in integration
 
-Select highly variable genes after accounting for technical variation:
-
+Same procedure as before with the matching cells:
 ```{r}
 decomp <- modelGeneVar(rna.sce.matching)
 ## filter by mean expression and significance of biological variation signal
 hvgs <- rownames(decomp)[decomp$p.value<0.01 & decomp$mean > 0.01]
 length(hvgs)
-```
 
-Run PCA and then UMAP using PCs:
-
-```{r}
 npcs <- 15
 ## PCA first: retrieve npcs PCs
 rna.sce.matching <- runPCA(rna.sce.matching, ncomponents = npcs, subset_row=hvgs, name = 'PCA')
@@ -290,18 +285,16 @@ rna.sce.matching <- runUMAP(rna.sce.matching, dimred="PCA",
                    min_dist = params$umap_params['min_dist'])
 ```
 
-### PCA
+### Dimension reduction
 
-Plot the first two UMAP components:
+PCA:
 
 ```{r, fig.asp=0.7}
 plot_reducedDims(sce = rna.sce.matching, reducedDim = 'PCA', dims = c(1,2), col_palette = col_palette)
 ```
 
 
-### UMAP
-
-Plot the first two UMAP components:
+UMAP:
 
 ```{r, fig.asp=0.7}
 plot_reducedDims(sce = rna.sce.matching, reducedDim = 'UMAP', dims = c(1,2), col_palette = col_palette)
@@ -345,18 +338,7 @@ Similar results to the analysis with all cells.
 
 ## PLS
 
-Data dimensions overview:
-
-```{r}
-# data dimensions
-lapply(experiments(gastru.mae), dim)
-```
-
-I   ntegration of all modalities with feature selection:
-
-<!-- ```{r, eval=params$save_output, echo=params$save_output} -->
-<!-- pls_output_name <- sprintf('multimodal_spls-ncomp_%s-scale_.rds', ncomp, scale) -->
-<!-- ``` -->
+Integration of all modalities with feature selection.
 
 Here we select for 50 features on each component in `multimodal_sPLS_wrapper`:
 
@@ -389,6 +371,7 @@ st <- system.time({
                             stages = NULL, DA = NULL, keepX = NULL, save = FALSE)
 })['elapsed']
 mmspls$stage <- gastru.mae$stage
+mmspls$lineage<- gastru.mae$lineage
 cat('\nPLS run finished. Runtime: ', format_runtime(st), '\n')
 ```
 
@@ -397,7 +380,7 @@ saveRDS(mmspls, file = 'savedata/MultiModalSparsePLS-All.rds')
 # mmspls <- readRDS('savedata/MultiModalSparsePLS-All.rds')
 ```
 
-```{r}
+```{r, echo=FALSE}
 plot_pls <- function(pls_obj, stage, legend.title = 'Stage', comp = c(1,2), col_palette) {
   variates <- lapply(pls_obj$variates, function(arr){
     df <- as.data.frame(arr[,comp])
@@ -418,7 +401,7 @@ plot_pls <- function(pls_obj, stage, legend.title = 'Stage', comp = c(1,2), col_
 
 ## score plots
 
-Colored by stage:
+Plot PLS components for cells across all views colored by embryonic stages:
 
 ```{r, fig.width=8, fig.height=8}
 pls_no.impute <- plot_pls(pls_obj = mmspls, stage = mmspls$stage, col_palette = col_palette)
@@ -428,15 +411,15 @@ pls_no.impute
 ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf')
 ```
 
-The derived latent components which seek to maximise the sum of concordant variation b/w rna and other modalities separate early-stage cells from late-stage cells. It indicates coordinated changes across the methylomes associated with the distinct transcriptional states of cells in the regions of study during gastrulation. 
+The derived latent components which seek to maximise the sum of concordant variation between rna and other modalities separate early-stage cells from late-stage cells. It indicates coordinated changes across the methylomes associated with the distinct transcriptional states of cells in the regions of study during gastrulation. 
 
+Coloring the cells by putative lineages mapped using rna cluster signature genes highlights the variation within the late-stage cells driven by disparate cell subpopulations in the transcriptome view:
 
-```{r}
-plot_pls(mmspls, gastru.mae$lineage, 
+```{r, fig.width=8, fig.height=8}
+plot_pls(mmspls, mmspls$lineage, 
          col_palette = gg_color_hue(length(unique(gastru.mae$lineage))), 
          legend.title = 'Lineage')
 ```
-
 
 <!-- ## UMAP using `r ncomp` PLS components -->
 
@@ -570,7 +553,7 @@ plot_pls(mmspls, gastru.mae$lineage,
 
 # Imputation
 
-Impute methylation data
+Impute methylation data:
 
 ```{r, results='hide', message=FALSE}
 # sum(!gastru.mae$pass_metQC)
@@ -593,6 +576,7 @@ saveRDS(gastru.mae.imputed, file = 'savedata/gastru.mae.imputed.rds')
 # gastru.mae.imputed <- readRDS('savedata/gastru.mae.imputed.rds')
 ```
 
+Perform data integration using imputed methylation data:
 ```{r run pls imputed, warning=FALSE}
 cat(sprintf('Running PLS on imputed data with %s components performing variable selection\n', ncomp))
 st <- system.time({
@@ -604,6 +588,7 @@ st <- system.time({
 
 cat('\nPLS run finished. Runtime: ', format_runtime(st), '\n')
 ```
+
 ```{r, eval=params$save_output, echo=FALSE}
 ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf')
 ```
@@ -615,6 +600,7 @@ saveRDS(mmspls.imputed, file = 'savedata/MultiModalSparsePLS-All-imputed.rds')
 
 ## score plots
 
+Plot PLS components for cells across all views:
 ```{r, fig.width=8, fig.height=8}
 pls_impute <- plot_pls(pls_obj = mmspls.imputed, stage = gastru.mae.imputed$stage, col_palette = col_palette)
 pls_impute
@@ -742,7 +728,7 @@ df <- data.frame(
 kable(round(t(df), 2))
 ```
 
-The extracted components show stronger phenotypic relevance for genebody and CGI methylation measurements. This was also apparent from score plots where diffent stages were better separated for these views after imputation.
+The extracted components show stronger phenotypic relevance in terms of embryonic stage for genebody and CGI methylation measurements. This was also apparent from score plots where different stages were better separated for these views after imputation.
 
 # Conclusion
 
