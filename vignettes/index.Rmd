@@ -8,7 +8,7 @@ params:
   on_my_mac: !r Sys.info()['user'] == 'alabadi'
   save_output: false
   local_data: false
-  mini_run: yes
+  mini_run: false
   matching_rna_for_umap: false
   ## run params
   drop_lineages: !r c('Primitive_endoderm','Visceral_endoderm', 'ExE_ectoderm')
