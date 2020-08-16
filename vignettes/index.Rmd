@@ -58,6 +58,7 @@ library(magrittr)
 library(reshape2)
 library(uwot)
 library(impute)
+library(nipals)
 ```
 
 ```{r, eval=params$save_output, include=params$save_output}
