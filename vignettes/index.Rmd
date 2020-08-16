@@ -388,7 +388,7 @@ st <- system.time({
                             ncomp = ncomp, scale = scale, design = 'null', lineages = NULL,
                             stages = NULL, DA = NULL, keepX = NULL, save = FALSE)
 })['elapsed']
-
+mmspls$stage <- gastru.mae$stage
 cat('\nPLS run finished. Runtime: ', format_runtime(st), '\n')
 ```
 
