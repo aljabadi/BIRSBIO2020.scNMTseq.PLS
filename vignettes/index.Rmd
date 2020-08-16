@@ -303,6 +303,45 @@ plot_reducedDims(sce = rna.sce.matching, reducedDim = 'UMAP', dims = c(1,2), col
 
 Similar results to the analysis with all cells.
 
+# Apply NIPALS for PCA with all assays
+
+We apply NIPALS dimension reduction algorithm on all data:
+
+```{r perform nipals}
+met_assays <- names(gastru.mae@ExperimentList)
+nipals_comps <- list()
+cat('\nRunning nipals on', parallel::detectCores(), ' cpus...\n')
+nipals_comps <- mclapply(named_list(met_assays), FUN = function(M){
+  nipals::nipals(t(gastru.mae@ExperimentList[[M]]), 
+                 ncomp = 2, center = TRUE, scale = FALSE, 
+                 maxiter = ifelse(params$mini_run, 10, 500))
+}, mc.cores = parallel::detectCores())
+```
+
+```{r save nipals, eval=params$save_output, include=params$save_output}
+saveRDS(nipals_comps, file = 'savedata/nipals_comps.rds')
+nipals_comps <- readRDS('savedata/nipals_comps.rds')
+```
+
+```{r plot nipals, fig.width=8, fig.height=8}
+## get scores
+nipals_comps_df <- lapply(nipals_comps, function(y){
+  df <- data.frame(y$scores)
+  df$stage <- gastru.mae$stage
+  df
+})
+nipals_comps_df <- rbindListWithNames(nipals_comps_df, new_col = 'Modality')
+
+## plot
+ggplot(nipals_comps_df, aes(PC1, PC2)) + geom_point(aes(col = stage)) +
+  scale_color_manual(values = col_palette) + facet_wrap(.~Modality, scales = 'free') +
+  theme_classic() +  theme(legend.position = c(0.93, .05),
+                                                       legend.justification = c(0.8, 0),
+                                                       legend.box.background = element_rect(colour = "black"),
+                                                       legend.title=element_blank())
+```
+
+
 # Integration
 
 <!-- ## gene id to gene symbol conversion data.frame -->
@@ -681,13 +720,11 @@ ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-imputed-stage.pdf')
 <!-- ggsave(plot = gg_stage, filename = 'figures/UMAP-MultiModalSparsePLS-imputed-stage.pdf', width = 10, height = 9) -->
 <!-- ``` -->
 
-## Predictive performance of PLS components
+## Predictive performance of PLS and PCA components
 
-We finally calculate the balanced prediction accuracy of a kmeans clustering algorithm which uses the first 2 PLS components from original and imputed measurements:
+We finally calculate the balanced prediction accuracy of a kmeans clustering algorith. We use the first 2 components from PCA components from individual assays as wel as PLS variates from integration of original and imputed measurements:
 
 ```{r}
-# variates <- mmspls$variates$rna[,1:2]
-# labels <- gastru.mae$stage
 kmeans_accuracy <- function(variates, labels) {
   names(labels) <- rownames(variates)
   labels <- as.data.frame(labels)
@@ -715,13 +752,19 @@ Balanced accuracy:
 
 ```{r}
 set.seed(427)
+## kmeans clustering balanced accuracy with PCA components from RNA data:
+kmeans_accuracy(variates = rna.sce.matching@int_colData$reducedDims@listData$PCA[,1:2], labels = mmspls$stage)
+## kmeans clustering balanced accuracy with PCA components from RNA data:
 df <- data.frame(
+  PCA_NIPALS = sapply(nipals_comps, function(x) {
+        kmeans_accuracy(variates = x$scores[,1:2], labels = mmspls$stage)
+    }),
   ## without imputation
-    accuracy_noImpute = sapply(mmspls$variates, function(x) {
+    PLS_noImpute = sapply(mmspls$variates, function(x) {
         kmeans_accuracy(variates = x[,1:2], labels = mmspls$stage)
     }),
     ## with imputation
-    accuracy_impute = sapply(mmspls.imputed$variates, function(x) {
+    PLS_impute = sapply(mmspls.imputed$variates, function(x) {
         kmeans_accuracy(variates = x[,1:2], labels = mmspls$stage)
     })
 )
@@ -729,7 +772,11 @@ df <- data.frame(
 kable(round(t(df), 2))
 ```
 
-The extracted components show stronger phenotypic relevance in terms of embryonic stage for genebody and CGI methylation measurements. This was also apparent from score plots where different stages were better separated for these views after imputation.
+The shared axes of variation across assays are more predictive of the embryonic stage than PCA components derived using Expectation Maximization PCA.
+
+Without imputation, except genebody methylation, the components from all assays are equally predictive. After imputation, the accuracy of the prediction is improved particularly for genebody methylation components.
+
+The integrative components show stronger phenotypic relevance in terms of embryonic stage for genebody and CGI methylation measurements. This was also apparent from score plots where different stages were better separated for these views after imputation.
 
 # Conclusion
 
