@@ -274,12 +274,15 @@ for (M in met_assays) {
   n_hvr <- 1000
   d <- d[,order(-colVars(d, na.rm = TRUE))<=n_hvr]
   cat('Performing nipals on:', M, '\n')
-  nipals_comps[[M]] <- 
-    nipals::nipals(d, 
-                   ncomp = 10, 
-                   center = TRUE,
-                   scale = FALSE,
-                   nipals_maxiter)
+  nipals_comps[[M]] <-
+    suppressWarnings({
+      nipals::nipals(d, 
+                     ncomp = 10, 
+                     center = TRUE,
+                     scale = FALSE,
+                     nipals_maxiter)
+    })
+    
 }
 # cat('\nRunning nipals on', parallel::detectCores(), ' cpus...\n')
 # nipals_comps <- mclapply(named_list(met_assays), FUN = function(M){
@@ -340,11 +343,13 @@ for (M in met_assays) {
   d <- d[,order(-colVars(d, na.rm = TRUE))<=n_hvr]
   cat('Performing nipals on:', M, '\n')
   nipals_comps_filt[[M]] <- 
-    nipals::nipals(d, 
-                   ncomp = 10, 
-                   center = TRUE,
-                   scale = FALSE,
-                   nipals_maxiter)
+    suppressWarnings({
+      nipals::nipals(d, 
+                     ncomp = 10, 
+                     center = TRUE,
+                     scale = FALSE,
+                     nipals_maxiter)
+    })
 }
 
 ```
