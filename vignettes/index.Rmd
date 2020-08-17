@@ -71,6 +71,7 @@ if (!dir.exists('savedata')) {
    cat('creating "savedata" folder ...\n')
   dir.create('savedata')
 }
+nipals_maxiter <- 1000
 ```
 
 # Data
@@ -84,6 +85,7 @@ gastru.mae_path <- url('https://cloudstor.aarnet.edu.au/plus/s/jsW7nh4YwThw8Q5/d
 ```
 
 ```{r, eval=params$mini_run, echo=FALSE}
+nipals_maxiter <- 10
 cat('loading mini data from Cloudstor ...\n')
 gastru.mae_path <- url('https://cloudstor.aarnet.edu.au/plus/s/v3UxkANKkUgmGKm/download')
 ```
@@ -276,7 +278,8 @@ for (M in met_assays) {
     nipals::nipals(d, 
                    ncomp = 10, 
                    center = TRUE,
-                   scale = FALSE)
+                   scale = FALSE,
+                   nipals_maxiter)
 }
 # cat('\nRunning nipals on', parallel::detectCores(), ' cpus...\n')
 # nipals_comps <- mclapply(named_list(met_assays), FUN = function(M){
@@ -341,7 +344,7 @@ for (M in met_assays) {
                    ncomp = 10, 
                    center = TRUE,
                    scale = FALSE,
-                   maxiter = 1000)
+                   nipals_maxiter)
 }
 
 ```
