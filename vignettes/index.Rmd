@@ -84,7 +84,7 @@ cat('loading data from Cloudstor ...\n')
 gastru.mae_path <- url('https://cloudstor.aarnet.edu.au/plus/s/jsW7nh4YwThw8Q5/download')
 ```
 
-```{r, eval=params$mini_run}
+```{r, eval=params$mini_run, echo=FALSE}
 cat('loading mini data from Cloudstor ...\n')
 gastru.mae_path <- url('https://cloudstor.aarnet.edu.au/plus/s/v3UxkANKkUgmGKm/download')
 ```
@@ -219,27 +219,19 @@ plot_reducedDims <- function(sce, reducedDim = 'UMAP',
   axes <- colnames(df) <- paste0(comps.prefix, dims)
   df$stage <- sce$stage
   ggplot(df, aes_string(axes[1], axes[2])) + geom_point(aes(col=stage), alpha = params$ggplot_alpha) +
-    theme_classic()+ scale_color_manual(values = col_palette) + labs(col = 'Stage')
+    theme_classic()+ scale_color_manual(values = col_palette) + labs(col = 'Stage') +
+    theme(legend.box.background = element_rect(colour = "black"))
 }
 ```
 
 ## Dimension reduction all of RNA cells
-
-Select highly variable genes after accounting for technical variation:
-
-```{r}
-decomp <- modelGeneVar(rna.sce)
-## filter by mean expression and significance of biological variation signal
-hvgs <- rownames(decomp)[decomp$p.value<0.01 & decomp$mean > 0.01]
-length(hvgs)
-```
 
 Run PCA and then UMAP using PCs:
 
 ```{r umap on all cells}
 npcs <- 15
 ## PCA first: retrieve npcs PCs
-rna.sce <- runPCA(rna.sce,  ncomponents = npcs, subset_row=hvgs, name = 'PCA')
+rna.sce <- runPCA(rna.sce,  ncomponents = npcs, name = 'PCA')
 
 ## UMAP parameters used:
 cat(sprintf('Running UMAP with parameters %s\n', paste(names(params$umap_params), ':',params$umap_params, collapse = ', ')))
@@ -268,7 +260,7 @@ Same procedure as before with the matching cells:
 ```{r umap on matching cells}
 decomp <- modelGeneVar(rna.sce.matching)
 ## filter by mean expression and significance of biological variation signal
-hvgs <- rownames(decomp)[decomp$p.value<0.01 & decomp$mean > 0.01]
+hvgs <- rownames(decomp)[decomp$p.value<0.05 & decomp$mean > 0.01]
 length(hvgs)
 
 npcs <- 15
@@ -288,13 +280,6 @@ rna.sce.matching <- runUMAP(rna.sce.matching, dimred="PCA",
 
 ### Dimension reduction
 
-PCA:
-
-```{r, fig.asp=0.7}
-plot_reducedDims(sce = rna.sce.matching, reducedDim = 'PCA', dims = c(1,2), col_palette = col_palette)
-```
-
-
 UMAP:
 
 ```{r, fig.asp=0.7}
@@ -307,18 +292,22 @@ Similar results to the analysis with all cells.
 
 We apply NIPALS dimension reduction algorithm on all data:
 
-```{r perform nipals}
-met_assays <- names(gastru.mae@ExperimentList)
+
+```{r perform nipals, warning=FALSE}
+met_assays <- names(gastru.mae@ExperimentList)[-1]
 nipals_comps <- list()
-cat('\nRunning nipals on', parallel::detectCores(), ' cpus...\n')
 for (M in met_assays) {
   d <- t(gastru.mae@ExperimentList[[M]])
+  n_hvr <- 1000
+  d <- d[,order(-colVars(d, na.rm = TRUE))<=n_hvr]
   cat('Performing nipals on:', M, '\n')
   nipals_comps[[M]] <- 
     nipals::nipals(d, 
-                   ncomp = 2, center = TRUE, scale = FALSE, 
-                   maxiter = ifelse(params$mini_run, 2, 500))
+                   ncomp = 15, 
+                   center = TRUE,
+                   scale = FALSE)
 }
+# cat('\nRunning nipals on', parallel::detectCores(), ' cpus...\n')
 # nipals_comps <- mclapply(named_list(met_assays), FUN = function(M){
 #   nipals::nipals(t(gastru.mae@ExperimentList[[M]]), 
 #                  ncomp = 2, center = TRUE, scale = FALSE, 
@@ -331,24 +320,40 @@ saveRDS(nipals_comps, file = 'savedata/nipals_comps.rds')
 nipals_comps <- readRDS('savedata/nipals_comps.rds')
 ```
 
-```{r plot nipals, fig.width=8, fig.height=8}
+## Score plots
+
+
+```{r umap nipals}
 ## get scores
-nipals_comps_df <- lapply(nipals_comps, function(y){
+nipals_comps_df <- lapply(named_list(names(nipals_comps)), function(x){
+  y <- nipals_comps[[x]]
   df <- data.frame(y$scores)
+  colnames(df) <- paste0('PC_', seq_along(df))
+  
   df$stage <- gastru.mae$stage
   df
 })
 nipals_comps_df <- rbindListWithNames(nipals_comps_df, new_col = 'Modality')
-
-## plot
-ggplot(nipals_comps_df, aes(PC1, PC2)) + geom_point(aes(col = stage)) +
-  scale_color_manual(values = col_palette) + facet_wrap(.~Modality, scales = 'free', ncol = 2) +
-  theme_classic() +  theme(legend.position = c(0.93, .05),
-                                                       legend.justification = c(0.8, 0),
-                                                       legend.box.background = element_rect(colour = "black"),
-                                                       legend.title=element_blank())
 ```
 
+
+```{r, ech=FALSE}
+## helper function to create nipals plots coloured by stage
+plot_nipals_redcuedDims <- function(nipals_comps_df, red_dim = 'PC', col_palette = col_palette) {
+  axes <- paste0(red_dim, '_', 1:2)
+  ggplot(nipals_comps_df, aes_string(axes[1], axes[2])) + geom_point(aes(col = stage)) +
+    scale_color_manual(values = col_palette) + facet_wrap(.~Modality, scales = 'free', ncol = 2) +
+    theme_classic() +  theme(legend.position = c(0.93, .05),
+                             legend.justification = c(0.8, 0),
+                             legend.box.background = element_rect(colour = "black"),
+                             legend.title=element_blank())
+}
+```
+
+Plot PCs:
+```{r plot nipals PCs, fig.width=8, fig.height=8}
+plot_nipals_redcuedDims(nipals_comps_df, red_dim = 'PC', col_palette = col_palette)
+```
 
 # Integration
 
@@ -763,9 +768,10 @@ Balanced accuracy:
 set.seed(427)
 ## kmeans clustering balanced accuracy with PCA components from RNA data:
 kmeans_accuracy(variates = rna.sce.matching@int_colData$reducedDims@listData$PCA[,1:2], labels = mmspls$stage)
+pca_comps <- c(list(rna = list(scores=rna.sce.matching@int_colData$reducedDims@listData$PCA)), nipals_comps)
 ## kmeans clustering balanced accuracy with PCA components from RNA data:
 df <- data.frame(
-  PCA_NIPALS = sapply(nipals_comps, function(x) {
+  PCA = sapply(pca_comps, function(x) {
         kmeans_accuracy(variates = x$scores[,1:2], labels = mmspls$stage)
     }),
   ## without imputation
