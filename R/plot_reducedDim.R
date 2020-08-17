@@ -13,9 +13,9 @@ plot_reducedDim <- function(sce, reducedDim = 'UMAP',
     theme(
       # legend.position=c(1,1),
       # legend.justification=c(1,1),
-      legend.text=element_text(size=9),
       legend.box.background = element_rect(colour = "black"),
-      legend.title=element_text(size=9),
+      legend.text=element_text(size=7, face='bold'),
+      legend.title=element_text(size=8, face='bold'),
       strip.text.x = element_text(size = 10, face = 'bold'))
 
   if (!is.null(col_palette)) {

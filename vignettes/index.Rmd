@@ -237,49 +237,23 @@ names(col_palette) <- stages
 ```
 
 ### all cells
-```{r, fig.asp=0.9, fig.width=4, fig.align='center'}
+```{r, fig.asp=0.7, fig.width=5, fig.align='center'}
 gg_rna_all <- plot_reducedDim(sce = rna.sce, reducedDim = 'UMAP', dims = c(1,2), col_palette = col_palette)
-gg_rna_all + theme(
-      legend.position=c(1,0.6),
-      legend.justification=c(1,0),
-      legend.text=element_text(size=7, face = 'bold'),
-      legend.title = element_text(size=8, face = 'bold'))
+gg_rna_all
 ```
 
 ### matching cells
-```{r, fig.asp=0.7}
-## flip UMAP_1 for consistency of legend location with previous plot
-umap_1 <- rna.sce.matching@int_colData$reducedDims$UMAP[,1]
-flip_umap_1 <- 
-  mean(umap_1) - umap_1
-rna.sce.matching@int_colData$reducedDims$UMAP[,1] <- flip_umap_1
+```{r, fig.asp=0.7, fig.width=5, fig.align='center'}
 gg_rna_matching <- plot_reducedDim(sce = rna.sce.matching, reducedDim = 'UMAP', dims = c(1,2), col_palette = col_palette)
-```
-
-```{r, fig.asp=0.9, fig.width=4, fig.align='center'}
-## all cells
-# gg_rna_all
-## matching cells
-gg_rna_matching + theme(
-      legend.position=c(1,0.6),
-      legend.justification=c(1,0),
-      legend.text=element_text(size=7, face = 'bold'),
-      legend.title = element_text(size=8, face = 'bold')
-)
+gg_rna_matching
 ```
 
 UMAP plot of all cells passing rna QC controls separates the cell populations from early-stage, mid-stage, and late-stage cells. This structure is also apparent in the matching cells' local embeddings but less strongly. we now visualise the putative lineages to see whether the population structure is in line with the mapped lineages using data from all cells:
 
-```{r, fig.asp=0.9, fig.width=4}
-## all cells
-# gg_rna_all
-## matching cells
-plot_reducedDim(sce = rna.sce.matching, reducedDim = 'UMAP', dims = c(1,2), col_palette = NULL, col = 'lineage') + theme(
-      legend.position=c(1,0.6),
-      legend.justification=c(1,0),
-      legend.text=element_text(size=7, face = 'bold'),
-      legend.title = element_text(size=8, face = 'bold')
-)
+```{r, fig.asp=0.7, fig.width=5, fig.align='center'}
+## colour by lineage
+rna.sce.matching$lineage[rna.sce.matching$lineage == 'NOIDEA'] <- NA
+plot_reducedDim(sce = rna.sce.matching, reducedDim = 'UMAP', dims = c(1,2), col_palette = NULL, col = 'lineage')
 ```
 
 We can see that the variation in the late-stage cells is driven by disparate germ layer cells.
@@ -328,6 +302,64 @@ plot_nipals(nipals_comps, cell_order = colnames(gastru.mae@ExperimentList[[1]]),
             stage = gastru.mae$stage, red_dim = 'PC', col_palette = col_palette, 
             dims = c(1, 2), facet_ncol = 2)
 ```
+
+```{r plot nipals PCs with outlier, fig.width=8, fig.height=6}
+outlier <- which.max(nipals_comps$met_promoter$scores[,1])
+plot_nipals(nipals_comps, cell_order = colnames(gastru.mae@ExperimentList[[1]]), 
+            stage = gastru.mae$stage, red_dim = 'PC', col_palette = col_palette, 
+            dims = c(1, 2), facet_ncol = 2, show.cell = 'E6.75_Plate2_H10')
+```
+
+The first two components from Expectation Maximization PCA. Whereas these PCs mainly distinguish early-stage from late-stage cells in all methylation views, an observation in agreement with the transcriptome UMAP projection, the stages are better resolved in some views (e.g. met_cgi) than others. Additionally, the algorithms seems to have been affected by outliers in met_promoter and potentially met_genebody.
+
+```{r}
+## missing values
+sapply(gastru.mae@ExperimentList[2:5], function(E){
+  sum(is.na(E[,'E6.75_Plate2_H10']))/length(E[,'E6.75_Plate2_H10'])
+})
+```
+
+Interestingly, this cell has least amount of missing values in views where it seems to be an outlier. Let's see what happens if we filter it.
+
+## Filter outlier
+
+```{r}
+el <- gastru.mae@ExperimentList
+ind_outlier <- which(colnames(el[[1]]) == 'E6.75_Plate2_H10')
+el <- lapply(el, function(E) {
+  E[,-ind_outlier]
+})
+met_assays <- names(el)[-1]
+nipals_comps_filt <- list()
+for (M in met_assays) {
+  d <- t(el[[M]])
+  n_hvr <- 1000
+  d <- d[,order(-colVars(d, na.rm = TRUE))<=n_hvr]
+  cat('Performing nipals on:', M, '\n')
+  nipals_comps_filt[[M]] <- 
+    nipals::nipals(d, 
+                   ncomp = 10, 
+                   center = TRUE,
+                   scale = FALSE,
+                   maxiter = 1000)
+}
+
+```
+
+```{r plot nipals PCs without outlier, fig.width=8, fig.height=6}
+plot_nipals(nipals_comps_filt, cell_order = colnames(el[[1]]), 
+            stage = gastru.mae$stage[-ind_outlier], red_dim = 'PC', col_palette = col_palette, 
+            dims = c(1, 2), facet_ncol = 2)
+```
+
+
+There seems to be an improvement in the ability of components to separate the stages.
+
+```{r}
+gastru.mae <- gastru.mae[,-ind_outlier,]
+rna.sce.matching <- rna.sce.matching[,-ind_outlier]
+```
+
 
 # Integration
 
