@@ -13,7 +13,6 @@ params:
   ## run params
   drop_lineages: !r c('Primitive_endoderm','Visceral_endoderm', 'ExE_ectoderm')
   umap_params: !r c(run.seed = 42, n_neighbors = 15, n_components = 2, min_dist = 0.55)
-  ggplot_alpha: 0.8
   pls_ncomp:  4
 vignette: >
   %\VignetteIndexEntry{scNMTseq challenge analysis using a PLS-based approach}
@@ -105,7 +104,7 @@ gastru.mae <- readRDS(gastru.mae_path)
 
 ## Filter MAE object
 
-Keep cells which pass QC metrics and exclude putative extra-embryonic cells as they are starkly different in methylation patterns and will drive most of variation in the relatively small population of matching cells, not allowing to fully explore cell to cell variation intended to explore in this hackathon:
+Keep cells which pass QC metrics and exclude putative extra-embryonic cells as they are starkly different in methylation patterns and will drive most of variation in the relatively small population of matching cells, not allowing to fully explore cell to cell variation intended for the purpose of this hackathon:
 
 ```{r filter MAE}
 ## subset RNA expression and DNA methylation modalities
@@ -133,26 +132,6 @@ gastru.mae@ExperimentList
 gastru.mae@ExperimentList$rna <- logcounts(gastru.mae@ExperimentList$rna)
 ## rna updated to matrix of logcounts
 gastru.mae@ExperimentList
-```
-
-Overview of assays:
-
-```{r}
-## helper to get % of missing values in an array
-get_pct_missing <- function(arr) {
-  round(100*sum(is.na(arr))/prod(dim(arr)))
-}
-## get dimensions and % of missing values for all assays
-df <- lapply(experiments(gastru.mae), function(w)
-     {
-     c(
-       'N (# cells)' = dim(w)[2],
-       'P (# features)' = dim(w)[1],
-       '% data missing' = get_pct_missing(w)
-     )
-     })
-df <- data.frame(df)
-kable(t(df), align = 'l')
 ```
 
 Breakdown of the number of cells in each stage:
@@ -202,31 +181,9 @@ ggsave(cov_plot, filename = 'figures/covplots.pdf', width = 8, height = 4)
 
 # RNA
 
-```{r}
-# Create colour palettes for stages:
-stages <- c("E4.5", "E5.5", "E6.5", "E7.5")
-# col_palette <- dput(viridisLite::viridis(n = length(stages)))
-col_palette <- c("#440154FF", "#31688EFF", "#35B779FF", "#FDE725FF")
-names(col_palette) <- stages
-```
-
-```{r}
-## helper function to create UMAP plots coloured by stage
-plot_reducedDims <- function(sce, reducedDim = 'UMAP', 
-                             dims = c(1,2), col_palette) {
-  comps.prefix <- ifelse(reducedDim == 'UMAP', 'UMAP_', 'PC_')
-  df <- data.frame(reducedDim(sce, reducedDim))[,dims]
-  axes <- colnames(df) <- paste0(comps.prefix, dims)
-  df$stage <- sce$stage
-  ggplot(df, aes_string(axes[1], axes[2])) + geom_point(aes(col=stage), alpha = params$ggplot_alpha) +
-    theme_classic()+ scale_color_manual(values = col_palette) + labs(col = 'Stage') +
-    theme(legend.box.background = element_rect(colour = "black"))
-}
-```
-
-## Dimension reduction all of RNA cells
-
 Run PCA and then UMAP using PCs:
+
+## Cells passing rna QC (n = `r dim(rna.sce)[2]`)
 
 ```{r umap on all cells}
 npcs <- 15
@@ -244,19 +201,8 @@ rna.sce <- runUMAP(rna.sce, dimred="PCA",
                    min_dist = params$umap_params['min_dist'])
 ```
 
-### UMAP
+## Cells passing both rna and methylation QC (n = `r dim(rna.sce.matching)[2]`)
 
-Plot the first two UMAP components:
-
-```{r, fig.asp=0.7}
-plot_reducedDims(sce = rna.sce, reducedDim = 'UMAP', dims = c(1,2), col_palette = col_palette)
-```
-
-UMAP plot separates the cell populations from early-stage, mid-stage, and late-stage cells and captures the the within-stage variation for early-stage and mid-stage cells.
-
-## Dimension reduction of all matching RNA cells used in integration
-
-Same procedure as before with the matching cells:
 ```{r umap on matching cells}
 decomp <- modelGeneVar(rna.sce.matching)
 ## filter by mean expression and significance of biological variation signal
@@ -278,22 +224,73 @@ rna.sce.matching <- runUMAP(rna.sce.matching, dimred="PCA",
                    min_dist = params$umap_params['min_dist'])
 ```
 
-### Dimension reduction
+## UMAP
 
-UMAP:
+Plot the first two UMAP components:
 
-```{r, fig.asp=0.7}
-plot_reducedDims(sce = rna.sce.matching, reducedDim = 'UMAP', dims = c(1,2), col_palette = col_palette)
+```{r}
+# Create colour palettes for stages:
+stages <- c("E4.5", "E5.5", "E6.5", "E7.5")
+# col_palette <- dput(viridisLite::viridis(n = length(stages)))
+col_palette <- c("#440154FF", "#31688EFF", "#35B779FF", "#FDE725FF")
+names(col_palette) <- stages
 ```
 
-Similar results to the analysis with all cells.
+### all cells
+```{r, fig.asp=0.9, fig.width=4, fig.align='center'}
+gg_rna_all <- plot_reducedDim(sce = rna.sce, reducedDim = 'UMAP', dims = c(1,2), col_palette = col_palette)
+gg_rna_all + theme(
+      legend.position=c(1,0.6),
+      legend.justification=c(1,0),
+      legend.text=element_text(size=7, face = 'bold'),
+      legend.title = element_text(size=8, face = 'bold'))
+```
 
-# Apply NIPALS for PCA with all assays
+### matching cells
+```{r, fig.asp=0.7}
+## flip UMAP_1 for consistency of legend location with previous plot
+umap_1 <- rna.sce.matching@int_colData$reducedDims$UMAP[,1]
+flip_umap_1 <- 
+  mean(umap_1) - umap_1
+rna.sce.matching@int_colData$reducedDims$UMAP[,1] <- flip_umap_1
+gg_rna_matching <- plot_reducedDim(sce = rna.sce.matching, reducedDim = 'UMAP', dims = c(1,2), col_palette = col_palette)
+```
 
-We apply NIPALS dimension reduction algorithm on all data:
+```{r, fig.asp=0.9, fig.width=4, fig.align='center'}
+## all cells
+# gg_rna_all
+## matching cells
+gg_rna_matching + theme(
+      legend.position=c(1,0.6),
+      legend.justification=c(1,0),
+      legend.text=element_text(size=7, face = 'bold'),
+      legend.title = element_text(size=8, face = 'bold')
+)
+```
 
+UMAP plot of all cells passing rna QC controls separates the cell populations from early-stage, mid-stage, and late-stage cells. This structure is also apparent in the matching cells' local embeddings but less strongly. we now visualise the putative lineages to see whether the population structure is in line with the mapped lineages using data from all cells:
 
-```{r perform nipals, warning=FALSE}
+```{r, fig.asp=0.9, fig.width=4}
+## all cells
+# gg_rna_all
+## matching cells
+plot_reducedDim(sce = rna.sce.matching, reducedDim = 'UMAP', dims = c(1,2), col_palette = NULL, col = 'lineage') + theme(
+      legend.position=c(1,0.6),
+      legend.justification=c(1,0),
+      legend.text=element_text(size=7, face = 'bold'),
+      legend.title = element_text(size=8, face = 'bold')
+)
+```
+
+We can see that the variation in the late-stage cells is driven by disparate germ layer cells.
+
+# DNA
+
+## EMPCA
+
+We perform PCA using an Expectation Maximization algorithm (NIPALS) for all methylation measurements using highly variable regions:
+
+```{r perform nipals, eval=!params$on_my_mac, warning=FALSE}
 met_assays <- names(gastru.mae@ExperimentList)[-1]
 nipals_comps <- list()
 for (M in met_assays) {
@@ -303,7 +300,7 @@ for (M in met_assays) {
   cat('Performing nipals on:', M, '\n')
   nipals_comps[[M]] <- 
     nipals::nipals(d, 
-                   ncomp = 15, 
+                   ncomp = 10, 
                    center = TRUE,
                    scale = FALSE)
 }
@@ -315,44 +312,21 @@ for (M in met_assays) {
 # }, mc.cores = parallel::detectCores())
 ```
 
+```{r load nipals, eval=params$on_my_mac, echo=FALSE}
+nipals_comps <- readRDS('savedata/nipals_comps.rds')
+```
+
 ```{r save nipals, eval=params$save_output, include=params$save_output}
 saveRDS(nipals_comps, file = 'savedata/nipals_comps.rds')
-nipals_comps <- readRDS('savedata/nipals_comps.rds')
 ```
 
 ## Score plots
 
-
-```{r umap nipals}
-## get scores
-nipals_comps_df <- lapply(named_list(names(nipals_comps)), function(x){
-  y <- nipals_comps[[x]]
-  df <- data.frame(y$scores)
-  colnames(df) <- paste0('PC_', seq_along(df))
-  
-  df$stage <- gastru.mae$stage
-  df
-})
-nipals_comps_df <- rbindListWithNames(nipals_comps_df, new_col = 'Modality')
-```
-
-
-```{r, ech=FALSE}
-## helper function to create nipals plots coloured by stage
-plot_nipals_redcuedDims <- function(nipals_comps_df, red_dim = 'PC', col_palette = col_palette) {
-  axes <- paste0(red_dim, '_', 1:2)
-  ggplot(nipals_comps_df, aes_string(axes[1], axes[2])) + geom_point(aes(col = stage)) +
-    scale_color_manual(values = col_palette) + facet_wrap(.~Modality, scales = 'free', ncol = 2) +
-    theme_classic() +  theme(legend.position = c(0.93, .05),
-                             legend.justification = c(0.8, 0),
-                             legend.box.background = element_rect(colour = "black"),
-                             legend.title=element_blank())
-}
-```
-
 Plot PCs:
-```{r plot nipals PCs, fig.width=8, fig.height=8}
-plot_nipals_redcuedDims(nipals_comps_df, red_dim = 'PC', col_palette = col_palette)
+```{r plot nipals PCs, fig.width=8, fig.height=6}
+plot_nipals(nipals_comps, cell_order = colnames(gastru.mae@ExperimentList[[1]]), 
+            stage = gastru.mae$stage, red_dim = 'PC', col_palette = col_palette, 
+            dims = c(1, 2), facet_ncol = 2)
 ```
 
 # Integration
@@ -391,7 +365,7 @@ plot_nipals_redcuedDims(nipals_comps_df, red_dim = 'PC', col_palette = col_palet
 
 ## PLS
 
-Integration of all modalities with feature selection.
+## Integration of all modalities with feature selection.
 
 Here we select for 50 features on each component in `multimodal_sPLS_wrapper`:
 
@@ -433,30 +407,11 @@ saveRDS(mmspls, file = 'savedata/MultiModalSparsePLS-All.rds')
 # mmspls <- readRDS('savedata/MultiModalSparsePLS-All.rds')
 ```
 
-```{r, echo=FALSE}
-plot_pls <- function(pls_obj, stage, legend.title = 'Stage', comp = c(1,2), col_palette) {
-  variates <- lapply(pls_obj$variates, function(arr){
-    df <- as.data.frame(arr[,comp])
-    df$stage <- stage
-    df
-  })
-  variates <- rbindListWithNames(variates, new_col = 'Modality')
-  axes <- colnames(variates)[1:2]
-  axes_labels <- paste0('component ', comp)
-  ggplot(variates) + 
-    theme_classic() +
-    geom_point(aes_string(x = axes[1], y = axes[2], col = 'stage'), alpha = params$ggplot_alph) +
-    facet_wrap(.~Modality, ncol = 2, scales = "free") +
-    scale_color_manual(values = col_palette) +
-    labs(x = axes_labels[1], y = axes_labels[2], col = legend.title)
-}
-```
-
 ## score plots
 
 Plot PLS components for cells across all views colored by embryonic stages:
 
-```{r, fig.width=8, fig.height=8}
+```{r, fig.width=8, fig.height=5}
 pls_no.impute <- plot_pls(pls_obj = mmspls, stage = mmspls$stage, col_palette = col_palette)
 pls_no.impute
 ```
@@ -464,10 +419,10 @@ pls_no.impute
 ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf')
 ```
 
-The derived latent components which seek to maximise the sum of concordant variation between rna and other modalities separate early-stage cells from late-stage cells. It indicates coordinated changes across the methylomes associated with the distinct transcriptional states of cells in the regions of study during gastrulation. 
+The latent components which seek to maximise the sum of concordant variation between rna and other modalities separate early-stage cells from late-stage cells. It indicates coordinated changes across the methylomes associated with the distinct transcriptional states of cells in the regions of study during gastrulation. 
 
 Colour by putative lineages:
-```{r, fig.width=8, fig.height=8}
+```{r, fig.width=8, fig.height=5}
 plot_pls(mmspls, mmspls$lineage, 
          col_palette = gg_color_hue(length(unique(gastru.mae$lineage))), 
          legend.title = 'Lineage')
@@ -630,7 +585,7 @@ saveRDS(gastru.mae.imputed, file = 'savedata/gastru.mae.imputed.rds')
 # gastru.mae.imputed <- readRDS('savedata/gastru.mae.imputed.rds')
 ```
 
-Perform data integration using imputed methylation data:
+## Data integration using imputed methylation data:
 ```{r run pls imputed, warning=FALSE}
 cat(sprintf('Running PLS on imputed data with %s components performing variable selection\n', ncomp))
 st <- system.time({
@@ -649,13 +604,13 @@ ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf')
 
 ```{r, eval=params$save_output, echo=params$save_output}
 saveRDS(mmspls.imputed, file = 'savedata/MultiModalSparsePLS-All-imputed.rds')
-# mmspls.imputed <- readRDS('savedata/MultiModalSparsePLS-All.rds')
+# mmspls.imputed <- readRDS('savedata/MultiModalSparsePLS-All-imputed.rds')
 ```
 
 ## score plots
 
 Plot PLS components for cells across all views:
-```{r, fig.width=8, fig.height=8}
+```{r, fig.width=8, fig.height=5}
 pls_impute <- plot_pls(pls_obj = mmspls.imputed, stage = gastru.mae.imputed$stage, col_palette = col_palette)
 pls_impute
 ```
@@ -736,50 +691,24 @@ ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-imputed-stage.pdf')
 
 ## Predictive performance of PLS and PCA components
 
-We finally calculate the balanced prediction accuracy of a kmeans clustering algorith. We use the first 2 components from PCA components from individual assays as wel as PLS variates from integration of original and imputed measurements:
+We finally calculate the balanced prediction accuracy of a kmeans clustering algorithm using the first 2 components from PCA components from individual assays as well as using PLS variates from integration of original and imputed measurements:
 
 ```{r}
-kmeans_accuracy <- function(variates, labels) {
-  names(labels) <- rownames(variates)
-  labels <- as.data.frame(labels)
-  labels$cell <- rownames(labels)
-  kmeans_res <- kmeans(x = variates, centers = length(unique(labels$labels)), iter.max = 3000, nstart = 50)
-  labels$cluster <- kmeans_res$cluster
-  tbl <- table(labels$labels, labels$cluster)
-  stage_cluster <- rep(NA, length(unique(labels$cluster)))
-  names(stage_cluster) <- rownames(tbl)
-  for (stage in rownames(tbl)) {
-    stage_cluster[stage] <- which.max(tbl[stage,])
-  }
-  ## order columns
-  tbl <- tbl[,stage_cluster[rownames(tbl)]]
-  total_cells <- rowSums(tbl)
-  class_weight <- total_cells / sum(total_cells)
-  misclassified <- rowSums(tbl) - diag(tbl)
-  err_class <- misclassified / total_cells
-  balanced_err <- mean(err_class)
-  1 - balanced_err
-}
-```
-
-Balanced accuracy:
-
-```{r}
+rna_pca <- rna.sce.matching@int_colData$reducedDims@listData$PCA
+all_scores <- c(list(rna = rna_pca), lapply(nipals_comps, function(x) x$scores[rownames(rna_pca),]))
+# rna_pca <- rna_pca[rownames(mmspls$variates$rna),]
 set.seed(427)
-## kmeans clustering balanced accuracy with PCA components from RNA data:
-kmeans_accuracy(variates = rna.sce.matching@int_colData$reducedDims@listData$PCA[,1:2], labels = mmspls$stage)
-pca_comps <- c(list(rna = list(scores=rna.sce.matching@int_colData$reducedDims@listData$PCA)), nipals_comps)
-## kmeans clustering balanced accuracy with PCA components from RNA data:
+## kmeans clustering balanced accuracy with PCA components from RNA and DNA data:
 df <- data.frame(
-  PCA = sapply(pca_comps, function(x) {
-        kmeans_accuracy(variates = x$scores[,1:2], labels = mmspls$stage)
+  PCA = sapply(all_scores, FUN = function(x) {
+        kmeans_accuracy(variates = x[,1:2], labels = mmspls$stage)
     }),
   ## without imputation
-    PLS_noImpute = sapply(mmspls$variates, function(x) {
+    PLS = sapply(mmspls$variates, FUN = function(x) {
         kmeans_accuracy(variates = x[,1:2], labels = mmspls$stage)
     }),
     ## with imputation
-    PLS_impute = sapply(mmspls.imputed$variates, function(x) {
+    PLS_impute = sapply(mmspls.imputed$variates, FUN = function(x) {
         kmeans_accuracy(variates = x[,1:2], labels = mmspls$stage)
     })
 )
@@ -787,12 +716,9 @@ df <- data.frame(
 kable(round(t(df), 2))
 ```
 
-The shared axes of variation across assays are more predictive of the embryonic stage than PCA components derived using Expectation Maximization PCA.
-
-Without imputation, with the exception of genebody methylation, the components from all assays are nearly equally predictive. After imputation, the accuracy of the prediction is improved particularly for genebody methylation components.
-
-The integrative components show stronger phenotypic relevance in terms of embryonic stage for genebody and CGI methylation measurements. This was also apparent from score plots where different stages were better separated for these views after imputation.
+For normalized gene expression data, the PLS components are more predictive of the embryonic stage than PCA components. Noticeably, without imputation, the components from all assays are nearly equally predictive. After imputation, the accuracy of the prediction using PLS components is improved particularly for genebody methylation as well as DHS sites methylation.
 
 # Conclusion
 
 Multi-modal PLS derives the common variation between transcriptome and methylome in different genomic regions for `r dim(gastru.mae@ExperimentList$rna)[2]` single cells during mouse gastrulation. The used data types vary in dimensions and and biological variation. The common axes of variation are driven partly by the stages of embryo, mainly separating early-stage and late-stage cells. The measurements include high levels of masked values and the method ignores these missing elements during integration. Imputation of missing values using a nearest neighbours imputation algorithm enabled the PLS method to capture more cross-modality covariation relevant to embryonic stages in some data views.
+
