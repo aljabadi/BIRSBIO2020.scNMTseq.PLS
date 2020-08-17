@@ -14,6 +14,7 @@ params:
   drop_lineages: !r c('Primitive_endoderm','Visceral_endoderm', 'ExE_ectoderm')
   umap_params: !r c(run.seed = 42, n_neighbors = 15, n_components = 2, min_dist = 0.55)
   pls_ncomp:  4
+  nipals_params: !r c(maxiter = 1000, ncomp = 10, n_hvr = 1000)
 vignette: >
   %\VignetteIndexEntry{scNMTseq challenge analysis using a PLS-based approach}
   %\VignetteEngine{knitr::rmarkdown}
@@ -60,6 +61,13 @@ library(impute)
 library(nipals)
 ```
 
+```{r}
+nipals_maxiter <- params$nipals_params['maxiter']
+nipals_ncomp <- params$nipals_params['ncomp']
+nipals_nhvr <- params$nipals_params['nhvr']
+```
+
+
 ```{r, eval=params$save_output, include=params$save_output}
 ## create directories to save the figures and output data:
 if (!dir.exists('figures')) {
@@ -71,7 +79,6 @@ if (!dir.exists('savedata')) {
    cat('creating "savedata" folder ...\n')
   dir.create('savedata')
 }
-nipals_maxiter <- 1000
 ```
 
 # Data
@@ -86,6 +93,8 @@ gastru.mae_path <- url('https://cloudstor.aarnet.edu.au/plus/s/jsW7nh4YwThw8Q5/d
 
 ```{r, eval=params$mini_run, echo=FALSE}
 nipals_maxiter <- 10
+nipals_ncomp <- 3
+nipals_nhvr <- 200
 cat('loading mini data from Cloudstor ...\n')
 gastru.mae_path <- url('https://cloudstor.aarnet.edu.au/plus/s/v3UxkANKkUgmGKm/download')
 ```
@@ -271,13 +280,13 @@ met_assays <- names(gastru.mae@ExperimentList)[-1]
 nipals_comps <- list()
 for (M in met_assays) {
   d <- t(gastru.mae@ExperimentList[[M]])
-  n_hvr <- 1000
+  n_hvr <- nipals_nhvr
   d <- d[,order(-colVars(d, na.rm = TRUE))<=n_hvr]
   cat('Performing nipals on:', M, '\n')
   nipals_comps[[M]] <-
     suppressWarnings({
       nipals::nipals(d, 
-                     ncomp = 10, 
+                     ncomp = nipals_ncomp, 
                      center = TRUE,
                      scale = FALSE,
                      nipals_maxiter)
@@ -339,13 +348,13 @@ met_assays <- names(el)[-1]
 nipals_comps_filt <- list()
 for (M in met_assays) {
   d <- t(el[[M]])
-  n_hvr <- 1000
+  n_hvr <- nipals_nhvr
   d <- d[,order(-colVars(d, na.rm = TRUE))<=n_hvr]
   cat('Performing nipals on:', M, '\n')
   nipals_comps_filt[[M]] <- 
     suppressWarnings({
       nipals::nipals(d, 
-                     ncomp = 10, 
+                     ncomp = nipals_ncomp, 
                      center = TRUE,
                      scale = FALSE,
                      nipals_maxiter)
