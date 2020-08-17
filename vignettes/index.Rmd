@@ -14,7 +14,7 @@ params:
   drop_lineages: !r c('Primitive_endoderm','Visceral_endoderm', 'ExE_ectoderm')
   umap_params: !r c(run.seed = 42, n_neighbors = 15, n_components = 2, min_dist = 0.55)
   pls_ncomp:  4
-  nipals_params: !r c(maxiter = 1000, ncomp = 10, n_hvr = 1000)
+  nipals_params: !r c(maxiter = 1000, ncomp = 10, nhvr = 1000)
 vignette: >
   %\VignetteIndexEntry{scNMTseq challenge analysis using a PLS-based approach}
   %\VignetteEngine{knitr::rmarkdown}
@@ -280,8 +280,8 @@ met_assays <- names(gastru.mae@ExperimentList)[-1]
 nipals_comps <- list()
 for (M in met_assays) {
   d <- t(gastru.mae@ExperimentList[[M]])
-  n_hvr <- nipals_nhvr
-  d <- d[,order(-colVars(d, na.rm = TRUE))<=n_hvr]
+  nhvr <- nipals_nhvr
+  d <- d[,order(-colVars(d, na.rm = TRUE))<=nhvr]
   cat('Performing nipals on:', M, '\n')
   nipals_comps[[M]] <-
     suppressWarnings({
@@ -348,8 +348,8 @@ met_assays <- names(el)[-1]
 nipals_comps_filt <- list()
 for (M in met_assays) {
   d <- t(el[[M]])
-  n_hvr <- nipals_nhvr
-  d <- d[,order(-colVars(d, na.rm = TRUE))<=n_hvr]
+  nhvr <- nipals_nhvr
+  d <- d[,order(-colVars(d, na.rm = TRUE))<=nhvr]
   cat('Performing nipals on:', M, '\n')
   nipals_comps_filt[[M]] <- 
     suppressWarnings({
