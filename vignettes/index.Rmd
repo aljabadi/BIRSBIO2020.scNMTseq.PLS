@@ -96,7 +96,7 @@ nipals_maxiter <- 10
 nipals_ncomp <- 3
 nipals_nhvr <- 200
 cat('loading mini data from Cloudstor ...\n')
-gastru.mae_path <- url('https://cloudstor.aarnet.edu.au/plus/s/v3UxkANKkUgmGKm/download')
+gastru.mae_path <- url('https://cloudstor.aarnet.edu.au/plus/s/tppSiI9GPuw9DUI/download')
 ```
 
 ```{r, eval=params$on_my_mac & !params$mini_run, include=FALSE}
