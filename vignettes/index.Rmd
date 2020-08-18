@@ -263,6 +263,7 @@ UMAP plot of all cells passing rna QC controls separates the cell populations fr
 
 ```{r, fig.asp=0.7, fig.width=5, fig.align='center'}
 ## colour by lineage
+rna.sce.matching$lineage <- gastru.mae$lineage
 rna.sce.matching$lineage[rna.sce.matching$lineage == 'NOIDEA'] <- NA
 plot_reducedDim(sce = rna.sce.matching, reducedDim = 'UMAP', dims = c(1,2), col_palette = NULL, col = 'lineage')
 ```
@@ -666,6 +667,8 @@ pls_impute
 ```{r, eval=params$save_output, echo=FALSE}
 ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-imputed-stage.pdf')
 ```
+
+The met_DHS view has clearly improved in separating different stages.
 
 <!-- ## UMAP using `r ncomp` PLS components from imputed data -->
 
