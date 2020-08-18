@@ -50,11 +50,11 @@ jobs:
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
 
-      - name: Check
-        env:
-          _R_CHECK_CRAN_INCOMING_REMOTE_: false
-        run: rcmdcheck::rcmdcheck(args = c("--no-manual"), error_on = "error", check_dir = "check")
-        shell: Rscript {0}
+      # - name: Check
+      #   env:
+      #     _R_CHECK_CRAN_INCOMING_REMOTE_: false
+      #   run: rcmdcheck::rcmdcheck(args = c("--no-manual"), error_on = "error", check_dir = "check")
+      #   shell: Rscript {0}
         
       # - uses: docker/build-push-action@v1
       #   with:
@@ -67,7 +67,7 @@ jobs:
 
       - name: Build pkgdown
         run: |
-           PATH=$PATH:$HOME/bin/ Rscript -e 'pkgdown::build_site(".")'
+           PATH=$PATH:$HOME/bin/ Rscript -e 'out = tryCatch({file.create("log.txt"); pkgdown::build_site(".")}, error = function(e) e); if (is(out, "error")) {cat(file = "log.txt", out$message, append = TRUE, sep = "\n"); stop(out$message)} else TRUE'
       # deploy needs rsync? Seems so.
       - name: Install deploy dependencies
         run: |
