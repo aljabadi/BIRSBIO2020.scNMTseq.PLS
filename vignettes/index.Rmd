@@ -765,9 +765,9 @@ df <- data.frame(
 kable(round(t(df), 2))
 ```
 
-For normalized gene expression data, the PLS components are more predictive of the embryonic stage than PCA components. Noticeably, without imputation, the components from all assays are nearly equally predictive. After imputation, the accuracy of the prediction using PLS components is improved particularly for genebody methylation as well as DHS sites methylation.
+Surprisingly, For normalised gene expression data, the PLS components are more predictive of the embryonic stage than PCA components. Noticeably, without imputation, the components from all assays are nearly equally predictive with the exception of genebody methylome which underperforms the rest. After imputation, the accuracy of the prediction using PLS components is improved considerably for genebody methylation.
 
 # Conclusion
 
-Multi-modal PLS derives the common variation between transcriptome and methylome in different genomic regions for `r dim(gastru.mae@ExperimentList$rna)[2]` single cells during mouse gastrulation. The used data types vary in dimensions and and biological variation. The common axes of variation are driven partly by the stages of embryo, mainly separating early-stage and late-stage cells. The measurements include high levels of masked values and the method ignores these missing elements during integration. Imputation of missing values using a nearest neighbours imputation algorithm enabled the PLS method to capture more cross-modality covariation relevant to embryonic stages in some data views.
+Multi-modal PLS derives the common variation between transcriptome and methylome in different genomic regions for `r dim(gastru.mae@ExperimentList$rna)[2]` single cells during mouse gastrulation. The used data types vary in dimensions and and biological variation. The common axes of variation are driven partly by the stages of embryo, which mainly separates early-stage and late-stage cells. The measurements include varying levels of masked values which are ignored by PLS algorithm during integration. Imputation of missing values using a nearest neighbours imputation method enabled the method to capture more cross-modality covariation relevant to embryonic stages in some data views.
 
