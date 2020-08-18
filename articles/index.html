@@ -89,7 +89,7 @@
                         <h4 class="author">Al JalalAbadi<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>
 </h4>
             
-            <h4 class="date">17 Aug 2020</h4>
+            <h4 class="date">18 Aug 2020</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/blob/master/vignettes/index.Rmd"><code>vignettes/index.Rmd</code></a></small>
       <div class="hidden name"><code>index.Rmd</code></div>
@@ -428,7 +428,7 @@
 <span class="no">mmspls</span>$<span class="no">lineage</span><span class="kw">&lt;-</span> <span class="no">gastru.mae</span>$<span class="no">lineage</span>
 <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'\nPLS run finished. Runtime: '</span>, <span class="fu">format_runtime</span>(<span class="no">st</span>), <span class="st">'\n'</span>)
 <span class="co">#&gt; </span>
-<span class="co">#&gt; PLS run finished. Runtime:  00:03:09</span></pre></body></html></div>
+<span class="co">#&gt; PLS run finished. Runtime:  00:03:04</span></pre></body></html></div>
 </div>
 <div id="score-plots-1" class="section level2">
 <h2 class="hasAnchor">
@@ -593,7 +593,7 @@
 
 <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'\nPLS run finished. Runtime: '</span>, <span class="fu">format_runtime</span>(<span class="no">st</span>), <span class="st">'\n'</span>)
 <span class="co">#&gt; </span>
-<span class="co">#&gt; PLS run finished. Runtime:  00:00:47</span></pre></body></html></div>
+<span class="co">#&gt; PLS run finished. Runtime:  00:00:38</span></pre></body></html></div>
 </div>
 <div id="score-plots-2" class="section level2">
 <h2 class="hasAnchor">
@@ -725,13 +725,13 @@
 </tr>
 </tbody>
 </table>
-<p>For normalized gene expression data, the PLS components are more predictive of the embryonic stage than PCA components. Noticeably, without imputation, the components from all assays are nearly equally predictive. After imputation, the accuracy of the prediction using PLS components is improved particularly for genebody methylation as well as DHS sites methylation.</p>
+<p>Surprisingly, For normalised gene expression data, the PLS components are more predictive of the embryonic stage than PCA components. Noticeably, without imputation, the components from all assays are nearly equally predictive with the exception of genebody methylome which underperforms the rest. After imputation, the accuracy of the prediction using PLS components is improved considerably for genebody methylation.</p>
 </div>
 </div>
 <div id="conclusion" class="section level1">
 <h1 class="hasAnchor">
 <a href="#conclusion" class="anchor"></a>Conclusion</h1>
-<p>Multi-modal PLS derives the common variation between transcriptome and methylome in different genomic regions for 795 single cells during mouse gastrulation. The used data types vary in dimensions and and biological variation. The common axes of variation are driven partly by the stages of embryo, mainly separating early-stage and late-stage cells. The measurements include high levels of masked values and the method ignores these missing elements during integration. Imputation of missing values using a nearest neighbours imputation algorithm enabled the PLS method to capture more cross-modality covariation relevant to embryonic stages in some data views.</p>
+<p>Multi-modal PLS derives the common variation between transcriptome and methylome in different genomic regions for 795 single cells during mouse gastrulation. The used data types vary in dimensions and and biological variation. The common axes of variation are driven partly by the stages of embryo, which mainly separates early-stage and late-stage cells. The measurements include varying levels of masked values which are ignored by PLS algorithm during integration. Imputation of missing values using a nearest neighbours imputation method enabled the method to capture more cross-modality covariation relevant to embryonic stages in some data views.</p>
 </div>
 <div class="footnotes">
 <hr>
