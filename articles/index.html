@@ -274,6 +274,7 @@
 <p><img src="index_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;"></p>
 <p>UMAP plot of all cells passing rna QC controls separates the cell populations from early-stage, mid-stage, and late-stage cells. This structure is also apparent in the matching cells’ local embeddings but less strongly. we now visualise the putative lineages to see whether the population structure is in line with the mapped lineages using data from all cells:</p>
 <div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="co">## colour by lineage</span>
+<span class="no">rna.sce.matching</span>$<span class="no">lineage</span> <span class="kw">&lt;-</span> <span class="no">gastru.mae</span>$<span class="no">lineage</span>
 <span class="no">rna.sce.matching</span>$<span class="no">lineage</span>[<span class="no">rna.sce.matching</span>$<span class="no">lineage</span> <span class="kw">==</span> <span class="st">'NOIDEA'</span>] <span class="kw">&lt;-</span> <span class="fl">NA</span>
 <span class="fu">plot_reducedDim</span>(<span class="kw">sce</span> <span class="kw">=</span> <span class="no">rna.sce.matching</span>, <span class="kw">reducedDim</span> <span class="kw">=</span> <span class="st">'UMAP'</span>, <span class="kw">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>), <span class="kw">col_palette</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">col</span> <span class="kw">=</span> <span class="st">'lineage'</span>)</pre></body></html></div>
 <p><img src="index_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;"></p>
@@ -428,7 +429,7 @@
 <span class="no">mmspls</span>$<span class="no">lineage</span><span class="kw">&lt;-</span> <span class="no">gastru.mae</span>$<span class="no">lineage</span>
 <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'\nPLS run finished. Runtime: '</span>, <span class="fu">format_runtime</span>(<span class="no">st</span>), <span class="st">'\n'</span>)
 <span class="co">#&gt; </span>
-<span class="co">#&gt; PLS run finished. Runtime:  00:03:04</span></pre></body></html></div>
+<span class="co">#&gt; PLS run finished. Runtime:  00:03:26</span></pre></body></html></div>
 </div>
 <div id="score-plots-1" class="section level2">
 <h2 class="hasAnchor">
@@ -593,7 +594,7 @@
 
 <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'\nPLS run finished. Runtime: '</span>, <span class="fu">format_runtime</span>(<span class="no">st</span>), <span class="st">'\n'</span>)
 <span class="co">#&gt; </span>
-<span class="co">#&gt; PLS run finished. Runtime:  00:00:38</span></pre></body></html></div>
+<span class="co">#&gt; PLS run finished. Runtime:  00:00:45</span></pre></body></html></div>
 </div>
 <div id="score-plots-2" class="section level2">
 <h2 class="hasAnchor">
@@ -602,6 +603,7 @@
 <div class="sourceCode" id="cb28"><html><body><pre class="r"><span class="no">pls_impute</span> <span class="kw">&lt;-</span> <span class="fu">plot_pls</span>(<span class="kw">pls_obj</span> <span class="kw">=</span> <span class="no">mmspls.imputed</span>, <span class="kw">stage</span> <span class="kw">=</span> <span class="no">gastru.mae.imputed</span>$<span class="no">stage</span>, <span class="kw">col_palette</span> <span class="kw">=</span> <span class="no">col_palette</span>)
 <span class="no">pls_impute</span></pre></body></html></div>
 <p><img src="index_files/figure-html/unnamed-chunk-29-1.png" width="768"></p>
+<p>The met_DHS view has clearly improved in separating different stages.</p>
 <!-- ## UMAP using 4 PLS components from imputed data -->
 <!-- ```{r} -->
 <!-- for (block in names(mmspls.imputed$variates)) { -->
