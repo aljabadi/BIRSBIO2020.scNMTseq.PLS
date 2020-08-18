@@ -68,6 +68,9 @@ jobs:
       - name: Build pkgdown
         run: |
            PATH=$PATH:$HOME/bin/ Rscript -e 'out = tryCatch({file.create("log.txt"); pkgdown::build_site(".")}, error = function(e) e); if (is(out, "error")) {cat(file = "log.txt", out$message, append = TRUE, sep = "\n"); stop(out$message)} else TRUE'
+      - uses: actions/upload-artifact@v2
+        with:
+          path: log.txt
       # deploy needs rsync? Seems so.
       - name: Install deploy dependencies
         run: |
