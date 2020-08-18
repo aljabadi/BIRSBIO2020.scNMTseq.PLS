@@ -1,6 +1,14 @@
-on: [push, pull_request]
+on:
+ push:
+ pull_request:
+    branches:
+      - master
+      - dev
+
+name: PLS on scNMTseq
+
 jobs:
-  job1:
+  BIRSBIO:
     runs-on: ubuntu-latest
     container: bioconductor/bioconductor_docker:devel
     steps:
