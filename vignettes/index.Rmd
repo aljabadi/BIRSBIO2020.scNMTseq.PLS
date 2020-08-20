@@ -320,6 +320,10 @@ plot_nipals(nipals_comps, cell_order = colnames(gastru.mae@ExperimentList[[1]]),
             dims = c(1, 2), facet_ncol = 2)
 ```
 
+The first two components from Expectation Maximization PCA. Whereas these PCs mainly distinguish early-stage from late-stage cells in all methylation views, an observation in agreement with the transcriptome UMAP projection, the stages are better resolved in some views (e.g. met_cgi) than others.
+
+Inspect the outlier cell in promoter view:
+
 ```{r plot nipals PCs with outlier, fig.width=8, fig.height=6}
 outlier <- which.max(nipals_comps$met_promoter$scores[,1])
 plot_nipals(nipals_comps, cell_order = colnames(gastru.mae@ExperimentList[[1]]), 
@@ -327,7 +331,7 @@ plot_nipals(nipals_comps, cell_order = colnames(gastru.mae@ExperimentList[[1]]),
             dims = c(1, 2), facet_ncol = 2, show.cell = 'E6.75_Plate2_H10')
 ```
 
-The first two components from Expectation Maximization PCA. Whereas these PCs mainly distinguish early-stage from late-stage cells in all methylation views, an observation in agreement with the transcriptome UMAP projection, the stages are better resolved in some views (e.g. met_cgi) than others. Additionally, the algorithms seems to have been affected by outliers in met_promoter and potentially met_genebody.
+The cell is also an outlier in the genebody view. Let's look at the the amount of missing values the cell measurements contain:
 
 ```{r}
 ## missing values
@@ -372,7 +376,7 @@ plot_nipals(nipals_comps_filt, cell_order = colnames(el[[1]]),
 ```
 
 
-There seems to be an improvement in the ability of components to separate the stages.
+There seems to be an improvement in the ability of components to separate the stages. We remove this cell in downstream analyses:
 
 ```{r}
 gastru.mae <- gastru.mae[,-ind_outlier,]
@@ -754,15 +758,15 @@ set.seed(427)
 ## kmeans clustering balanced accuracy with PCA components from RNA and DNA data:
 df <- data.frame(
   PCA = sapply(all_scores, FUN = function(x) {
-        kmeans_accuracy(variates = x[,1:2], labels = mmspls$stage)
+        kmeans_accuracy(variates = x[,1:2], labels = mmspls$stage)$BAR
     }),
   ## without imputation
     PLS = sapply(mmspls$variates, FUN = function(x) {
-        kmeans_accuracy(variates = x[,1:2], labels = mmspls$stage)
+        kmeans_accuracy(variates = x[,1:2], labels = mmspls$stage)$BAR
     }),
     ## with imputation
     PLS_impute = sapply(mmspls.imputed$variates, FUN = function(x) {
-        kmeans_accuracy(variates = x[,1:2], labels = mmspls$stage)
+        kmeans_accuracy(variates = x[,1:2], labels = mmspls$stage)$BAR
     })
 )
 
@@ -771,7 +775,62 @@ kable(round(t(df), 2))
 
 Surprisingly, For normalised gene expression data, the PLS components are more predictive of the embryonic stage than PCA components. Noticeably, without imputation, the components from all assays are nearly equally predictive with the exception of genebody methylome which underperforms the rest. After imputation, the accuracy of the prediction using PLS components is improved considerably for genebody methylation.
 
+Looking at individual stages:
+
+```{r}
+## helpers and function to create a data.frame of form:
+##         Stage Method Modality Accuracy
+##          E4.5    PCA      rna     0.50
+##          E5.5    PLS      rna     0.35
+##          E6.5    PCA      rna     0.75
+.get_class_accuracy <- function(scores) {
+  DF <- lapply(scores, FUN = function(x) {
+  kmeans_accuracy(variates = x[,1:2], labels = mmspls$stage)$classAccuracy
+})
+  DF <- round(data.frame(DF),2)
+  DF$Stage <- rownames(DF)
+  rownames(DF) <- NULL
+  DF
+}
+
+get_class_accuracy <- function(scores_list) {
+  df_class <- lapply(scores_list, function(scores) {
+    .get_class_accuracy(scores)
+  })
+  df_class <- rbindListWithNames(df_class, new_col = 'Method')
+  df_class <- reshape2::melt(df_class, measure.vars = 1:5, 
+                             value.name = 'Accuracy', 
+                             variable.name = 'Modality')
+  df_class
+}
+```
+
+Get per class accuracy:
+```{r}
+accuracy_per_class <- 
+  get_class_accuracy(scores_list = 
+                       list(PCA = all_scores, 
+                            PLS = mmspls$variates,
+                            PLS_impute = mmspls.imputed$variates))
+head(accuracy_per_class)
+```
+
+Column plots of balanced accuracy rates for all modalities and stages:
+
+```{r, fig.asp=0.8}
+ggplot(accuracy_per_class, aes(Stage, Accuracy)) + facet_wrap(.~Modality, ncol=2) +
+  geom_col(aes(fill = Method), position = 'dodge') +
+  theme_classic() +
+  labs(y = 'Balanced Accuracy')
+```
+
+Views differ in their predictive performance for different stages. For instance, using PLS components the genebody methylation more predictive of embryonic stages in E4.5 and E5.5 cells compared to CGI methylation, whereas the opposite holds for late-stage cells.
+
+```{r, include=FALSE, eval=FALSE}
+purl('index.Rmd')
+```
+
 # Conclusion
 
-Multi-modal PLS derives the common variation between transcriptome and methylome in different genomic regions for `r dim(gastru.mae@ExperimentList$rna)[2]` single cells during mouse gastrulation. The used data types vary in dimensions and and biological variation. The common axes of variation are driven partly by the stages of embryo, which mainly separates early-stage and late-stage cells. The measurements include varying levels of masked values which are ignored by PLS algorithm during integration. Imputation of missing values using a nearest neighbours imputation method enabled the method to capture more cross-modality covariation relevant to embryonic stages in some data views.
+Multi-modal PLS derives the common variation between transcriptome and methylome in different genomic regions for `r dim(gastru.mae@ExperimentList$rna)[2]` single cells during mouse gastrulation. The used data types vary in dimensions and and biological variation. The common axes of variation are driven partly by the stages of embryo, which mainly separates early-stage and late-stage cells. The measurements include varying levels of masked values which are ignored by PLS algorithm during integration. Imputation of missing values using a nearest neighbours imputation method enabled the method to capture more cross-modality covariation relevant to embryonic stages in some data views. A classification of cells based on either PCA or PLS components revealed that the projected components of shared variation are more predictive of the embryonic stages than the Principal Components of the transcriptome. It also showed that different views resolve different phenotypic dynamics which highlights the importance of data integration to better understand the cellular behaviour.
 

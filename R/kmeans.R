@@ -18,7 +18,7 @@ kmeans_accuracy <- function(variates, labels, nstart=50, iter.max=2000) {
   misclassified <- rowSums(tbl) - diag(tbl)
   err_class <- misclassified / total_cells
   balanced_err <- mean(err_class)
-  1 - balanced_err
+  list(BAR = 1 - balanced_err, classAccuracy = 1-err_class)
 }
 
 # kmeans_perf <- function(variates, labels, times=10, ...) {
