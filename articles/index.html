@@ -89,7 +89,7 @@
                         <h4 class="author">Al JalalAbadi<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>
 </h4>
             
-            <h4 class="date">18 Aug 2020</h4>
+            <h4 class="date">20 Aug 2020</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/blob/master/vignettes/index.Rmd"><code>vignettes/index.Rmd</code></a></small>
       <div class="hidden name"><code>index.Rmd</code></div>
@@ -429,7 +429,7 @@
 <span class="no">mmspls</span>$<span class="no">lineage</span><span class="kw">&lt;-</span> <span class="no">gastru.mae</span>$<span class="no">lineage</span>
 <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'\nPLS run finished. Runtime: '</span>, <span class="fu">format_runtime</span>(<span class="no">st</span>), <span class="st">'\n'</span>)
 <span class="co">#&gt; </span>
-<span class="co">#&gt; PLS run finished. Runtime:  00:03:26</span></pre></body></html></div>
+<span class="co">#&gt; PLS run finished. Runtime:  00:04:46</span></pre></body></html></div>
 </div>
 <div id="score-plots-1" class="section level2">
 <h2 class="hasAnchor">
@@ -594,7 +594,7 @@
 
 <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'\nPLS run finished. Runtime: '</span>, <span class="fu">format_runtime</span>(<span class="no">st</span>), <span class="st">'\n'</span>)
 <span class="co">#&gt; </span>
-<span class="co">#&gt; PLS run finished. Runtime:  00:00:45</span></pre></body></html></div>
+<span class="co">#&gt; PLS run finished. Runtime:  00:00:53</span></pre></body></html></div>
 </div>
 <div id="score-plots-2" class="section level2">
 <h2 class="hasAnchor">
@@ -678,15 +678,15 @@
 <span class="co">## kmeans clustering balanced accuracy with PCA components from RNA and DNA data:</span>
 <span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(
   <span class="kw">PCA</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span>(<span class="no">all_scores</span>, <span class="kw">FUN</span> <span class="kw">=</span> <span class="kw">function</span>(<span class="no">x</span>) {
-        <span class="fu">kmeans_accuracy</span>(<span class="kw">variates</span> <span class="kw">=</span> <span class="no">x</span>[,<span class="fl">1</span>:<span class="fl">2</span>], <span class="kw">labels</span> <span class="kw">=</span> <span class="no">mmspls</span>$<span class="no">stage</span>)
+        <span class="fu">kmeans_accuracy</span>(<span class="kw">variates</span> <span class="kw">=</span> <span class="no">x</span>[,<span class="fl">1</span>:<span class="fl">2</span>], <span class="kw">labels</span> <span class="kw">=</span> <span class="no">mmspls</span>$<span class="no">stage</span>)$<span class="no">BAR</span>
     }),
   <span class="co">## without imputation</span>
     <span class="kw">PLS</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span>(<span class="no">mmspls</span>$<span class="no">variates</span>, <span class="kw">FUN</span> <span class="kw">=</span> <span class="kw">function</span>(<span class="no">x</span>) {
-        <span class="fu">kmeans_accuracy</span>(<span class="kw">variates</span> <span class="kw">=</span> <span class="no">x</span>[,<span class="fl">1</span>:<span class="fl">2</span>], <span class="kw">labels</span> <span class="kw">=</span> <span class="no">mmspls</span>$<span class="no">stage</span>)
+        <span class="fu">kmeans_accuracy</span>(<span class="kw">variates</span> <span class="kw">=</span> <span class="no">x</span>[,<span class="fl">1</span>:<span class="fl">2</span>], <span class="kw">labels</span> <span class="kw">=</span> <span class="no">mmspls</span>$<span class="no">stage</span>)$<span class="no">BAR</span>
     }),
     <span class="co">## with imputation</span>
     <span class="kw">PLS_impute</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span>(<span class="no">mmspls.imputed</span>$<span class="no">variates</span>, <span class="kw">FUN</span> <span class="kw">=</span> <span class="kw">function</span>(<span class="no">x</span>) {
-        <span class="fu">kmeans_accuracy</span>(<span class="kw">variates</span> <span class="kw">=</span> <span class="no">x</span>[,<span class="fl">1</span>:<span class="fl">2</span>], <span class="kw">labels</span> <span class="kw">=</span> <span class="no">mmspls</span>$<span class="no">stage</span>)
+        <span class="fu">kmeans_accuracy</span>(<span class="kw">variates</span> <span class="kw">=</span> <span class="no">x</span>[,<span class="fl">1</span>:<span class="fl">2</span>], <span class="kw">labels</span> <span class="kw">=</span> <span class="no">mmspls</span>$<span class="no">stage</span>)$<span class="no">BAR</span>
     })
 )
 
@@ -728,12 +728,59 @@
 </tbody>
 </table>
 <p>Surprisingly, For normalised gene expression data, the PLS components are more predictive of the embryonic stage than PCA components. Noticeably, without imputation, the components from all assays are nearly equally predictive with the exception of genebody methylome which underperforms the rest. After imputation, the accuracy of the prediction using PLS components is improved considerably for genebody methylation.</p>
+<p>Looking at individual stages:</p>
+<div class="sourceCode" id="cb30"><html><body><pre class="r"><span class="co">## helpers and function to create a data.frame of form:</span>
+<span class="co">## Stage Method Modality Accuracy</span>
+<span class="co">##  E4.5    PCA      rna     0.50</span>
+<span class="co">##  E5.5    PLS      rna     0.35</span>
+<span class="co">##  E6.5    PCA      rna     0.75</span>
+<span class="no">.get_class_accuracy</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">scores</span>) {
+  <span class="no">DF</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="no">scores</span>, <span class="kw">FUN</span> <span class="kw">=</span> <span class="kw">function</span>(<span class="no">x</span>) {
+  <span class="fu">kmeans_accuracy</span>(<span class="kw">variates</span> <span class="kw">=</span> <span class="no">x</span>[,<span class="fl">1</span>:<span class="fl">2</span>], <span class="kw">labels</span> <span class="kw">=</span> <span class="no">mmspls</span>$<span class="no">stage</span>)$<span class="no">classAccuracy</span>
+})
+  <span class="no">DF</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">DF</span>),<span class="fl">2</span>)
+  <span class="no">DF</span>$<span class="no">Stage</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">DF</span>)
+  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">DF</span>) <span class="kw">&lt;-</span> <span class="kw">NULL</span>
+  <span class="no">DF</span>
+}
+
+<span class="no">get_class_accuracy</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">scores_list</span>) {
+  <span class="no">df_class</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="no">scores_list</span>, <span class="kw">function</span>(<span class="no">scores</span>) {
+    <span class="fu">.get_class_accuracy</span>(<span class="no">scores</span>)
+  })
+  <span class="no">df_class</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/reference/utils.html">rbindListWithNames</a></span>(<span class="no">df_class</span>, <span class="kw">new_col</span> <span class="kw">=</span> <span class="st">'Method'</span>)
+  <span class="no">df_class</span> <span class="kw">&lt;-</span> <span class="kw pkg">reshape2</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/reshape2/man/melt.html">melt</a></span>(<span class="no">df_class</span>, <span class="kw">measure.vars</span> <span class="kw">=</span> <span class="fl">1</span>:<span class="fl">5</span>,
+                             <span class="kw">value.name</span> <span class="kw">=</span> <span class="st">'Accuracy'</span>,
+                             <span class="kw">variable.name</span> <span class="kw">=</span> <span class="st">'Modality'</span>)
+  <span class="no">df_class</span>
+}</pre></body></html></div>
+<p>Get per class accuracy:</p>
+<div class="sourceCode" id="cb31"><html><body><pre class="r"><span class="no">accuracy_per_class</span> <span class="kw">&lt;-</span>
+  <span class="fu">get_class_accuracy</span>(<span class="kw">scores_list</span> <span class="kw">=</span>
+                       <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">PCA</span> <span class="kw">=</span> <span class="no">all_scores</span>,
+                            <span class="kw">PLS</span> <span class="kw">=</span> <span class="no">mmspls</span>$<span class="no">variates</span>,
+                            <span class="kw">PLS_impute</span> <span class="kw">=</span> <span class="no">mmspls.imputed</span>$<span class="no">variates</span>))
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">accuracy_per_class</span>)
+<span class="co">#&gt;   Stage Method Modality Accuracy</span>
+<span class="co">#&gt; 1  E4.5    PCA      rna     0.50</span>
+<span class="co">#&gt; 2  E5.5    PCA      rna     0.49</span>
+<span class="co">#&gt; 3  E6.5    PCA      rna     0.59</span>
+<span class="co">#&gt; 4  E7.5    PCA      rna     0.64</span>
+<span class="co">#&gt; 5  E4.5    PLS      rna     1.00</span>
+<span class="co">#&gt; 6  E5.5    PLS      rna     0.99</span></pre></body></html></div>
+<p>Column plots of balanced accuracy rates for all modalities and stages:</p>
+<div class="sourceCode" id="cb32"><html><body><pre class="r"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">accuracy_per_class</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="no">Stage</span>, <span class="no">Accuracy</span>)) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="no">.</span>~<span class="no">Modality</span>, <span class="kw">ncol</span><span class="kw">=</span><span class="fl">2</span>) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">fill</span> <span class="kw">=</span> <span class="no">Method</span>), <span class="kw">position</span> <span class="kw">=</span> <span class="st">'dodge'</span>) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_classic</a></span>() +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">y</span> <span class="kw">=</span> <span class="st">'Balanced Accuracy'</span>)</pre></body></html></div>
+<p><img src="index_files/figure-html/unnamed-chunk-34-1.png" width="768"></p>
+<p>Views differ in their predictive performance for different stages. For instance based on PLS measures, met_DHS components accurately classify all early stage cells (E4.5 and E5.5) whereas CGI methylation components have low accuracy for these cells, but more accurately characterise late-stage cells.</p>
 </div>
 </div>
 <div id="conclusion" class="section level1">
 <h1 class="hasAnchor">
 <a href="#conclusion" class="anchor"></a>Conclusion</h1>
-<p>Multi-modal PLS derives the common variation between transcriptome and methylome in different genomic regions for 795 single cells during mouse gastrulation. The used data types vary in dimensions and and biological variation. The common axes of variation are driven partly by the stages of embryo, which mainly separates early-stage and late-stage cells. The measurements include varying levels of masked values which are ignored by PLS algorithm during integration. Imputation of missing values using a nearest neighbours imputation method enabled the method to capture more cross-modality covariation relevant to embryonic stages in some data views.</p>
+<p>Multi-modal PLS derives the common variation between transcriptome and methylome in different genomic regions for 795 single cells during mouse gastrulation. The used data types vary in dimensions and and biological variation. The common axes of variation are driven partly by the stages of embryo, which mainly separates early-stage and late-stage cells. The measurements include varying levels of masked values which are ignored by PLS algorithm during integration. Imputation of missing values using a nearest neighbours imputation method enabled the method to capture more cross-modality covariation relevant to embryonic stages in some data views. A classification of cells based on either PCA or PLS components revealed that the projected components of shared variation are more predictive of the embryonic stages than the Principal Components of the transcriptome. It also showed that different views resolve different phenotypic</p>
 </div>
 <div class="footnotes">
 <hr>
