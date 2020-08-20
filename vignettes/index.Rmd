@@ -91,6 +91,11 @@ cat('loading data from Cloudstor ...\n')
 gastru.mae_path <- url('https://cloudstor.aarnet.edu.au/plus/s/jsW7nh4YwThw8Q5/download')
 ```
 
+```{r, eval=params$on_my_mac, include=FALSE}
+cat('loading data from local folder ...\n')
+gastru.mae_path <- 'savedata/scnmtseq_gastrulation_mae-sce.rds'
+```
+
 ```{r, eval=params$mini_run, echo=FALSE}
 nipals_maxiter <- 10
 nipals_ncomp <- 3
@@ -99,10 +104,6 @@ cat('loading mini data from Cloudstor ...\n')
 gastru.mae_path <- url('https://cloudstor.aarnet.edu.au/plus/s/tppSiI9GPuw9DUI/download')
 ```
 
-```{r, eval=params$on_my_mac & !params$mini_run, include=FALSE}
-cat('loading data from local folder ...\n')
-gastru.mae_path <- 'savedata/scnmtseq_gastrulation_mae-sce.rds'
-```
 
 ```{r load MAE}
 gastru.mae <- readRDS(gastru.mae_path)
@@ -276,7 +277,7 @@ We can see that the variation in the late-stage cells is driven by disparate ger
 
 We perform PCA using an Expectation Maximization algorithm (NIPALS) for all methylation measurements using highly variable regions:
 
-```{r perform nipals, eval=!params$on_my_mac, warning=FALSE}
+```{r perform nipals, eval=!params$on_my_mac | params$mini_run, warning=FALSE}
 met_assays <- names(gastru.mae@ExperimentList)[-1]
 nipals_comps <- list()
 for (M in met_assays) {
@@ -302,11 +303,11 @@ for (M in met_assays) {
 # }, mc.cores = parallel::detectCores())
 ```
 
-```{r load nipals, eval=params$on_my_mac, echo=FALSE}
+```{r load nipals, eval=!(!params$on_my_mac | params$mini_run), echo=FALSE}
 nipals_comps <- readRDS('savedata/nipals_comps.rds')
 ```
 
-```{r save nipals, eval=params$save_output, include=params$save_output}
+```{r save nipals, eval=params$save_output & !params$mini_run, include=params$save_output}
 saveRDS(nipals_comps, file = 'savedata/nipals_comps.rds')
 ```
 
@@ -452,7 +453,7 @@ mmspls$lineage<- gastru.mae$lineage
 cat('\nPLS run finished. Runtime: ', format_runtime(st), '\n')
 ```
 
-```{r, eval=params$save_output, echo=params$save_output}
+```{r, eval=params$save_output & !params$mini_run, echo=params$save_output}
 saveRDS(mmspls, file = 'savedata/MultiModalSparsePLS-All.rds')
 # mmspls <- readRDS('savedata/MultiModalSparsePLS-All.rds')
 ```
