@@ -124,7 +124,11 @@ keep_assays <- grep("rna|met",names(assays(gastru.mae)))
 gastru.mae <- gastru.mae[,,keep_assays]
 ## remove putative extraembryonic cells
 cat(sprintf('dropping lineages %s, plus the unassigned lineages.\n', paste(params$drop_lineages, collapse = ', ')))
-gastru.mae <- gastru.mae[,!(gastru.mae$lineage %in% params$drop_lineages | is.na(gastru.mae$lineage)),]
+filter_cells <- gastru.mae$lineage %in% params$drop_lineages
+filter_cells <- filter_cells | is.na(gastru.mae$lineage)
+## outlier cell to be filtered
+filter_cells <- filter_cells | rownames(colData(gastru.mae)) == 'E6.75_Plate2_H10'
+gastru.mae <- gastru.mae[,!filter_cells,]
 ## keep cells which pass RNA QC
 gastru.mae <- gastru.mae[,gastru.mae$pass_rnaQC==TRUE,]
 ## Keep full rna SCE for UMAP
@@ -254,13 +258,14 @@ gg_rna_all <- plot_reducedDim(sce = rna.sce, reducedDim = 'UMAP', dims = c(1,2),
 gg_rna_all
 ```
 
+UMAP plot of all cells passing rna QC controls separates the cell populations from early-stage, mid-stage, and late-stage cells. This structure is also apparent in the matching cells' local embeddings but less strongly:
+
 ### matching cells
 ```{r, fig.asp=0.7, fig.width=5, fig.align='center'}
 gg_rna_matching <- plot_reducedDim(sce = rna.sce.matching, reducedDim = 'UMAP', dims = c(1,2), col_palette = col_palette)
 gg_rna_matching
 ```
 
-UMAP plot of all cells passing rna QC controls separates the cell populations from early-stage, mid-stage, and late-stage cells. This structure is also apparent in the matching cells' local embeddings but less strongly. we now visualise the putative lineages to see whether the population structure is in line with the mapped lineages using data from all cells:
 
 ```{r, fig.asp=0.7, fig.width=5, fig.align='center'}
 ## colour by lineage
