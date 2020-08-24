@@ -1,10 +1,17 @@
 #' @export
-plot_pls <- function(pls_obj, stage, legend.title = 'Stage', comp = c(1,2), col_palette) {
+plot_pls <- function(pls_obj, stage, legend.title = 'Stage', comp = c(1,2), col_palette,
+                     ind.keep=NULL) ## cells to keep
+  {
+
   variates <- lapply(pls_obj$variates, function(arr){
     df <- as.data.frame(arr[,comp])
     df$stage <- stage
     df
   })
+
+  if (!is.null(ind.keep)) {
+    variates <- lapply(variates, function(x) x[ind.keep,])
+  }
   variates <- rbindListWithNames(variates, new_col = 'Modality')
   axes <- colnames(variates)[1:2]
   axes_labels <- paste0('component ', comp)
