@@ -329,66 +329,66 @@ plot_nipals(nipals_comps, cell_order = colnames(gastru.mae@ExperimentList[[1]]),
 
 The first two components from Expectation Maximization PCA. Whereas these PCs mainly distinguish early-stage from late-stage cells in all methylation views, an observation in agreement with the transcriptome UMAP projection, the stages are better resolved in some views (e.g. met_cgi) than others.
 
-Inspect the outlier cell in promoter view:
+<!-- Inspect the outlier cell in promoter view: -->
 
-```{r plot nipals PCs with outlier, fig.width=8, fig.height=6}
-outlier <- which.max(nipals_comps$met_promoter$scores[,1])
-plot_nipals(nipals_comps, cell_order = colnames(gastru.mae@ExperimentList[[1]]), 
-            stage = gastru.mae$stage, red_dim = 'PC', col_palette = col_palette, 
-            dims = c(1, 2), facet_ncol = 2, show.cell = 'E6.75_Plate2_H10')
-```
+<!-- ```{r plot nipals PCs with outlier, fig.width=8, fig.height=6} -->
+<!-- outlier <- which.max(nipals_comps$met_promoter$scores[,1]) -->
+<!-- plot_nipals(nipals_comps, cell_order = colnames(gastru.mae@ExperimentList[[1]]),  -->
+<!--             stage = gastru.mae$stage, red_dim = 'PC', col_palette = col_palette,  -->
+<!--             dims = c(1, 2), facet_ncol = 2, show.cell = 'E6.75_Plate2_H10') -->
+<!-- ``` -->
 
-The cell is also an outlier in the genebody view. Let's look at the the amount of missing values the cell measurements contain:
+<!-- The cell is also an outlier in the genebody view. Let's look at the the amount of missing values the cell measurements contain: -->
 
-```{r}
-## missing values
-sapply(gastru.mae@ExperimentList[2:5], function(E){
-  sum(is.na(E[,'E6.75_Plate2_H10']))/length(E[,'E6.75_Plate2_H10'])
-})
-```
+<!-- ```{r} -->
+<!-- ## missing values -->
+<!-- sapply(gastru.mae@ExperimentList[2:5], function(E){ -->
+<!--   sum(is.na(E[,'E6.75_Plate2_H10']))/length(E[,'E6.75_Plate2_H10']) -->
+<!-- }) -->
+<!-- ``` -->
 
-Interestingly, this cell has least amount of missing values in views where it seems to be an outlier. Let's see what happens if we filter it.
+<!-- Interestingly, this cell has least amount of missing values in views where it seems to be an outlier. Let's see what happens if we filter it. -->
 
-## Filter outlier
+<!-- ## Filter outlier -->
 
-```{r}
-el <- gastru.mae@ExperimentList
-ind_outlier <- which(colnames(el[[1]]) == 'E6.75_Plate2_H10')
-el <- lapply(el, function(E) {
-  E[,-ind_outlier]
-})
-met_assays <- names(el)[-1]
-nipals_comps_filt <- list()
-for (M in met_assays) {
-  d <- t(el[[M]])
-  nhvr <- nipals_nhvr
-  d <- d[,order(-colVars(d, na.rm = TRUE))<=nhvr]
-  cat('Performing nipals on:', M, '\n')
-  nipals_comps_filt[[M]] <- 
-    suppressWarnings({
-      nipals::nipals(d, 
-                     ncomp = nipals_ncomp, 
-                     center = TRUE,
-                     scale = FALSE,
-                     nipals_maxiter)
-    })
-}
+<!-- ```{r} -->
+<!-- el <- gastru.mae@ExperimentList -->
+<!-- ind_outlier <- which(colnames(el[[1]]) == 'E6.75_Plate2_H10') -->
+<!-- el <- lapply(el, function(E) { -->
+<!--   E[,-ind_outlier] -->
+<!-- }) -->
+<!-- met_assays <- names(el)[-1] -->
+<!-- nipals_comps_filt <- list() -->
+<!-- for (M in met_assays) { -->
+<!--   d <- t(el[[M]]) -->
+<!--   nhvr <- nipals_nhvr -->
+<!--   d <- d[,order(-colVars(d, na.rm = TRUE))<=nhvr] -->
+<!--   cat('Performing nipals on:', M, '\n') -->
+<!--   nipals_comps_filt[[M]] <-  -->
+<!--     suppressWarnings({ -->
+<!--       nipals::nipals(d,  -->
+<!--                      ncomp = nipals_ncomp,  -->
+<!--                      center = TRUE, -->
+<!--                      scale = FALSE, -->
+<!--                      nipals_maxiter) -->
+<!--     }) -->
+<!-- } -->
 
-```
+<!-- ``` -->
 
-```{r plot nipals PCs without outlier, fig.width=8, fig.height=6}
-plot_nipals(nipals_comps_filt, cell_order = colnames(el[[1]]), 
-            stage = gastru.mae$stage[-ind_outlier], red_dim = 'PC', col_palette = col_palette, 
-            dims = c(1, 2), facet_ncol = 2)
-```
+<!-- ```{r plot nipals PCs without outlier, fig.width=8, fig.height=6} -->
+<!-- plot_nipals(nipals_comps_filt, cell_order = colnames(el[[1]]),  -->
+<!--             stage = gastru.mae$stage[-ind_outlier], red_dim = 'PC', col_palette = col_palette,  -->
+<!--             dims = c(1, 2), facet_ncol = 2) -->
+<!-- ``` -->
 
 
-There seems to be an improvement in the ability of components to separate the stages. We remove this cell in downstream analyses:
+<!-- There seems to be an improvement in the ability of components to separate the stages. We remove this cell in downstream analyses: -->
 
-```{r}
-gastru.mae <- gastru.mae[,-ind_outlier,]
-rna.sce.matching <- rna.sce.matching[,-ind_outlier]
-```
+<!-- ```{r} -->
+<!-- gastru.mae <- gastru.mae[,-ind_outlier,] -->
+<!-- rna.sce.matching <- rna.sce.matching[,-ind_outlier] -->
+<!-- ``` -->
 
 
 # Integration
