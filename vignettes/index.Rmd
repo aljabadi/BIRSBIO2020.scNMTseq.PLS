@@ -267,14 +267,16 @@ gg_rna_matching
 ```
 
 
-```{r, fig.asp=0.7, fig.width=5, fig.align='center'}
-## colour by lineage
-rna.sce.matching$lineage <- gastru.mae$lineage
-rna.sce.matching$lineage[rna.sce.matching$lineage == 'NOIDEA'] <- NA
-plot_reducedDim(sce = rna.sce.matching, reducedDim = 'UMAP', dims = c(1,2), col_palette = NULL, col = 'lineage')
-```
+<!-- We now visualise the putative lineages to see whether the population structure is in line with the mapped lineages using data from all cells: -->
 
-We can see that the variation in the late-stage cells is driven by disparate germ layer cells.
+<!-- ```{r, fig.asp=0.7, fig.width=5, fig.align='center'} -->
+<!-- ## colour by lineage -->
+<!-- rna.sce.matching$lineage <- gastru.mae$lineage -->
+<!-- rna.sce.matching$lineage[rna.sce.matching$lineage == 'NOIDEA'] <- NA -->
+<!-- plot_reducedDim(sce = rna.sce.matching, reducedDim = 'UMAP', dims = c(1,2), col_palette = NULL, col = 'lineage') -->
+<!-- ``` -->
+
+<!-- We can see that the variation in the late-stage cells is driven by disparate germ layer cells. -->
 
 # DNA
 
