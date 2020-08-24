@@ -483,17 +483,17 @@ ggsave(filename = 'figures/plotIndiv-MultiModalSparsePLS-stage.pdf')
 
 The latent components which seek to maximise the sum of concordant variation between rna and other modalities separate early-stage cells from late-stage cells. It indicates coordinated changes across the methylomes associated with the distinct transcriptional states of cells in the regions of study during gastrulation. 
 
-Colour late-stage cells by putative lineages:
-```{r, fig.width=8, fig.height=5}
-keep_stages <- c('E6.5', 'E7.5')
-latestage_cells <- mmspls$stage %in% keep_stages
-plot_pls(mmspls, mmspls$lineage, 
-         ind.keep = latestage_cells,
-         col_palette = gg_color_hue(length(unique(mmspls$lineage))), 
-         legend.title = 'Lineage')
-```
+<!-- Colour late-stage cells by putative lineages: -->
+<!-- ```{r, fig.width=8, fig.height=5} -->
+<!-- keep_stages <- c('E6.5', 'E7.5') -->
+<!-- latestage_cells <- mmspls$stage %in% keep_stages -->
+<!-- plot_pls(mmspls, mmspls$lineage,  -->
+<!--          ind.keep = latestage_cells, -->
+<!--          col_palette = gg_color_hue(length(unique(mmspls$lineage))),  -->
+<!--          legend.title = 'Lineage') -->
+<!-- ``` -->
 
-We can see the variation within the late-stage cells driven by disparate cell subpopulations in the transcriptome view.
+<!-- We can see the variation within the late-stage cells driven by disparate cell subpopulations in the transcriptome view. -->
 
 <!-- ## UMAP using `r ncomp` PLS components -->
 
