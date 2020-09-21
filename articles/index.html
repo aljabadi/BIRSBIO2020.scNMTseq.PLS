@@ -89,7 +89,7 @@
                         <h4 class="author">Al JalalAbadi<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>
 </h4>
             
-            <h4 class="date">24 Aug 2020</h4>
+            <h4 class="date">21 Sep 2020</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/blob/master/vignettes/index.Rmd"><code>vignettes/index.Rmd</code></a></small>
       <div class="hidden name"><code>index.Rmd</code></div>
@@ -102,29 +102,37 @@
 <p><strong>Note:</strong> These analyses are different from the ones presented in the hackathon due to updated preprocessing if data in order to harmonize the analyses for publication. For original analyses see <a href="https://github.com/ajabadi/scNMT_seq_gastrulation" class="uri">https://github.com/ajabadi/scNMT_seq_gastrulation</a>.</p>
 <hr>
 <p>Load the required packages:</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">BIRSBIO2020.scNMTseq.PLS</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">MultiAssayExperiment</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">scater</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">scran</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">mixOmics</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">magrittr</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">reshape2</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">uwot</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">impute</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">nipals</span>)</pre></body></html></div>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="no">nipals_maxiter</span> <span class="kw">&lt;-</span> <span class="no">params</span>$<span class="no">nipals_params</span>[<span class="st">'maxiter'</span>]
-<span class="no">nipals_ncomp</span> <span class="kw">&lt;-</span> <span class="no">params</span>$<span class="no">nipals_params</span>[<span class="st">'ncomp'</span>]
-<span class="no">nipals_nhvr</span> <span class="kw">&lt;-</span> <span class="no">params</span>$<span class="no">nipals_params</span>[<span class="st">'nhvr'</span>]</pre></body></html></div>
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://ajabadi.github.io/BIRSBIO2020.scNMTseq.PLS">BIRSBIO2020.scNMTseq.PLS</a></span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://waldronlab.io/MultiAssayExperiment">MultiAssayExperiment</a></span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://bioconductor.org/packages/scater">scater</a></span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">scran</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://www.mixOmics.org">mixOmics</a></span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://ggplot2.tidyverse.org">ggplot2</a></span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">magrittr</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://github.com/hadley/reshape">reshape2</a></span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://github.com/jlmelville/uwot">uwot</a></span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">impute</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://kwstat.github.io/nipals">nipals</a></span>)
+</pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="kw">nipals_maxiter</span> <span class="op">&lt;-</span> <span class="kw">params</span><span class="op">$</span><span class="kw">nipals_params</span>[<span class="st">'maxiter'</span>]
+<span class="kw">nipals_ncomp</span> <span class="op">&lt;-</span> <span class="kw">params</span><span class="op">$</span><span class="kw">nipals_params</span>[<span class="st">'ncomp'</span>]
+<span class="kw">nipals_nhvr</span> <span class="op">&lt;-</span> <span class="kw">params</span><span class="op">$</span><span class="kw">nipals_params</span>[<span class="st">'nhvr'</span>]
+</pre></div>
 <div id="data" class="section level1">
 <h1 class="hasAnchor">
 <a href="#data" class="anchor"></a>Data</h1>
 <p>Details of the hackathon data and preprocessing steps: <a href="https://github.com/BIRSBiointegration/Hackathon/tree/master/scNMT-seq" class="uri">https://github.com/BIRSBiointegration/Hackathon/tree/master/scNMT-seq</a></p>
 <p>Load the <code>MultiAssayExperiment</code> object from Cloudstor:</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'loading data from Cloudstor ...\n'</span>)
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'loading data from Cloudstor ...\n'</span>)
 <span class="co">#&gt; loading data from Cloudstor ...</span>
-<span class="no">gastru.mae_path</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/connections.html">url</a></span>(<span class="st">'https://cloudstor.aarnet.edu.au/plus/s/jsW7nh4YwThw8Q5/download'</span>)</pre></body></html></div>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">gastru.mae</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span>(<span class="no">gastru.mae_path</span>)</pre></body></html></div>
+<span class="kw">gastru.mae_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/connections.html">url</a></span>(<span class="st">'https://cloudstor.aarnet.edu.au/plus/s/jsW7nh4YwThw8Q5/download'</span>)
+</pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit">
+<span class="kw">gastru.mae</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span>(<span class="kw">gastru.mae_path</span>)
+</pre></div>
 <!-- ```{r, eval=!params$on_my_mac} -->
 <!-- cat(sprintf('loading the following assays using SingleCellMultiModal package: %s\n', paste(params$keep_assays, collapse = ', '))) -->
 <!-- gastru.mae <- scNMT(dataType = 'mouse_gastrulation', modes = params$keep_assays, dry.run = FALSE, verbose = FALSE) -->
@@ -133,30 +141,33 @@
 <h2 class="hasAnchor">
 <a href="#filter-mae-object" class="anchor"></a>Filter MAE object</h2>
 <p>Keep cells which pass QC metrics and exclude putative extra-embryonic cells as they are starkly different in methylation patterns and will drive most of variation in the relatively small population of matching cells, not allowing to fully explore cell to cell variation intended for the purpose of this hackathon:</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="co">## subset RNA expression and DNA methylation modalities</span>
-<span class="no">keep_assays</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span>(<span class="st">"rna|met"</span>,<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="fu">assays</span>(<span class="no">gastru.mae</span>)))
-<span class="no">gastru.mae</span> <span class="kw">&lt;-</span> <span class="no">gastru.mae</span>[,,<span class="no">keep_assays</span>]
+<div class="sourceCode" id="cb5"><pre class="downlit">
+<span class="co">## subset RNA expression and DNA methylation modalities</span>
+<span class="kw">keep_assays</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span>(<span class="st">"rna|met"</span>,<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="fu">assays</span>(<span class="kw">gastru.mae</span>)))
+<span class="kw">gastru.mae</span> <span class="op">&lt;-</span> <span class="kw">gastru.mae</span>[,,<span class="kw">keep_assays</span>]
 <span class="co">#&gt; harmonizing input:</span>
 <span class="co">#&gt;   removing 4403 sampleMap rows not in names(experiments)</span>
 <span class="co">## remove putative extraembryonic cells</span>
-<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'dropping lineages %s, plus the unassigned lineages.\n'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="no">params</span>$<span class="no">drop_lineages</span>, <span class="kw">collapse</span> <span class="kw">=</span> <span class="st">', '</span>)))
+<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'dropping lineages %s, plus the unassigned lineages.\n'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="kw">params</span><span class="op">$</span><span class="kw">drop_lineages</span>, collapse = <span class="st">', '</span>)))
 <span class="co">#&gt; dropping lineages Primitive_endoderm, Visceral_endoderm, ExE_ectoderm, plus the unassigned lineages.</span>
-<span class="no">filter_cells</span> <span class="kw">&lt;-</span> <span class="no">gastru.mae</span>$<span class="no">lineage</span> <span class="kw">%in%</span> <span class="no">params</span>$<span class="no">drop_lineages</span>
-<span class="no">filter_cells</span> <span class="kw">&lt;-</span> <span class="no">filter_cells</span> <span class="kw">|</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="no">gastru.mae</span>$<span class="no">lineage</span>)
+<span class="kw">filter_cells</span> <span class="op">&lt;-</span> <span class="kw">gastru.mae</span><span class="op">$</span><span class="kw">lineage</span> <span class="op">%in%</span> <span class="kw">params</span><span class="op">$</span><span class="kw">drop_lineages</span>
+<span class="kw">filter_cells</span> <span class="op">&lt;-</span> <span class="kw">filter_cells</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="kw">gastru.mae</span><span class="op">$</span><span class="kw">lineage</span>)
 <span class="co">## outlier cell to be filtered</span>
-<span class="no">filter_cells</span> <span class="kw">&lt;-</span> <span class="no">filter_cells</span> <span class="kw">|</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="fu">colData</span>(<span class="no">gastru.mae</span>)) <span class="kw">==</span> <span class="st">'E6.75_Plate2_H10'</span>
-<span class="no">gastru.mae</span> <span class="kw">&lt;-</span> <span class="no">gastru.mae</span>[,!<span class="no">filter_cells</span>,]
+<span class="kw">filter_cells</span> <span class="op">&lt;-</span> <span class="kw">filter_cells</span> <span class="op">|</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="fu">colData</span>(<span class="kw">gastru.mae</span>)) <span class="op">==</span> <span class="st">'E6.75_Plate2_H10'</span>
+<span class="kw">gastru.mae</span> <span class="op">&lt;-</span> <span class="kw">gastru.mae</span>[,<span class="op">!</span><span class="kw">filter_cells</span>,]
 <span class="co">## keep cells which pass RNA QC</span>
-<span class="no">gastru.mae</span> <span class="kw">&lt;-</span> <span class="no">gastru.mae</span>[,<span class="no">gastru.mae</span>$<span class="no">pass_rnaQC</span><span class="kw">==</span><span class="fl">TRUE</span>,]
+<span class="kw">gastru.mae</span> <span class="op">&lt;-</span> <span class="kw">gastru.mae</span>[,<span class="kw">gastru.mae</span><span class="op">$</span><span class="kw">pass_rnaQC</span><span class="op">==</span><span class="fl">TRUE</span>,]
 <span class="co">## Keep full rna SCE for UMAP</span>
-<span class="no">rna.sce</span> <span class="kw">&lt;-</span> <span class="no">gastru.mae</span>@<span class="kw">ExperimentList</span>$<span class="no">rna</span>
+<span class="kw">rna.sce</span> <span class="op">&lt;-</span> <span class="kw">gastru.mae</span><span class="op">@</span>ExperimentList<span class="op">$</span><span class="kw">rna</span>
 <span class="co">## keep cells that also pass QC for DNA methylation</span>
-<span class="no">gastru.mae</span> <span class="kw">&lt;-</span> <span class="no">gastru.mae</span>[,<span class="no">gastru.mae</span>$<span class="no">pass_metQC</span><span class="kw">==</span><span class="fl">TRUE</span>,]
+<span class="kw">gastru.mae</span> <span class="op">&lt;-</span> <span class="kw">gastru.mae</span>[,<span class="kw">gastru.mae</span><span class="op">$</span><span class="kw">pass_metQC</span><span class="op">==</span><span class="fl">TRUE</span>,]
 <span class="co">## rna SCE for cells passing met and rna QC</span>
-<span class="no">rna.sce.matching</span> <span class="kw">&lt;-</span> <span class="no">gastru.mae</span>@<span class="kw">ExperimentList</span>$<span class="no">rna</span></pre></body></html></div>
+<span class="kw">rna.sce.matching</span> <span class="op">&lt;-</span> <span class="kw">gastru.mae</span><span class="op">@</span>ExperimentList<span class="op">$</span><span class="kw">rna</span>
+</pre></div>
 <p>Replace the rna SCE with normalised counts in MAE object as the integration wrapper requires matrices in assays:</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="co">## rna is an SCE object</span>
-<span class="no">gastru.mae</span>@<span class="kw">ExperimentList</span>
+<div class="sourceCode" id="cb6"><pre class="downlit">
+<span class="co">## rna is an SCE object</span>
+<span class="kw">gastru.mae</span><span class="op">@</span>ExperimentList
 <span class="co">#&gt; ExperimentList class object of length 5:</span>
 <span class="co">#&gt;  [1] rna: SingleCellExperiment with 18345 rows and 795 columns</span>
 <span class="co">#&gt;  [2] met_genebody: matrix with 17559 rows and 795 columns</span>
@@ -164,18 +175,21 @@
 <span class="co">#&gt;  [4] met_cgi: matrix with 14080 rows and 795 columns</span>
 <span class="co">#&gt;  [5] met_DHS: matrix with 6673 rows and 795 columns</span>
 <span class="co">## replace SCE with logcounts</span>
-<span class="no">gastru.mae</span>@<span class="kw">ExperimentList</span>$<span class="no">rna</span> <span class="kw">&lt;-</span> <span class="fu">logcounts</span>(<span class="no">gastru.mae</span>@<span class="kw">ExperimentList</span>$<span class="no">rna</span>)
+<span class="kw">gastru.mae</span><span class="op">@</span>ExperimentList<span class="op">$</span><span class="kw">rna</span> <span class="op">&lt;-</span> <span class="fu">logcounts</span>(<span class="kw">gastru.mae</span><span class="op">@</span>ExperimentList<span class="op">$</span><span class="kw">rna</span>)
 <span class="co">## rna updated to matrix of logcounts</span>
-<span class="no">gastru.mae</span>@<span class="kw">ExperimentList</span>
+<span class="kw">gastru.mae</span><span class="op">@</span>ExperimentList
 <span class="co">#&gt; ExperimentList class object of length 5:</span>
 <span class="co">#&gt;  [1] rna: matrix with 18345 rows and 795 columns</span>
 <span class="co">#&gt;  [2] met_genebody: matrix with 17559 rows and 795 columns</span>
 <span class="co">#&gt;  [3] met_promoter: matrix with 17179 rows and 795 columns</span>
 <span class="co">#&gt;  [4] met_cgi: matrix with 14080 rows and 795 columns</span>
-<span class="co">#&gt;  [5] met_DHS: matrix with 6673 rows and 795 columns</span></pre></body></html></div>
+<span class="co">#&gt;  [5] met_DHS: matrix with 6673 rows and 795 columns</span>
+</pre></div>
 <p>Breakdown of the number of cells in each stage:</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span>(<span class="no">gastru.mae</span>$<span class="no">stage</span>) <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>() <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>() <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/magrittr/man/aliases.html">set_rownames</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'stage'</span>, <span class="st">'# of cells'</span>)) <span class="kw">%&gt;%</span> <span class="fu">kable</span>()</pre></body></html></div>
+<div class="sourceCode" id="cb7"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span>(<span class="kw">gastru.mae</span><span class="op">$</span><span class="kw">stage</span>) <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>() <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>() <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/magrittr/man/aliases.html">set_rownames</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'stage'</span>, <span class="st">'# of cells'</span>)) <span class="op">%&gt;%</span> <span class="fu">kable</span>()
+</pre></div>
 <table class="table"><tbody>
 <tr class="odd">
 <td align="left">stage</td>
@@ -197,13 +211,15 @@
 <h2 class="hasAnchor">
 <a href="#feature-detection" class="anchor"></a>Feature detection</h2>
 <p>Create density plots of the feature detection rate across all cells for all modalities:</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="no">cov_plot</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">coverages</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">pct_NAs</span>)) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span>(<span class="kw">fill</span> <span class="kw">=</span> <span class="st">'lightblue'</span>, <span class="kw">show.legend</span> <span class="kw">=</span> <span class="fl">FALSE</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_vline</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">xintercept</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="no">pct_NAs</span>)),
-             <span class="kw">color</span><span class="kw">=</span><span class="st">"blue"</span>, <span class="kw">linetype</span><span class="kw">=</span><span class="st">"dashed"</span>, <span class="kw">size</span><span class="kw">=</span><span class="fl">0.5</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="st">'% of cells detecting the feature'</span>) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="no">.</span>~<span class="no">dataset</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">2</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">strip.text.x</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">size</span> <span class="kw">=</span> <span class="fl">10</span>, <span class="kw">face</span> <span class="kw">=</span> <span class="st">'bold'</span>, <span class="kw">color</span> <span class="kw">=</span> <span class="st">'purple'</span>))
-
-<span class="no">cov_plot</span></pre></body></html></div>
+<div class="sourceCode" id="cb8"><pre class="downlit">
+<span class="kw">cov_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="kw">coverages</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(x = <span class="kw">pct_NAs</span>)) <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span>(fill = <span class="st">'lightblue'</span>, show.legend = <span class="fl">FALSE</span>) <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_vline</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(xintercept=<span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="kw">pct_NAs</span>)),
+             color=<span class="st">"blue"</span>, linetype=<span class="st">"dashed"</span>, size=<span class="fl">0.5</span>) <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(x = <span class="st">'% of cells detecting the feature'</span>) <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="kw">.</span><span class="op">~</span><span class="kw">dataset</span>, nrow = <span class="fl">2</span>) <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(strip.text.x = <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(size = <span class="fl">10</span>, face = <span class="st">'bold'</span>, color = <span class="st">'purple'</span>))
+  
+<span class="kw">cov_plot</span>
+</pre></div>
 <p><img src="index_files/figure-html/unnamed-chunk-11-1.png" width="768"></p>
 <p>Density plots for methylation data show that shorter genomic regions tend to have less feature coverage. Dashed blue line indicates the average across all modalities.</p>
 </div>
@@ -215,67 +231,77 @@
 <div id="cells-passing-rna-qc-n-2146" class="section level2">
 <h2 class="hasAnchor">
 <a href="#cells-passing-rna-qc-n-2146" class="anchor"></a>Cells passing rna QC (n = 2146)</h2>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="no">npcs</span> <span class="kw">&lt;-</span> <span class="fl">15</span>
+<div class="sourceCode" id="cb9"><pre class="downlit">
+<span class="kw">npcs</span> <span class="op">&lt;-</span> <span class="fl">15</span>
 <span class="co">## PCA first: retrieve npcs PCs</span>
-<span class="no">rna.sce</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runPCA.html">runPCA</a></span>(<span class="no">rna.sce</span>,  <span class="kw">ncomponents</span> <span class="kw">=</span> <span class="no">npcs</span>, <span class="kw">name</span> <span class="kw">=</span> <span class="st">'PCA'</span>)
+<span class="kw">rna.sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runPCA.html">runPCA</a></span>(<span class="kw">rna.sce</span>,  ncomponents = <span class="kw">npcs</span>, name = <span class="st">'PCA'</span>)
 
 <span class="co">## UMAP parameters used:</span>
-<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Running UMAP with parameters %s\n'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">params</span>$<span class="no">umap_params</span>), <span class="st">':'</span>,<span class="no">params</span>$<span class="no">umap_params</span>, <span class="kw">collapse</span> <span class="kw">=</span> <span class="st">', '</span>)))
+<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Running UMAP with parameters %s\n'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="kw">params</span><span class="op">$</span><span class="kw">umap_params</span>), <span class="st">':'</span>,<span class="kw">params</span><span class="op">$</span><span class="kw">umap_params</span>, collapse = <span class="st">', '</span>)))
 <span class="co">#&gt; Running UMAP with parameters run.seed : 42, n_neighbors : 15, n_components : 2, min_dist : 0.55</span>
 
 <span class="co">## run UMAP</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'run.seed'</span>])
-<span class="no">rna.sce</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runUMAP.html">runUMAP</a></span>(<span class="no">rna.sce</span>, <span class="kw">dimred</span><span class="kw">=</span><span class="st">"PCA"</span>,
-                   <span class="kw">ncomponents</span> <span class="kw">=</span> <span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'n_components'</span>],
-                   <span class="kw">n_neighbors</span> <span class="kw">=</span> <span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'n_neighbors'</span>],
-                   <span class="kw">min_dist</span> <span class="kw">=</span> <span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'min_dist'</span>])</pre></body></html></div>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="kw">params</span><span class="op">$</span><span class="kw">umap_params</span>[<span class="st">'run.seed'</span>])
+<span class="kw">rna.sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runUMAP.html">runUMAP</a></span>(<span class="kw">rna.sce</span>, dimred=<span class="st">"PCA"</span>, 
+                   ncomponents = <span class="kw">params</span><span class="op">$</span><span class="kw">umap_params</span>[<span class="st">'n_components'</span>], 
+                   n_neighbors = <span class="kw">params</span><span class="op">$</span><span class="kw">umap_params</span>[<span class="st">'n_neighbors'</span>], 
+                   min_dist = <span class="kw">params</span><span class="op">$</span><span class="kw">umap_params</span>[<span class="st">'min_dist'</span>])
+</pre></div>
 </div>
 <div id="cells-passing-both-rna-and-methylation-qc-n-795" class="section level2">
 <h2 class="hasAnchor">
 <a href="#cells-passing-both-rna-and-methylation-qc-n-795" class="anchor"></a>Cells passing both rna and methylation QC (n = 795)</h2>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="no">decomp</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/modelGeneVar.html">modelGeneVar</a></span>(<span class="no">rna.sce.matching</span>)
+<div class="sourceCode" id="cb10"><pre class="downlit">
+<span class="kw">decomp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scran/man/modelGeneVar.html">modelGeneVar</a></span>(<span class="kw">rna.sce.matching</span>)
 <span class="co">## filter by mean expression and significance of biological variation signal</span>
-<span class="no">hvgs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">decomp</span>)[<span class="no">decomp</span>$<span class="no">p.value</span><span class="kw">&lt;</span><span class="fl">0.05</span> <span class="kw">&amp;</span> <span class="no">decomp</span>$<span class="no">mean</span> <span class="kw">&gt;</span> <span class="fl">0.01</span>]
-<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">hvgs</span>)
+<span class="kw">hvgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="kw">decomp</span>)[<span class="kw">decomp</span><span class="op">$</span><span class="kw">p.value</span><span class="op">&lt;</span><span class="fl">0.05</span> <span class="op">&amp;</span> <span class="kw">decomp</span><span class="op">$</span><span class="kw">mean</span> <span class="op">&gt;</span> <span class="fl">0.01</span>]
+<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw">hvgs</span>)
 <span class="co">#&gt; [1] 680</span>
 
-<span class="no">npcs</span> <span class="kw">&lt;-</span> <span class="fl">15</span>
+<span class="kw">npcs</span> <span class="op">&lt;-</span> <span class="fl">15</span>
 <span class="co">## PCA first: retrieve npcs PCs</span>
-<span class="no">rna.sce.matching</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runPCA.html">runPCA</a></span>(<span class="no">rna.sce.matching</span>, <span class="kw">ncomponents</span> <span class="kw">=</span> <span class="no">npcs</span>, <span class="kw">subset_row</span><span class="kw">=</span><span class="no">hvgs</span>, <span class="kw">name</span> <span class="kw">=</span> <span class="st">'PCA'</span>)
+<span class="kw">rna.sce.matching</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runPCA.html">runPCA</a></span>(<span class="kw">rna.sce.matching</span>, ncomponents = <span class="kw">npcs</span>, subset_row=<span class="kw">hvgs</span>, name = <span class="st">'PCA'</span>)
 
 <span class="co">## UMAP parameters used:</span>
-<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Running UMAP with parameters %s\n'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">params</span>$<span class="no">umap_params</span>), <span class="st">':'</span>,<span class="no">params</span>$<span class="no">umap_params</span>, <span class="kw">collapse</span> <span class="kw">=</span> <span class="st">', '</span>)))
+<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Running UMAP with parameters %s\n'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="kw">params</span><span class="op">$</span><span class="kw">umap_params</span>), <span class="st">':'</span>,<span class="kw">params</span><span class="op">$</span><span class="kw">umap_params</span>, collapse = <span class="st">', '</span>)))
 <span class="co">#&gt; Running UMAP with parameters run.seed : 42, n_neighbors : 15, n_components : 2, min_dist : 0.55</span>
 
 <span class="co">## run UMAP</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'run.seed'</span>])
-<span class="no">rna.sce.matching</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runUMAP.html">runUMAP</a></span>(<span class="no">rna.sce.matching</span>, <span class="kw">dimred</span><span class="kw">=</span><span class="st">"PCA"</span>,
-                   <span class="kw">ncomponents</span> <span class="kw">=</span> <span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'n_components'</span>],
-                   <span class="kw">n_neighbors</span> <span class="kw">=</span> <span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'n_neighbors'</span>],
-                   <span class="kw">min_dist</span> <span class="kw">=</span> <span class="no">params</span>$<span class="no">umap_params</span>[<span class="st">'min_dist'</span>])</pre></body></html></div>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="kw">params</span><span class="op">$</span><span class="kw">umap_params</span>[<span class="st">'run.seed'</span>])
+<span class="kw">rna.sce.matching</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runUMAP.html">runUMAP</a></span>(<span class="kw">rna.sce.matching</span>, dimred=<span class="st">"PCA"</span>, 
+                   ncomponents = <span class="kw">params</span><span class="op">$</span><span class="kw">umap_params</span>[<span class="st">'n_components'</span>], 
+                   n_neighbors = <span class="kw">params</span><span class="op">$</span><span class="kw">umap_params</span>[<span class="st">'n_neighbors'</span>], 
+                   min_dist = <span class="kw">params</span><span class="op">$</span><span class="kw">umap_params</span>[<span class="st">'min_dist'</span>])
+</pre></div>
 </div>
 <div id="umap" class="section level2">
 <h2 class="hasAnchor">
 <a href="#umap" class="anchor"></a>UMAP</h2>
 <p>Plot the first two UMAP components:</p>
-<div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="co"># Create colour palettes for stages:</span>
-<span class="no">stages</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"E4.5"</span>, <span class="st">"E5.5"</span>, <span class="st">"E6.5"</span>, <span class="st">"E7.5"</span>)
+<div class="sourceCode" id="cb11"><pre class="downlit">
+<span class="co"># Create colour palettes for stages:</span>
+<span class="kw">stages</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"E4.5"</span>, <span class="st">"E5.5"</span>, <span class="st">"E6.5"</span>, <span class="st">"E7.5"</span>)
 <span class="co"># col_palette &lt;- dput(viridisLite::viridis(n = length(stages)))</span>
-<span class="no">col_palette</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"#440154FF"</span>, <span class="st">"#31688EFF"</span>, <span class="st">"#35B779FF"</span>, <span class="st">"#FDE725FF"</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">col_palette</span>) <span class="kw">&lt;-</span> <span class="no">stages</span></pre></body></html></div>
+<span class="kw">col_palette</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"#440154FF"</span>, <span class="st">"#31688EFF"</span>, <span class="st">"#35B779FF"</span>, <span class="st">"#FDE725FF"</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="kw">col_palette</span>) <span class="op">&lt;-</span> <span class="kw">stages</span>
+</pre></div>
 <div id="all-cells" class="section level3">
 <h3 class="hasAnchor">
 <a href="#all-cells" class="anchor"></a>all cells</h3>
-<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="no">gg_rna_all</span> <span class="kw">&lt;-</span> <span class="fu">plot_reducedDim</span>(<span class="kw">sce</span> <span class="kw">=</span> <span class="no">rna.sce</span>, <span class="kw">reducedDim</span> <span class="kw">=</span> <span class="st">'UMAP'</span>, <span class="kw">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>), <span class="kw">col_palette</span> <span class="kw">=</span> <span class="no">col_palette</span>)
-<span class="no">gg_rna_all</span></pre></body></html></div>
+<div class="sourceCode" id="cb12"><pre class="downlit">
+<span class="kw">gg_rna_all</span> <span class="op">&lt;-</span> <span class="fu">plot_reducedDim</span>(sce = <span class="kw">rna.sce</span>, reducedDim = <span class="st">'UMAP'</span>, dims = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>), col_palette = <span class="kw">col_palette</span>)
+<span class="kw">gg_rna_all</span>
+</pre></div>
 <p><img src="index_files/figure-html/unnamed-chunk-14-1.png" width="480" style="display: block; margin: auto;"></p>
 <p>UMAP plot of all cells passing rna QC controls separates the cell populations from early-stage, mid-stage, and late-stage cells. This structure is also apparent in the matching cells’ local embeddings but less strongly:</p>
 </div>
 <div id="matching-cells" class="section level3">
 <h3 class="hasAnchor">
 <a href="#matching-cells" class="anchor"></a>matching cells</h3>
-<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="no">gg_rna_matching</span> <span class="kw">&lt;-</span> <span class="fu">plot_reducedDim</span>(<span class="kw">sce</span> <span class="kw">=</span> <span class="no">rna.sce.matching</span>, <span class="kw">reducedDim</span> <span class="kw">=</span> <span class="st">'UMAP'</span>, <span class="kw">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>), <span class="kw">col_palette</span> <span class="kw">=</span> <span class="no">col_palette</span>)
-<span class="no">gg_rna_matching</span></pre></body></html></div>
+<div class="sourceCode" id="cb13"><pre class="downlit">
+<span class="kw">gg_rna_matching</span> <span class="op">&lt;-</span> <span class="fu">plot_reducedDim</span>(sce = <span class="kw">rna.sce.matching</span>, reducedDim = <span class="st">'UMAP'</span>, dims = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>,<span class="fl">2</span>), col_palette = <span class="kw">col_palette</span>)
+<span class="kw">gg_rna_matching</span>
+</pre></div>
 <p><img src="index_files/figure-html/unnamed-chunk-15-1.png" width="480" style="display: block; margin: auto;"></p>
 <!-- We now visualise the putative lineages to see whether the population structure is in line with the mapped lineages using data from all cells: -->
 <!-- ```{r, fig.asp=0.7, fig.width=5, fig.align='center'} -->
@@ -295,22 +321,23 @@
 <h2 class="hasAnchor">
 <a href="#empca" class="anchor"></a>EMPCA</h2>
 <p>We perform PCA using an Expectation Maximization algorithm (NIPALS) for all methylation measurements using highly variable regions:</p>
-<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="no">met_assays</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">gastru.mae</span>@<span class="kw">ExperimentList</span>)[-<span class="fl">1</span>]
-<span class="no">nipals_comps</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>()
-<span class="kw">for</span> (<span class="no">M</span> <span class="kw">in</span> <span class="no">met_assays</span>) {
-  <span class="no">d</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="no">gastru.mae</span>@<span class="kw">ExperimentList</span><span class="kw">[[</span><span class="no">M</span>]])
-  <span class="no">nhvr</span> <span class="kw">&lt;-</span> <span class="no">nipals_nhvr</span>
-  <span class="no">d</span> <span class="kw">&lt;-</span> <span class="no">d</span>[,<span class="fu"><a href="https://rdrr.io/r/base/order.html">order</a></span>(-<span class="fu">colVars</span>(<span class="no">d</span>, <span class="kw">na.rm</span> <span class="kw">=</span> <span class="fl">TRUE</span>))<span class="kw">&lt;=</span><span class="no">nhvr</span>]
-  <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'Performing nipals on:'</span>, <span class="no">M</span>, <span class="st">'\n'</span>)
-  <span class="no">nipals_comps</span><span class="kw">[[</span><span class="no">M</span>]] <span class="kw">&lt;-</span>
+<div class="sourceCode" id="cb14"><pre class="downlit">
+<span class="kw">met_assays</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="kw">gastru.mae</span><span class="op">@</span>ExperimentList)[<span class="op">-</span><span class="fl">1</span>]
+<span class="kw">nipals_comps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>()
+<span class="co">for</span> (<span class="kw">M</span> <span class="co">in</span> <span class="kw">met_assays</span>) {
+  <span class="kw">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw">gastru.mae</span><span class="op">@</span>ExperimentList[[<span class="kw">M</span>]])
+  <span class="kw">nhvr</span> <span class="op">&lt;-</span> <span class="kw">nipals_nhvr</span>
+  <span class="kw">d</span> <span class="op">&lt;-</span> <span class="kw">d</span>[,<span class="fu"><a href="https://rdrr.io/r/base/order.html">order</a></span>(<span class="op">-</span><span class="fu">colVars</span>(<span class="kw">d</span>, na.rm = <span class="fl">TRUE</span>))<span class="op">&lt;=</span><span class="kw">nhvr</span>]
+  <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'Performing nipals on:'</span>, <span class="kw">M</span>, <span class="st">'\n'</span>)
+  <span class="kw">nipals_comps</span>[[<span class="kw">M</span>]] <span class="op">&lt;-</span>
     <span class="fu"><a href="https://rdrr.io/r/base/warning.html">suppressWarnings</a></span>({
-      <span class="kw pkg">nipals</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/nipals/man/nipals.html">nipals</a></span>(<span class="no">d</span>,
-                     <span class="kw">ncomp</span> <span class="kw">=</span> <span class="no">nipals_ncomp</span>,
-                     <span class="kw">center</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
-                     <span class="kw">scale</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
-                     <span class="no">nipals_maxiter</span>)
+      <span class="kw">nipals</span>::<span class="fu"><a href="https://rdrr.io/pkg/nipals/man/nipals.html">nipals</a></span>(<span class="kw">d</span>, 
+                     ncomp = <span class="kw">nipals_ncomp</span>, 
+                     center = <span class="fl">TRUE</span>,
+                     scale = <span class="fl">FALSE</span>,
+                     <span class="kw">nipals_maxiter</span>)
     })
-
+    
 }
 <span class="co">#&gt; Performing nipals on: met_genebody </span>
 <span class="co">#&gt; Performing nipals on: met_promoter </span>
@@ -321,15 +348,18 @@
 <span class="co">#   nipals::nipals(t(gastru.mae@ExperimentList[[M]]), </span>
 <span class="co">#                  ncomp = 2, center = TRUE, scale = FALSE, </span>
 <span class="co">#                  maxiter = ifelse(params$mini_run, 10, 500))</span>
-<span class="co"># }, mc.cores = parallel::detectCores())</span></pre></body></html></div>
+<span class="co"># }, mc.cores = parallel::detectCores())</span>
+</pre></div>
 </div>
 <div id="score-plots" class="section level2">
 <h2 class="hasAnchor">
 <a href="#score-plots" class="anchor"></a>Score plots</h2>
 <p>Plot PCs:</p>
-<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="fu">plot_nipals</span>(<span class="no">nipals_comps</span>, <span class="kw">cell_order</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">gastru.mae</span>@<span class="kw">ExperimentList</span><span class="kw">[[</span><span class="fl">1</span>]]),
-            <span class="kw">stage</span> <span class="kw">=</span> <span class="no">gastru.mae</span>$<span class="no">stage</span>, <span class="kw">red_dim</span> <span class="kw">=</span> <span class="st">'PC'</span>, <span class="kw">col_palette</span> <span class="kw">=</span> <span class="no">col_palette</span>,
-            <span class="kw">dims</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">2</span>), <span class="kw">facet_ncol</span> <span class="kw">=</span> <span class="fl">2</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb15"><pre class="downlit">
+<span class="fu">plot_nipals</span>(<span class="kw">nipals_comps</span>, cell_order = <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="kw">gastru.mae</span><span class="op">@</span>ExperimentList[[<span class="fl">1</span>]]), 
+            stage = <span class="kw">gastru.mae</span><span class="op">$</span><span class="kw">stage</span>, red_dim = <span class="st">'PC'</span>, col_palette = <span class="kw">col_palette</span>, 
+            dims = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">2</span>), facet_ncol = <span class="fl">2</span>)
+</pre></div>
 <p><img src="index_files/figure-html/plot%20nipals%20PCs-1.png" width="768"></p>
 <p>The first two components from Expectation Maximization PCA. Whereas these PCs mainly distinguish early-stage from late-stage cells in all methylation views, an observation in agreement with the transcriptome UMAP projection, the stages are better resolved in some views (e.g. met_cgi) than others.</p>
 <!-- Inspect the outlier cell in promoter view: -->
@@ -418,32 +448,38 @@
 <h2 class="hasAnchor">
 <a href="#integration-of-all-modalities-with-feature-selection-" class="anchor"></a>Integration of all modalities with feature selection.</h2>
 <p>Here we select for 50 features on each component in <code>multimodal_sPLS_wrapper</code>:</p>
-<div class="sourceCode" id="cb16"><html><body><pre class="r"><span class="co">## number of components</span>
-<span class="no">ncomp</span> <span class="kw">&lt;-</span> <span class="no">params</span>$<span class="no">pls_ncomp</span>
+<div class="sourceCode" id="cb16"><pre class="downlit">
+<span class="co">## number of components</span>
+<span class="kw">ncomp</span> <span class="op">&lt;-</span> <span class="kw">params</span><span class="op">$</span><span class="kw">pls_ncomp</span>
 <span class="co">## feature scaling</span>
-<span class="no">scale</span> <span class="kw">&lt;-</span> <span class="fl">FALSE</span></pre></body></html></div>
-<div class="sourceCode" id="cb17"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Running PLS with %s components performing variable selection\n'</span>, <span class="no">ncomp</span>))
+<span class="kw">scale</span> <span class="op">&lt;-</span> <span class="fl">FALSE</span>
+</pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Running PLS with %s components performing variable selection\n'</span>, <span class="kw">ncomp</span>))
 <span class="co">#&gt; Running PLS with 4 components performing variable selection</span>
-<span class="no">st</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>({
-  <span class="no">mmspls</span> <span class="kw">&lt;-</span>
-    <span class="fu"><a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/reference/multimodal_sPLS_wrapper.html">multimodal_sPLS_wrapper</a></span>(<span class="kw">mae</span> <span class="kw">=</span> <span class="no">gastru.mae</span>, <span class="kw">study_assays</span> <span class="kw">=</span> <span class="kw">NULL</span>,
-                            <span class="kw">ncomp</span> <span class="kw">=</span> <span class="no">ncomp</span>, <span class="kw">scale</span> <span class="kw">=</span> <span class="no">scale</span>, <span class="kw">design</span> <span class="kw">=</span> <span class="st">'null'</span>, <span class="kw">lineages</span> <span class="kw">=</span> <span class="kw">NULL</span>,
-                            <span class="kw">stages</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">DA</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">keepX</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">save</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
+<span class="kw">st</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>({
+  <span class="kw">mmspls</span> <span class="op">&lt;-</span>
+    <span class="fu"><a href="../reference/multimodal_sPLS_wrapper.html">multimodal_sPLS_wrapper</a></span>(mae = <span class="kw">gastru.mae</span>, study_assays = <span class="kw">NULL</span>,
+                            ncomp = <span class="kw">ncomp</span>, scale = <span class="kw">scale</span>, design = <span class="st">'null'</span>, lineages = <span class="kw">NULL</span>,
+                            stages = <span class="kw">NULL</span>, DA = <span class="kw">NULL</span>, keepX = <span class="kw">NULL</span>, save = <span class="fl">FALSE</span>)
 })[<span class="st">'elapsed'</span>]
 <span class="co">#&gt; Making unique feature names by adding assay name to feature name for: met_genebody</span>
 <span class="co">#&gt; Making unique feature names by adding assay name to feature name for: met_promoter</span>
-<span class="no">mmspls</span>$<span class="no">stage</span> <span class="kw">&lt;-</span> <span class="no">gastru.mae</span>$<span class="no">stage</span>
-<span class="no">mmspls</span>$<span class="no">lineage</span><span class="kw">&lt;-</span> <span class="no">gastru.mae</span>$<span class="no">lineage</span>
-<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'\nPLS run finished. Runtime: '</span>, <span class="fu">format_runtime</span>(<span class="no">st</span>), <span class="st">'\n'</span>)
+<span class="kw">mmspls</span><span class="op">$</span><span class="kw">stage</span> <span class="op">&lt;-</span> <span class="kw">gastru.mae</span><span class="op">$</span><span class="kw">stage</span>
+<span class="kw">mmspls</span><span class="op">$</span><span class="kw">lineage</span><span class="op">&lt;-</span> <span class="kw">gastru.mae</span><span class="op">$</span><span class="kw">lineage</span>
+<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'\nPLS run finished. Runtime: '</span>, <span class="fu">format_runtime</span>(<span class="kw">st</span>), <span class="st">'\n'</span>)
 <span class="co">#&gt; </span>
-<span class="co">#&gt; PLS run finished. Runtime:  00:02:34</span></pre></body></html></div>
+<span class="co">#&gt; PLS run finished. Runtime:  00:02:44</span>
+</pre></div>
 </div>
 <div id="score-plots-1" class="section level2">
 <h2 class="hasAnchor">
 <a href="#score-plots-1" class="anchor"></a>score plots</h2>
 <p>Plot PLS components for cells across all views colored by embryonic stages:</p>
-<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="no">pls_no.impute</span> <span class="kw">&lt;-</span> <span class="fu">plot_pls</span>(<span class="kw">pls_obj</span> <span class="kw">=</span> <span class="no">mmspls</span>, <span class="kw">stage</span> <span class="kw">=</span> <span class="no">mmspls</span>$<span class="no">stage</span>, <span class="kw">col_palette</span> <span class="kw">=</span> <span class="no">col_palette</span>)
-<span class="no">pls_no.impute</span></pre></body></html></div>
+<div class="sourceCode" id="cb18"><pre class="downlit">
+<span class="kw">pls_no.impute</span> <span class="op">&lt;-</span> <span class="fu">plot_pls</span>(pls_obj = <span class="kw">mmspls</span>, stage = <span class="kw">mmspls</span><span class="op">$</span><span class="kw">stage</span>, col_palette = <span class="kw">col_palette</span>)
+<span class="kw">pls_no.impute</span>
+</pre></div>
 <p><img src="index_files/figure-html/unnamed-chunk-19-1.png" width="768"></p>
 <p>The latent components which seek to maximise the sum of concordant variation between rna and other modalities separate early-stage cells from late-stage cells. It indicates coordinated changes across the methylomes associated with the distinct transcriptional states of cells in the regions of study during gastrulation.</p>
 <!-- Colour late-stage cells by putative lineages: -->
@@ -575,44 +611,50 @@
 <h1 class="hasAnchor">
 <a href="#imputation" class="anchor"></a>Imputation</h1>
 <p>Impute the missing methylation data using a nearest neighbours algorithm:</p>
-<div class="sourceCode" id="cb19"><html><body><pre class="r"><span class="co"># sum(!gastru.mae$pass_metQC)</span>
+<div class="sourceCode" id="cb19"><pre class="downlit">
+<span class="co"># sum(!gastru.mae$pass_metQC)</span>
 <span class="co">#&gt; 0</span>
-<span class="no">gastru.mae.imputed</span> <span class="kw">&lt;-</span> <span class="no">gastru.mae</span>
-<span class="no">met_assays</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span>(<span class="kw">pattern</span> <span class="kw">=</span> <span class="st">'^met'</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/MultiAssayExperiment/man/MultiAssayExperiment-methods.html">experiments</a></span>(<span class="no">gastru.mae.imputed</span>)), <span class="kw">value</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
-<span class="kw">for</span> (<span class="no">assay_type</span> <span class="kw">in</span> <span class="no">met_assays</span>) {
-  <span class="no">assay_values</span> <span class="kw">&lt;-</span> <span class="no">gastru.mae.imputed</span>@<span class="kw">ExperimentList</span><span class="kw">[[</span><span class="no">assay_type</span>]]
-  <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'\nimputing values for:'</span>, <span class="no">assay_type</span>, <span class="st">'\n'</span>)
-  <span class="no">gastru.mae.imputed</span>@<span class="kw">ExperimentList</span><span class="kw">[[</span><span class="no">assay_type</span>]] <span class="kw">&lt;-</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/impute/man/impute.knn.html">impute.knn</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">assay_values</span>,
-               <span class="kw">k</span> <span class="kw">=</span> <span class="fl">30</span>,
-               <span class="kw">rowmax</span> <span class="kw">=</span> <span class="fl">0.99</span>,
-               <span class="kw">colmax</span> <span class="kw">=</span> <span class="fl">0.99</span>,
-               <span class="kw">rng.seed</span><span class="kw">=</span><span class="fl">42</span>)$<span class="no">data</span>
-}</pre></body></html></div>
+<span class="kw">gastru.mae.imputed</span> <span class="op">&lt;-</span> <span class="kw">gastru.mae</span>
+<span class="kw">met_assays</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html">grep</a></span>(pattern = <span class="st">'^met'</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/MultiAssayExperiment/man/MultiAssayExperiment-methods.html">experiments</a></span>(<span class="kw">gastru.mae.imputed</span>)), value = <span class="fl">TRUE</span>)
+<span class="co">for</span> (<span class="kw">assay_type</span> <span class="co">in</span> <span class="kw">met_assays</span>) {
+  <span class="kw">assay_values</span> <span class="op">&lt;-</span> <span class="kw">gastru.mae.imputed</span><span class="op">@</span>ExperimentList[[<span class="kw">assay_type</span>]]
+  <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'\nimputing values for:'</span>, <span class="kw">assay_type</span>, <span class="st">'\n'</span>)
+  <span class="kw">gastru.mae.imputed</span><span class="op">@</span>ExperimentList[[<span class="kw">assay_type</span>]] <span class="op">&lt;-</span> 
+    <span class="fu"><a href="https://rdrr.io/pkg/impute/man/impute.knn.html">impute.knn</a></span>(data = <span class="kw">assay_values</span>, 
+               k = <span class="fl">30</span>, 
+               rowmax = <span class="fl">0.99</span>, 
+               colmax = <span class="fl">0.99</span>,  
+               rng.seed=<span class="fl">42</span>)<span class="op">$</span><span class="kw">data</span>
+}
+</pre></div>
 <div id="data-integration-using-imputed-methylation-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#data-integration-using-imputed-methylation-data" class="anchor"></a>Data integration using imputed methylation data:</h2>
-<div class="sourceCode" id="cb20"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Running PLS on imputed data with %s components performing variable selection\n'</span>, <span class="no">ncomp</span>))
+<div class="sourceCode" id="cb20"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">'Running PLS on imputed data with %s components performing variable selection\n'</span>, <span class="kw">ncomp</span>))
 <span class="co">#&gt; Running PLS on imputed data with 4 components performing variable selection</span>
-<span class="no">st</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>({
-  <span class="no">mmspls.imputed</span> <span class="kw">&lt;-</span>
-    <span class="fu"><a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/reference/multimodal_sPLS_wrapper.html">multimodal_sPLS_wrapper</a></span>(<span class="kw">mae</span> <span class="kw">=</span> <span class="no">gastru.mae.imputed</span>, <span class="kw">study_assays</span> <span class="kw">=</span> <span class="kw">NULL</span>,
-                            <span class="kw">ncomp</span> <span class="kw">=</span> <span class="no">ncomp</span>, <span class="kw">scale</span> <span class="kw">=</span> <span class="no">scale</span>, <span class="kw">design</span> <span class="kw">=</span> <span class="st">'null'</span>, <span class="kw">lineages</span> <span class="kw">=</span> <span class="kw">NULL</span>,
-                            <span class="kw">stages</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">DA</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">keepX</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">save</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
+<span class="kw">st</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>({
+  <span class="kw">mmspls.imputed</span> <span class="op">&lt;-</span>
+    <span class="fu"><a href="../reference/multimodal_sPLS_wrapper.html">multimodal_sPLS_wrapper</a></span>(mae = <span class="kw">gastru.mae.imputed</span>, study_assays = <span class="kw">NULL</span>,
+                            ncomp = <span class="kw">ncomp</span>, scale = <span class="kw">scale</span>, design = <span class="st">'null'</span>, lineages = <span class="kw">NULL</span>,
+                            stages = <span class="kw">NULL</span>, DA = <span class="kw">NULL</span>, keepX = <span class="kw">NULL</span>, save = <span class="fl">FALSE</span>)
 })[<span class="st">'elapsed'</span>]
 <span class="co">#&gt; Making unique feature names by adding assay name to feature name for: met_genebody</span>
 <span class="co">#&gt; Making unique feature names by adding assay name to feature name for: met_promoter</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'\nPLS run finished. Runtime: '</span>, <span class="fu">format_runtime</span>(<span class="no">st</span>), <span class="st">'\n'</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span>(<span class="st">'\nPLS run finished. Runtime: '</span>, <span class="fu">format_runtime</span>(<span class="kw">st</span>), <span class="st">'\n'</span>)
 <span class="co">#&gt; </span>
-<span class="co">#&gt; PLS run finished. Runtime:  00:00:27</span></pre></body></html></div>
+<span class="co">#&gt; PLS run finished. Runtime:  00:00:57</span>
+</pre></div>
 </div>
 <div id="score-plots-2" class="section level2">
 <h2 class="hasAnchor">
 <a href="#score-plots-2" class="anchor"></a>score plots</h2>
 <p>Plot PLS components for cells across all views:</p>
-<div class="sourceCode" id="cb21"><html><body><pre class="r"><span class="no">pls_impute</span> <span class="kw">&lt;-</span> <span class="fu">plot_pls</span>(<span class="kw">pls_obj</span> <span class="kw">=</span> <span class="no">mmspls.imputed</span>, <span class="kw">stage</span> <span class="kw">=</span> <span class="no">gastru.mae.imputed</span>$<span class="no">stage</span>, <span class="kw">col_palette</span> <span class="kw">=</span> <span class="no">col_palette</span>)
-<span class="no">pls_impute</span></pre></body></html></div>
+<div class="sourceCode" id="cb21"><pre class="downlit">
+<span class="kw">pls_impute</span> <span class="op">&lt;-</span> <span class="fu">plot_pls</span>(pls_obj = <span class="kw">mmspls.imputed</span>, stage = <span class="kw">gastru.mae.imputed</span><span class="op">$</span><span class="kw">stage</span>, col_palette = <span class="kw">col_palette</span>)
+<span class="kw">pls_impute</span>
+</pre></div>
 <p><img src="index_files/figure-html/unnamed-chunk-24-1.png" width="768"></p>
 <p>The met_DHS view has clearly improved in separating different stages.</p>
 <!-- ## UMAP using 4 PLS components from imputed data -->
@@ -682,26 +724,28 @@
 <h2 class="hasAnchor">
 <a href="#predictive-performance-of-pls-and-pca-components" class="anchor"></a>Predictive performance of PLS and PCA components</h2>
 <p>We finally calculate the balanced prediction accuracy of a kmeans clustering algorithm using the first 2 components from PCA components from individual assays as well as using PLS variates from integration of original and imputed measurements:</p>
-<div class="sourceCode" id="cb22"><html><body><pre class="r"><span class="no">rna_pca</span> <span class="kw">&lt;-</span> <span class="no">rna.sce.matching</span>@<span class="kw">int_colData</span>$<span class="no">reducedDims</span>@<span class="kw">listData</span>$<span class="no">PCA</span>
-<span class="no">all_scores</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">rna</span> <span class="kw">=</span> <span class="no">rna_pca</span>), <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="no">nipals_comps</span>, <span class="kw">function</span>(<span class="no">x</span>) <span class="no">x</span>$<span class="no">scores</span>[<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">rna_pca</span>),]))
+<div class="sourceCode" id="cb22"><pre class="downlit">
+<span class="kw">rna_pca</span> <span class="op">&lt;-</span> <span class="kw">rna.sce.matching</span><span class="op">@</span>int_colData<span class="op">$</span><span class="kw">reducedDims</span><span class="op">@</span>listData<span class="op">$</span><span class="kw">PCA</span>
+<span class="kw">all_scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(rna = <span class="kw">rna_pca</span>), <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="kw">nipals_comps</span>, <span class="fu">function</span>(<span class="kw">x</span>) <span class="kw">x</span><span class="op">$</span><span class="kw">scores</span>[<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="kw">rna_pca</span>),]))
 <span class="co"># rna_pca &lt;- rna_pca[rownames(mmspls$variates$rna),]</span>
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">427</span>)
 <span class="co">## kmeans clustering balanced accuracy with PCA components from RNA and DNA data:</span>
-<span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(
-  <span class="kw">PCA</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span>(<span class="no">all_scores</span>, <span class="kw">FUN</span> <span class="kw">=</span> <span class="kw">function</span>(<span class="no">x</span>) {
-        <span class="fu">kmeans_accuracy</span>(<span class="kw">variates</span> <span class="kw">=</span> <span class="no">x</span>[,<span class="fl">1</span>:<span class="fl">2</span>], <span class="kw">labels</span> <span class="kw">=</span> <span class="no">mmspls</span>$<span class="no">stage</span>)$<span class="no">BAR</span>
+<span class="kw">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(
+  PCA = <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span>(<span class="kw">all_scores</span>, FUN = <span class="fu">function</span>(<span class="kw">x</span>) {
+        <span class="fu">kmeans_accuracy</span>(variates = <span class="kw">x</span>[,<span class="fl">1</span><span class="op">:</span><span class="fl">2</span>], labels = <span class="kw">mmspls</span><span class="op">$</span><span class="kw">stage</span>)<span class="op">$</span><span class="kw">BAR</span>
     }),
   <span class="co">## without imputation</span>
-    <span class="kw">PLS</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span>(<span class="no">mmspls</span>$<span class="no">variates</span>, <span class="kw">FUN</span> <span class="kw">=</span> <span class="kw">function</span>(<span class="no">x</span>) {
-        <span class="fu">kmeans_accuracy</span>(<span class="kw">variates</span> <span class="kw">=</span> <span class="no">x</span>[,<span class="fl">1</span>:<span class="fl">2</span>], <span class="kw">labels</span> <span class="kw">=</span> <span class="no">mmspls</span>$<span class="no">stage</span>)$<span class="no">BAR</span>
+    PLS = <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span>(<span class="kw">mmspls</span><span class="op">$</span><span class="kw">variates</span>, FUN = <span class="fu">function</span>(<span class="kw">x</span>) {
+        <span class="fu">kmeans_accuracy</span>(variates = <span class="kw">x</span>[,<span class="fl">1</span><span class="op">:</span><span class="fl">2</span>], labels = <span class="kw">mmspls</span><span class="op">$</span><span class="kw">stage</span>)<span class="op">$</span><span class="kw">BAR</span>
     }),
     <span class="co">## with imputation</span>
-    <span class="kw">PLS_impute</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span>(<span class="no">mmspls.imputed</span>$<span class="no">variates</span>, <span class="kw">FUN</span> <span class="kw">=</span> <span class="kw">function</span>(<span class="no">x</span>) {
-        <span class="fu">kmeans_accuracy</span>(<span class="kw">variates</span> <span class="kw">=</span> <span class="no">x</span>[,<span class="fl">1</span>:<span class="fl">2</span>], <span class="kw">labels</span> <span class="kw">=</span> <span class="no">mmspls</span>$<span class="no">stage</span>)$<span class="no">BAR</span>
+    PLS_impute = <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span>(<span class="kw">mmspls.imputed</span><span class="op">$</span><span class="kw">variates</span>, FUN = <span class="fu">function</span>(<span class="kw">x</span>) {
+        <span class="fu">kmeans_accuracy</span>(variates = <span class="kw">x</span>[,<span class="fl">1</span><span class="op">:</span><span class="fl">2</span>], labels = <span class="kw">mmspls</span><span class="op">$</span><span class="kw">stage</span>)<span class="op">$</span><span class="kw">BAR</span>
     })
 )
 
-<span class="fu">kable</span>(<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="no">df</span>), <span class="fl">2</span>))</pre></body></html></div>
+<span class="fu">kable</span>(<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw">df</span>), <span class="fl">2</span>))
+</pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left"></th>
@@ -740,50 +784,56 @@
 </table>
 <p>Surprisingly, For normalised gene expression data, the PLS components are more predictive of the embryonic stage than PCA components. Noticeably, without imputation, the components from all assays are nearly equally predictive with the exception of genebody methylome which underperforms the rest. After imputation, the accuracy of the prediction using PLS components is improved considerably for genebody methylation.</p>
 <p>Looking at individual stages:</p>
-<div class="sourceCode" id="cb23"><html><body><pre class="r"><span class="co">## helpers and function to create a data.frame of form:</span>
+<div class="sourceCode" id="cb23"><pre class="downlit">
+<span class="co">## helpers and function to create a data.frame of form:</span>
 <span class="co">##         Stage Method Modality Accuracy</span>
 <span class="co">##          E4.5    PCA      rna     0.50</span>
 <span class="co">##          E5.5    PLS      rna     0.35</span>
 <span class="co">##          E6.5    PCA      rna     0.75</span>
-<span class="no">.get_class_accuracy</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">scores</span>) {
-  <span class="no">DF</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="no">scores</span>, <span class="kw">FUN</span> <span class="kw">=</span> <span class="kw">function</span>(<span class="no">x</span>) {
-  <span class="fu">kmeans_accuracy</span>(<span class="kw">variates</span> <span class="kw">=</span> <span class="no">x</span>[,<span class="fl">1</span>:<span class="fl">2</span>], <span class="kw">labels</span> <span class="kw">=</span> <span class="no">mmspls</span>$<span class="no">stage</span>)$<span class="no">classAccuracy</span>
+<span class="kw">.get_class_accuracy</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">scores</span>) {
+  <span class="kw">DF</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="kw">scores</span>, FUN = <span class="fu">function</span>(<span class="kw">x</span>) {
+  <span class="fu">kmeans_accuracy</span>(variates = <span class="kw">x</span>[,<span class="fl">1</span><span class="op">:</span><span class="fl">2</span>], labels = <span class="kw">mmspls</span><span class="op">$</span><span class="kw">stage</span>)<span class="op">$</span><span class="kw">classAccuracy</span>
 })
-  <span class="no">DF</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">DF</span>),<span class="fl">2</span>)
-  <span class="no">DF</span>$<span class="no">Stage</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">DF</span>)
-  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">DF</span>) <span class="kw">&lt;-</span> <span class="kw">NULL</span>
-  <span class="no">DF</span>
+  <span class="kw">DF</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="kw">DF</span>),<span class="fl">2</span>)
+  <span class="kw">DF</span><span class="op">$</span><span class="kw">Stage</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="kw">DF</span>)
+  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="kw">DF</span>) <span class="op">&lt;-</span> <span class="kw">NULL</span>
+  <span class="kw">DF</span>
 }
 
-<span class="no">get_class_accuracy</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">scores_list</span>) {
-  <span class="no">df_class</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="no">scores_list</span>, <span class="kw">function</span>(<span class="no">scores</span>) {
-    <span class="fu">.get_class_accuracy</span>(<span class="no">scores</span>)
+<span class="kw">get_class_accuracy</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">scores_list</span>) {
+  <span class="kw">df_class</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="kw">scores_list</span>, <span class="fu">function</span>(<span class="kw">scores</span>) {
+    <span class="fu">.get_class_accuracy</span>(<span class="kw">scores</span>)
   })
-  <span class="no">df_class</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://github.com/ajabadi/BIRSBIO2020.scNMTseq.PLS/reference/utils.html">rbindListWithNames</a></span>(<span class="no">df_class</span>, <span class="kw">new_col</span> <span class="kw">=</span> <span class="st">'Method'</span>)
-  <span class="no">df_class</span> <span class="kw">&lt;-</span> <span class="kw pkg">reshape2</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/reshape2/man/melt.html">melt</a></span>(<span class="no">df_class</span>, <span class="kw">measure.vars</span> <span class="kw">=</span> <span class="fl">1</span>:<span class="fl">5</span>,
-                             <span class="kw">value.name</span> <span class="kw">=</span> <span class="st">'Accuracy'</span>,
-                             <span class="kw">variable.name</span> <span class="kw">=</span> <span class="st">'Modality'</span>)
-  <span class="no">df_class</span>
-}</pre></body></html></div>
+  <span class="kw">df_class</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/utils.html">rbindListWithNames</a></span>(<span class="kw">df_class</span>, new_col = <span class="st">'Method'</span>)
+  <span class="kw">df_class</span> <span class="op">&lt;-</span> <span class="kw">reshape2</span>::<span class="fu"><a href="https://rdrr.io/pkg/reshape2/man/melt.html">melt</a></span>(<span class="kw">df_class</span>, measure.vars = <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, 
+                             value.name = <span class="st">'Accuracy'</span>, 
+                             variable.name = <span class="st">'Modality'</span>)
+  <span class="kw">df_class</span>
+}
+</pre></div>
 <p>Get per class accuracy:</p>
-<div class="sourceCode" id="cb24"><html><body><pre class="r"><span class="no">accuracy_per_class</span> <span class="kw">&lt;-</span>
-  <span class="fu">get_class_accuracy</span>(<span class="kw">scores_list</span> <span class="kw">=</span>
-                       <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">PCA</span> <span class="kw">=</span> <span class="no">all_scores</span>,
-                            <span class="kw">PLS</span> <span class="kw">=</span> <span class="no">mmspls</span>$<span class="no">variates</span>,
-                            <span class="kw">PLS_impute</span> <span class="kw">=</span> <span class="no">mmspls.imputed</span>$<span class="no">variates</span>))
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">accuracy_per_class</span>)
+<div class="sourceCode" id="cb24"><pre class="downlit">
+<span class="kw">accuracy_per_class</span> <span class="op">&lt;-</span> 
+  <span class="fu">get_class_accuracy</span>(scores_list = 
+                       <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(PCA = <span class="kw">all_scores</span>, 
+                            PLS = <span class="kw">mmspls</span><span class="op">$</span><span class="kw">variates</span>,
+                            PLS_impute = <span class="kw">mmspls.imputed</span><span class="op">$</span><span class="kw">variates</span>))
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="kw">accuracy_per_class</span>)
 <span class="co">#&gt;   Stage Method Modality Accuracy</span>
 <span class="co">#&gt; 1  E4.5    PCA      rna     0.50</span>
 <span class="co">#&gt; 2  E5.5    PCA      rna     0.49</span>
 <span class="co">#&gt; 3  E6.5    PCA      rna     0.58</span>
 <span class="co">#&gt; 4  E7.5    PCA      rna     0.64</span>
 <span class="co">#&gt; 5  E4.5    PLS      rna     1.00</span>
-<span class="co">#&gt; 6  E5.5    PLS      rna     0.99</span></pre></body></html></div>
+<span class="co">#&gt; 6  E5.5    PLS      rna     0.99</span>
+</pre></div>
 <p>Column plots of balanced accuracy rates for all modalities and stages:</p>
-<div class="sourceCode" id="cb25"><html><body><pre class="r"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">accuracy_per_class</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="no">Stage</span>, <span class="no">Accuracy</span>)) + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="no">.</span>~<span class="no">Modality</span>, <span class="kw">ncol</span><span class="kw">=</span><span class="fl">2</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">fill</span> <span class="kw">=</span> <span class="no">Method</span>), <span class="kw">position</span> <span class="kw">=</span> <span class="st">'dodge'</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_classic</a></span>() +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">y</span> <span class="kw">=</span> <span class="st">'Balanced Accuracy'</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb25"><pre class="downlit">
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="kw">accuracy_per_class</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">Stage</span>, <span class="kw">Accuracy</span>)) <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="kw">.</span><span class="op">~</span><span class="kw">Modality</span>, ncol=<span class="fl">2</span>) <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(fill = <span class="kw">Method</span>), position = <span class="st">'dodge'</span>) <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_classic</a></span>() <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(y = <span class="st">'Balanced Accuracy'</span>)
+</pre></div>
 <p><img src="index_files/figure-html/unnamed-chunk-29-1.png" width="768"></p>
 <p>Views differ in their predictive performance for different stages. For instance, using PLS components the genebody methylation more predictive of embryonic stages in E4.5 and E5.5 cells compared to CGI methylation, whereas the opposite holds for late-stage cells.</p>
 </div>
@@ -816,7 +866,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
