@@ -9,6 +9,7 @@ name: PLS on scNMTseq
 
 jobs:
   BIRSBIO:
+    if: "!contains(github.event.head_commit.message, 'skip-ci')"
     runs-on: ubuntu-latest
     container: bioconductor/bioconductor_docker:devel
     steps:
@@ -46,15 +47,15 @@ jobs:
         run: |
           options(repos = c(CRAN = "https://cran.r-project.org"))
           BiocManager::repositories()
-          remotes::install_deps(dependencies = TRUE, repos = BiocManager::repositories())
-          remotes::install_cran("rcmdcheck")
+          remotes::install_deps(dependencies = TRUE, repos = BiocManager::repositories(), Ncpu = 2L)
+          remotes::install_cran("rcmdcheck", Ncpu = 2L)
         shell: Rscript {0}
 
-      # - name: Check
-      #   env:
-      #     _R_CHECK_CRAN_INCOMING_REMOTE_: false
-      #   run: rcmdcheck::rcmdcheck(args = c("--no-manual"), error_on = "error", check_dir = "check")
-      #   shell: Rscript {0}
+      - name: Check
+        env:
+          _R_CHECK_CRAN_INCOMING_REMOTE_: false
+        run: rcmdcheck::rcmdcheck(args = c("--no-manual"), error_on = "error", check_dir = "check")
+        shell: Rscript {0}
         
       # - uses: docker/build-push-action@v1
       #   with:
@@ -68,7 +69,8 @@ jobs:
       - name: Build pkgdown
         run: |
            PATH=$PATH:$HOME/bin/ Rscript -e 'out = tryCatch({pkgdown::build_site(".")}, error = function(e) e); if (is(out, "error")) {cat(file = "log.txt", out$message, append = TRUE, sep = "\n"); stop(out$message)} else TRUE'
-      - uses: actions/upload-artifact@v2
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
         if: failure()
         with:
           path: log.txt
