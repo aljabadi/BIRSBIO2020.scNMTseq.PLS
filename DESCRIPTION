@@ -22,6 +22,8 @@ Imports: MultiAssayExperiment,
          uwot,
          impute,
          nipals,
+         basilisk,
+         reticulate,
          scran
 Remotes: 
         ajabadi/mixOmics@MultiAssayExperiment
