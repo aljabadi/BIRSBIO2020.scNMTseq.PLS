@@ -5,7 +5,7 @@ date: "`r format(Sys.Date(), '%d %b %Y')`"
 output: rmarkdown::html_vignette
 params:
   ## setup params
-  on_my_mac: !r Sys.info()['user'] == 'alabadi'
+  on_my_mac: !r Sys.info()['user'] == 'ablabadi'
   save_output: false
   local_data: false
   mini_run: false
@@ -44,12 +44,13 @@ local.lib <- '../lib'
 dir.create(local.lib)
 .libPaths(local.lib)
 ## uncomment this if you are not building the vignette along with the package
-# remotes::install_github('mixOmicsTeam/mixOmics@MultiAssayExperiment', upgrade = 'never')
+# remotes::install_github('mixOmicsTeam/mixOmics@MultiAssayExperiment', upgrade = 'never',force = TRUE)
 ```
 
 ```{r load packages, warning=FALSE, message=FALSE}
 library(BIRSBIO2020.scNMTseq.PLS)
 library(MultiAssayExperiment)
+library(SingleCellMultiModal)
 library(scater)
 library(scran)
 library(mixOmics)
@@ -85,11 +86,11 @@ if (!dir.exists('savedata')) {
 
 Details of the hackathon data and preprocessing steps: https://github.com/BIRSBiointegration/Hackathon/tree/master/scNMT-seq
 
-Load the `MultiAssayExperiment` object from Cloudstor:
-```{r}
-cat('loading data from Cloudstor ...\n')
-gastru.mae_path <- url('https://cloudstor.aarnet.edu.au/plus/s/jsW7nh4YwThw8Q5/download')
-```
+<!-- Load the `MultiAssayExperiment` object from Cloudstor: -->
+<!-- ```{r} -->
+<!-- cat('loading data from Cloudstor ...\n') -->
+<!-- gastru.mae_path <- url('https://cloudstor.aarnet.edu.au/plus/s/jsW7nh4YwThw8Q5/download') -->
+<!-- ``` -->
 
 ```{r, eval=params$on_my_mac, include=FALSE}
 cat('loading data from local folder ...\n')
@@ -105,14 +106,17 @@ gastru.mae_path <- url('https://cloudstor.aarnet.edu.au/plus/s/tppSiI9GPuw9DUI/d
 ```
 
 
-```{r load MAE}
-gastru.mae <- readRDS(gastru.mae_path)
-```
-
-<!-- ```{r, eval=!params$on_my_mac} -->
-<!-- cat(sprintf('loading the following assays using SingleCellMultiModal package: %s\n', paste(params$keep_assays, collapse = ', '))) -->
-<!-- gastru.mae <- scNMT(dataType = 'mouse_gastrulation', modes = params$keep_assays, dry.run = FALSE, verbose = FALSE) -->
+<!-- ```{r load MAE} -->
+<!-- gastru.mae <- readRDS(gastru.mae_path) -->
 <!-- ``` -->
+
+Load the `MultiAssayExperiment` object using [SingleCellMultiModal](https://bioconductor.org/packages/release/data/experiment/html/SingleCellMultiModal.html) package:
+
+```{r, eval=!params$on_my_mac}
+# cat(sprintf('loading the following assays from ExperimentHub: %s\n', paste(params$keep_assays, collapse = ', ')))
+cat('loading the assay data from ExperimentHub: %s\n')
+gastru.mae <- scNMT(dataType = 'mouse_gastrulation', modes = '*', version = '2.0.0', dry.run = FALSE, verbose = FALSE)
+```
 
 ## Filter MAE object
 

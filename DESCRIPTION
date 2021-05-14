@@ -22,6 +22,7 @@ Imports: MultiAssayExperiment,
          uwot,
          impute,
          nipals,
+         SingleCellMultiModal,
          scran
 Remotes: 
         mixOmicsTeam/mixOmics@MultiAssayExperiment

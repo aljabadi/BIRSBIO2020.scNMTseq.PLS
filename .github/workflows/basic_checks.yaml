@@ -9,6 +9,7 @@ name: PLS on scNMTseq
 
 jobs:
   BIRSBIO:
+    if: !contains(github.event.head_commit.message, 'skip-ci')
     runs-on: ubuntu-latest
     container: bioconductor/bioconductor_docker:devel
     steps:
@@ -50,25 +51,27 @@ jobs:
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
 
-      # - name: Check
-      #   env:
-      #     _R_CHECK_CRAN_INCOMING_REMOTE_: false
-      #   run: rcmdcheck::rcmdcheck(args = c("--no-manual"), error_on = "error", check_dir = "check")
-      #   shell: Rscript {0}
+      - name: Check
+        env:
+          _R_CHECK_CRAN_INCOMING_REMOTE_: false
+        run: rcmdcheck::rcmdcheck(args = c("--no-manual"), error_on = "error", check_dir = "check")
+        shell: Rscript {0}
         
-      # - uses: docker/build-push-action@v1
-      #   with:
-      #     username: ${{ secrets.DOCKER_USERNAME }}
-      #     password: ${{ secrets.DOCKER_PASSWORD }}
-      #     repository: aljabadi/birs_bio_2020-scnmtseq-pls
-      #     tag_with_ref: true
-      #     tag_with_sha: true
-      #     tags: latest
+      - name: Push to Docker
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: aljabadi/birs_bio_2020-scnmtseq-pls
+          tag_with_ref: true
+          tag_with_sha: true
+          tags: latest
 
       - name: Build pkgdown
         run: |
            PATH=$PATH:$HOME/bin/ Rscript -e 'out = tryCatch({pkgdown::build_site(".")}, error = function(e) e); if (is(out, "error")) {cat(file = "log.txt", out$message, append = TRUE, sep = "\n"); stop(out$message)} else TRUE'
-      - uses: actions/upload-artifact@v2
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
         if: failure()
         with:
           path: log.txt

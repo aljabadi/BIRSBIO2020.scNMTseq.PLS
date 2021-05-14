@@ -1,0 +1,115 @@
+---
+title: "scNMTseq challenge analysis using a PLS-based approach"
+author: Al JalalAbadi^[Melbourne Integrative Genomics, The University of Melbourne (al.jal.abadi@gmail.com)]
+date: "`r format(Sys.Date(), '%d %b %Y')`"
+output: rmarkdown::html_vignette
+params:
+  ## setup params
+  on_my_mac: !r Sys.info()['user'] == 'alabadi'
+  save_output: false
+  local_data: false
+  mini_run: false
+  matching_rna_for_umap: false
+  ## run params
+  drop_lineages: !r c('Primitive_endoderm','Visceral_endoderm', 'ExE_ectoderm')
+  umap_params: !r c(run.seed = 42, n_neighbors = 15, n_components = 2, min_dist = 0.55)
+  pls_ncomp:  4
+  nipals_params: !r c(maxiter = 200, ncomp = 2, nhvr = 1000)
+vignette: >
+  %\VignetteIndexEntry{scNMTseq challenge analysis using a PLS-based approach}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+--------
+
+```{r, include = FALSE}
+library(knitr)
+knitr::opts_chunk$set(collapse = TRUE, 
+                      comment = "#>", 
+                      fig.width = 8, 
+                      cache = FALSE)
+```
+
+```{r load packages, warning=FALSE, message=FALSE}
+library(BIRSBIO2020.scNMTseq.PLS)
+library(here)
+```
+
+
+## PLS
+
+## Integration of all modalities with feature selection.
+
+```{r}
+mmspls_weighted <- readRDS(here('../BIRSBIO2020.scNMTseq.PLS_Spartan/vignettes/savedata/MultiModalSparsePLS-weighted.rds'))
+mmspls_unweighted <- readRDS(here('../BIRSBIO2020.scNMTseq.PLS_Spartan/vignettes/savedata/MultiModalSparsePLS-unweighted.rds'))
+```
+
+```{r}
+pls.plot.weighted <- plot_pls(mmspls_weighted, stage = mmspls_weighted$stage, legend.title = 'Stage', comp = c(1,2), col_palette = col_palette)
+pls.plot.unweighted <- plot_pls(mmspls_unweighted, stage = mmspls_weighted$stage, legend.title = 'Stage', comp = c(1,2), col_palette = col_palette)
+ggsave(pls.plot.weighted, filename = 'pls.plot.weighted.pdf', width = 6, height = 12)
+ggsave(pls.plot.unweighted, filename = 'pls.plot.unweighted.pdf', width = 6, height = 12)
+```
+
+```{r}
+## MultiAssayExperiment branch
+system("cd /Users/alabadi/Projects/dev/R/_work/mixOmics/mixOmics_ajabadi/mixOmics_ajabadi; git checkout MultiAssayExperiment")
+devtools::load_all('/Users/alabadi/Projects/dev/R/_work/mixOmics/mixOmics_ajabadi/mixOmics_ajabadi')
+alignment_weighted <- get_pls_alignment(object = mmspls_weighted, Y.block = 'rna', weighted = TRUE)
+alignment_unweighted <- get_pls_alignment(object = mmspls_unweighted, Y.block = 'rna', weighted = TRUE)
+```
+
+Test and see which ones have improved
+
+```{r}
+mapply(x = alignment_weighted, y = alignment_unweighted, FUN = function(x, y) t.test(x, y, alternative = 'less')$p.value)
+```
+
+
+```{r}
+.get_comp_correlations <- function(variates){
+  assay_types <- names(variates)[-which(names(variates) == 'rna')]
+  df_list <- lapply(assay_types, function(x) {
+   df <- data.frame(t(diag(cor(variates$rna, variates[[x]]))))
+   df$block <- x
+   df
+  })
+  df <- Reduce(rbind, df_list)
+  df
+}
+
+get_comp_correlations <- function(weighted_variates, unweighted_variates)
+{
+  weighted_df <- .get_comp_correlations(weighted_variates)
+  weighted_df$method <- 'PLS_weighted'
+  unweighted_df <- .get_comp_correlations(unweighted_variates)
+  unweighted_df$method <- 'PLS'
+  rbind(weighted_df, unweighted_df)
+}
+
+```
+
+
+```{r}
+comp_cors <- get_comp_correlations(weighted_variates = mmspls_weighted$variates, unweighted_variates = mmspls_unweighted$variates)
+```
+
+```{r}
+ggplot_cors <- function(comp_cors, comp = 1) {
+  ggplot(comp_cors) + geom_col(aes_string(x = 'block', y = paste0('comp', comp), fill = 'method'), position = 'dodge2')
+  
+}
+```
+```{r}
+ggplot_cors(comp_cors, comp = 1)
+ggplot_cors(comp_cors, comp = 2)
+```
+
+
+# Conclusion
+
+Multi-modal PLS derives the common variation between transcriptome and methylome in different genomic regions for `r dim(gastru.mae@ExperimentList$rna)[2]` single cells during mouse gastrulation. The used data types vary in dimensions and and biological variation. The common axes of variation are driven partly by the stages of embryo, which mainly separates early-stage and late-stage cells. The measurements include varying levels of masked values which are ignored by PLS algorithm during integration. Imputation of missing values using a nearest neighbours imputation method enabled the method to capture more cross-modality covariation relevant to embryonic stages in some data views. A classification of cells based on either PCA or PLS components revealed that the projected components of shared variation are more predictive of the embryonic stages than the Principal Components of the transcriptome. It also showed that different views resolve different phenotypic dynamics which highlights the importance of data integration to better understand the cellular behaviour.
+
