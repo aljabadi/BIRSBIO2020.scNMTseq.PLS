@@ -5,4 +5,5 @@ inst/doc
 .Rhistory
 doc
 Meta
-**/*.rds
+data
+# **/*.rds

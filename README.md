@@ -1,6 +1,6 @@
 # BIRSBIO 2020 scNMTseq challenge using a PLS-based approach
 
-pkdown report available at: https://ajabadi.github.io/BIRSBIO2020.scNMTseq.PLS
+pkdown report available at: https://aljabadi.github.io/BIRSBIO2020.scNMTseq.PLS
 
 ## How to take your vignette into a `pkdown` package deployed using GitHub Actions
 
